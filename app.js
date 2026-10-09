@@ -17,6 +17,12 @@
   const selectionCount = document.getElementById('selectionCount');
   const commandLog = document.getElementById('commandLog');
   const fileInput = document.getElementById('fileInput');
+  const textEditor = document.getElementById('textEditor');
+  const textEditorTitle = document.getElementById('textEditorTitle');
+  const textEditorValue = document.getElementById('textEditorValue');
+  const textEditorSize = document.getElementById('textEditorSize');
+  const textEditorPlace = document.getElementById('textEditorPlace');
+  let textEditContext = null;
 
   const NS='http://www.w3.org/2000/svg';
   const state = {
@@ -151,6 +157,53 @@
   function propSelect(label,key,options,value){return `<div class="prop"><label>${label}</label><select data-key="${key}">${options.map(o=>`<option ${o===value?'selected':''}>${o}</option>`).join('')}</select></div>`}
   function setNested(o,key,val,num){const parts=key.split('.');let ref=o;for(let i=0;i<parts.length-1;i++)ref=ref[parts[i]];if(parts.at(-1)==='length')return;ref[parts.at(-1)]=num?Number(val):val}
   function escapeHtml(v){return String(v??'').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+  function openTextEditor(point, entity = null){
+    textEditContext = { point: { x: point.x, y: point.y }, entityId: entity?.id || null };
+    textEditorTitle.textContent = entity ? 'Edit Text' : 'Place Text';
+    textEditorPlace.textContent = entity ? 'Save changes' : 'Place text';
+    textEditorValue.value = entity?.text ?? 'BEAM B1';
+    textEditorSize.value = String(entity?.size ?? 20);
+    const screen = toScreen(point);
+    const left = clamp(screen.x + 14, 10, Math.max(10, wrap.clientWidth - 320));
+    const top = clamp(screen.y + 14, 10, Math.max(10, wrap.clientHeight - 235));
+    textEditor.style.left = left + 'px';
+    textEditor.style.top = top + 'px';
+    textEditor.hidden = false;
+    textEditorValue.focus();
+    textEditorValue.select();
+    setStatus(entity ? 'Editing text. Enter to save, Esc to cancel.' : 'Enter text and height, then place it.');
+  }
+  function closeTextEditor(save = false){
+    if(!textEditContext)return;
+    const context = textEditContext;
+    const value = textEditorValue.value.trim();
+    const size = Number(textEditorSize.value);
+    textEditor.hidden = true;
+    textEditContext = null;
+    if(!save){setStatus('Text editing cancelled.');return}
+    if(!value){setStatus('Text cannot be empty.');return}
+    if(!Number.isFinite(size)||size<=0){setStatus('Text height must be a positive number.');return}
+    if(context.entityId){
+      const entity = state.entities.find(item=>item.id===context.entityId);
+      if(!entity){setStatus('That text entity no longer exists.');return}
+      history.transact('EDIT TEXT',()=>{entity.text=value;entity.size=size;entity.modifiedAt=new Date().toISOString()});
+      state.selection=[entity.id];
+      render();
+      log(`TEXT edited: ${value}`);
+      setStatus('Text updated.');
+    }else{
+      addEntity({type:'text',x:context.point.x,y:context.point.y,text:value,size});
+      log(`TEXT created: ${value}`);
+      setStatus('Text placed.');
+    }
+  }
+  textEditorPlace.addEventListener('click',()=>closeTextEditor(true));
+  document.getElementById('textEditorCancel').addEventListener('click',()=>closeTextEditor(false));
+  document.getElementById('textEditorClose').addEventListener('click',()=>closeTextEditor(false));
+  [textEditorValue,textEditorSize].forEach(input=>input.addEventListener('keydown',ev=>{
+    if(ev.key==='Enter'){ev.preventDefault();ev.stopPropagation();closeTextEditor(true)}
+    else if(ev.key==='Escape'){ev.preventDefault();ev.stopPropagation();closeTextEditor(false)}
+  }));
   function addEntity(e){history.transact(`CREATE ${e.type}`,()=>{e.id=uid();e.layer=e.layer||state.activeLayer;e.layerId=layerByName(e.layer).id;e.visible=true;e.locked=false;e.color='BYLAYER';e.linetype='BYLAYER';e.lineweight=null;e.transparency=0;e.attributes={};e.metadata={};e.transform={x:0,y:0,z:0,rotation:0,scaleX:1,scaleY:1};e.createdAt=new Date().toISOString();e.modifiedAt=e.createdAt;state.entities.push(e);state.previousSelection=[...state.selection];state.selection=[e.id]});render()}
   function setTool(tool){state.tool=tool;state.interaction=null;document.querySelectorAll('.tool[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===tool));const names={select:'Select',line:'Line',polyline:'Polyline',rect:'Rectangle',circle:'Circle',text:'Text',dimension:'Dimension',arc:'Arc (start, point on arc, end)',ellipse:'Ellipse (center, x radius, y radius)',polygon:'Polygon',spline:'Spline',hatch:'Hatch',gradient:'Gradient',point:'Point',revcloud:'Revision cloud'};commandHint.textContent=tool==='select'?'Select an object or start drawing.':`${names[tool]||tool} — click points on the canvas.`;log(`Tool: ${tool.toUpperCase()}`)}
   function beginTool(point,additive=false,precise=false){
@@ -164,7 +217,7 @@
     }
     if(state.tool==='point'){addEntity({type:'point',x:p.x,y:p.y});return}
     if(state.tool==='hatch'||state.tool==='gradient'){applyFill(state.tool);return}
-    if(state.tool==='text'){const text=window.prompt('Text to place:','BEAM B1');if(text){addEntity({type:'text',x:point.x,y:point.y,text,size:20});log(`TEXT created: ${text}`)}return}
+    if(state.tool==='text'){openTextEditor(p);return}
   }
   function updateTool(point){if(!state.interaction)return;state.interaction.current=point;renderPreview()}
   function endTool(point,precise=false){if(!state.interaction)return;const i=state.interaction;point=precise?point:snapPoint(point).p;
@@ -260,7 +313,7 @@
   window.addEventListener('mouseup',()=>{if(state.interaction?.kind==='pan'){state.interaction=null;wrap.classList.remove('is-panning')}});
   window.addEventListener('blur',()=>{state.panKeyDown=false;wrap.classList.remove('pan-ready');if(state.interaction?.kind==='pan'){state.interaction=null;wrap.classList.remove('is-panning')}});
   function moveEntity(e,dx,dy){const move=p=>{p.x+=dx;p.y+=dy};if(e.type==='line'||e.type==='dimension'){move(e.a);move(e.b)}else if(e.type==='arc'){move(e.a);move(e.b);move(e.c)}else if(e.type==='rect'){e.x+=dx;e.y+=dy}else if(e.type==='circle'||e.type==='ellipse'){e.cx+=dx;e.cy+=dy}else if(['polyline','polygon','spline','revcloud'].includes(e.type))e.points.forEach(move);else if(e.type==='text'||e.type==='point'){e.x+=dx;e.y+=dy}}
-  svg.addEventListener('dblclick',ev=>{const p=snapPoint(toWorld(ev.clientX,ev.clientY)).p;const h=hitTest(p);if(h&&h.type==='text'){const v=window.prompt('Edit text:',h.text);if(v!==null){h.text=v;render();}}});
+  svg.addEventListener('dblclick',ev=>{const p=snapPoint(toWorld(ev.clientX,ev.clientY)).p;const h=hitTest(p);if(h&&h.type==='text'){ev.preventDefault();openTextEditor({x:h.x,y:h.y},h);}});
   svg.addEventListener('wheel',ev=>{
     // Covers wheel mice, smooth trackpads, and Ctrl+wheel trackpad-pinch
     // gestures. Zoom is anchored to the pointer rather than the canvas origin.
