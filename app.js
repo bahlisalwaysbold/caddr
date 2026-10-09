@@ -178,11 +178,16 @@
     const context = textEditContext;
     const value = textEditorValue.value.trim();
     const size = Number(textEditorSize.value);
+    if(!save){
+      textEditor.hidden = true;
+      textEditContext = null;
+      setStatus('Text editing cancelled.');
+      return;
+    }
+    if(!value){setStatus('Text cannot be empty.');textEditorValue.focus();return}
+    if(!Number.isFinite(size)||size<=0){setStatus('Text height must be a positive number.');textEditorSize.focus();return}
     textEditor.hidden = true;
     textEditContext = null;
-    if(!save){setStatus('Text editing cancelled.');return}
-    if(!value){setStatus('Text cannot be empty.');return}
-    if(!Number.isFinite(size)||size<=0){setStatus('Text height must be a positive number.');return}
     if(context.entityId){
       const entity = state.entities.find(item=>item.id===context.entityId);
       if(!entity){setStatus('That text entity no longer exists.');return}
