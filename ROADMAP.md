@@ -8,12 +8,13 @@ This roadmap is intentionally incremental. Each slice must preserve legacy `.bah
 - Centralize command aliases, transaction history, coordinate parsing, and geometric snap candidates.
 - Wire existing drawing/edit workflows through undo/redo; add practical selection and grip improvements.
 - Keep the SVG renderer and current MVP workflows intact.
+- Add the basic 2D drawing/editing command set, precision toggles, and starter line constraints/parameters.
 
 ## Next slices
 
-1. Precision and selection: window/crossing/fence selection, spatial index, snap overrides/tracking, and numeric command state machine.
-2. Editing kernel: tested trim/extend, mirror/scale/stretch, fillet/chamfer, join/explode, and rectangular/polar/path arrays.
-3. Annotation and styles: associative dimensions, text styles, center marks/centerlines, and real hatch boundaries.
+1. Precision and selection: fence selection, snap overrides, polar-angle configuration, and richer dynamic command prompts.
+2. Editing kernel: expand edge cases and geometric test coverage for trim/extend, mirror/scale/stretch, fillet/chamfer, join/explode, and arrays; support more than line-based boundaries and selected entity types.
+3. Annotation and styles: associative dimensions, text styles, center marks/centerlines, and boundary-driven hatch regions.
 4. Document systems: layer manager, blocks/attributes, layouts/viewports, tables, schedules, and migration tests.
 5. Output and coordination: PDF/PNG/CSV, references, compare, markup, cleanup/audit, and standards checking.
 6. Structural model: typed grids, columns, beams, slabs, foundations, reinforcement, relationships, and generated schedules/details.
@@ -21,6 +22,7 @@ This roadmap is intentionally incremental. Each slice must preserve legacy `.bah
 
 ## Quality gates
 
-- Preserve the current line, circle, rectangle, polyline, text, dimension, move, copy, rotate, offset, delete, pan, zoom, snap, grid, layers, properties, save/open, SVG, and DXF workflows.
+- Preserve the line, polyline, rectangle, circle, arc, ellipse, polygon, spline, hatch, gradient, point, revision-cloud, text and dimension workflows; move, copy, rotate, scale, mirror, offset, trim/extend, fillet/chamfer, stretch, arrays, break/join/explode; precision aids; constraints/parameters; and save/open/export.
 - Every geometry mutation uses a command transaction and round-trips through the versioned project format.
 - Add focused mathematical and workflow tests with each behavior slice; do not represent unimplemented features as functional controls.
+- Editing commands are an intentionally small 2D kernel, not full DWG/AutoCAD-compatible implementations; unsupported geometry combinations must report their limits.
