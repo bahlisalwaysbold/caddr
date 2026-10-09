@@ -21,8 +21,8 @@
   const NS='http://www.w3.org/2000/svg';
   const state = {
     units:'mm', grid:true, snap:true, ortho:false, polar:false, tracking:false, dynamicInput:true, gridSize:50, majorGrid:250,
-    layers:[{id:'layer-1',name:'Structural',visible:true,locked:false,color:'#111827'},{id:'layer-2',name:'Dimensions',visible:true,locked:false,color:'#1f4d95'},{id:'layer-3',name:'Text',visible:true,locked:false,color:'#8a5900'}],
-    activeLayer:'Structural', entities:[], selection:[], tool:'select',
+    layers:[{id:'layer-1',name:'S-CONC',visible:true,locked:false,color:'#59d7af'},{id:'layer-2',name:'S-DIMS',visible:true,locked:false,color:'#cbd5e1'},{id:'layer-3',name:'S-TEXT',visible:true,locked:false,color:'#a9cbff'}],
+    activeLayer:'S-CONC', entities:[], selection:[], tool:'select',
     constraints:[], parameters:[],
     viewport:{x:0,y:0,scale:1}, interaction:null, panKeyDown:false, previousSelection:[], nextId:1
   };
@@ -330,7 +330,7 @@
 
   // starter structural example: 4-column bay, one beam and two dimensions
   function seedExample(){
-    const S='Structural',D='Dimensions';
+    const S='S-CONC',D='S-DIMS';
     state.entities.push({id:uid(),type:'line',layer:S,a:{x:250,y:250},b:{x:750,y:250}});
     state.entities.push({id:uid(),type:'line',layer:S,a:{x:250,y:500},b:{x:750,y:500}});
     state.entities.push({id:uid(),type:'line',layer:S,a:{x:250,y:250},b:{x:250,y:500}});
@@ -338,7 +338,7 @@
     for(const [x,y] of [[250,250],[750,250],[250,500],[750,500]])state.entities.push({id:uid(),type:'rect',layer:S,x:x-25,y:y-25,w:50,h:50});
     state.entities.push({id:uid(),type:'dimension',layer:D,a:{x:250,y:250},b:{x:750,y:250},offset:-80});
     state.entities.push({id:uid(),type:'dimension',layer:D,a:{x:250,y:250},b:{x:250,y:500},offset:-80});
-    state.entities.push({id:uid(),type:'text',layer:'Text',x:380,y:380,text:'STRUCTURAL PLAN — MVP',size:24});
+    state.entities.push({id:uid(),type:'text',layer:'S-TEXT',x:380,y:380,text:'STRUCTURAL PLAN — MVP',size:24});
   }
   seedExample();const initial=Core.normalizeDocument(captureDocument()).document;Object.assign(state,{layers:initial.layers,activeLayer:initial.activeLayer,entities:initial.entities,nextId:initial.nextId});registerCommands();setTool('select');render();fitView();setStatus('Bahl CAD MVP ready.');log('READY — structural drafting core loaded');
 })();
