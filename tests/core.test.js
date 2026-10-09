@@ -71,7 +71,7 @@ test('ASCII DXF import reads layers and common drafting entities', () => {
     '0','LWPOLYLINE','8','S-CONC','90','3','70','1','10','0','20','0','10','20','20','0','10','20','20','20',
     '0','TEXT','8','S-TEXT','10','5','20','10','40','2.5','1','TEST',
     '0','ENDSEC','0','EOF'
-  ].join('\\n');
+  ].join('\n');
   const parsed = Core.parseDxf(dxf);
   assert.equal(parsed.entities.length, 5);
   assert.deepEqual(parsed.entities.map(e => e.type), ['line','circle','arc','polyline','text']);
@@ -84,7 +84,7 @@ test('ASCII DXF import reads layers and common drafting entities', () => {
 });
 
 test('ASCII DXF import rejects files with no supported entities', () => {
-  assert.throws(() => Core.parseDxf('0\\nSECTION\\n2\\nENTITIES\\n0\\nENDSEC\\n0\\nEOF'), /No supported DXF entities/);
+  assert.throws(() => Core.parseDxf('0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF'), /No supported DXF entities/);
 });
 
 test('viewport zoom keeps the world point under the cursor fixed', () => {
