@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#121820" />
+  <title>Caddr — Structural Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="structural.css" />
+</head>
+<body class="structural-page">
+  <div class="structural-app">
+    <header class="structural-topbar">
+      <div class="structural-brand">
+        <a class="caddr-mark" href="index.html" aria-label="Return to Caddr drawing studio">C</a>
+        <div><strong>Caddr</strong><span>ENGINEERING WORKSPACE</span></div>
+      </div>
+      <div class="structural-breadcrumb"><a href="index.html">Drawing Studio</a><span>/</span><strong>Structural Studio</strong><span class="prototype-chip">PROTOTYPE</span></div>
+      <div class="structural-top-actions">
+        <span class="save-state"><i></i> Local demo project</span>
+        <button class="structural-ghost-button" id="exportStructuralReport" type="button">Export summary ↗</button>
+        <a class="back-to-cad" href="index.html">← Back to CAD</a>
+      </div>
+    </header>
+
+    <div class="structural-projectbar">
+      <div class="project-title-block">
+        <span class="eyebrow">CURRENT PROJECT</span>
+        <h1>Riverside Medical Centre <span class="edit-pencil" title="Demo project name">✎</span></h1>
+        <p>RC frame building <span>·</span> 3 storeys <span>·</span> Project CDR-024</p>
+      </div>
+      <div class="project-meta">
+        <div><span>Design basis</span><strong id="activeCodeSummary">Eurocode · EC2 / EC3</strong></div>
+        <div><span>Model state</span><strong><i class="state-dot"></i> Preliminary</strong></div>
+        <div><span>Last updated</span><strong>Just now · Sample data</strong></div>
+      </div>
+    </div>
+
+    <nav class="structural-module-nav" aria-label="Structural workflow">
+      <button class="module-tab active" type="button" data-view-button="overview"><span class="module-icon">⌂</span>Overview</button>
+      <button class="module-tab" type="button" data-view-button="model"><span class="module-icon">▱</span>Model</button>
+      <button class="module-tab" type="button" data-view-button="loads"><span class="module-icon">↓</span>Loads</button>
+      <button class="module-tab" type="button" data-view-button="analysis"><span class="module-icon">⌁</span>Analysis</button>
+      <button class="module-tab" type="button" data-view-button="design"><span class="module-icon">◈</span>Design checks</button>
+      <button class="module-tab" type="button" data-view-button="detailing"><span class="module-icon">▦</span>Detailing</button>
+      <button class="module-tab" type="button" data-view-button="quantities"><span class="module-icon">▤</span>Quantities &amp; costs</button>
+      <button class="module-tab" type="button" data-view-button="reports"><span class="module-icon">☷</span>Reports</button>
+    </nav>
+
+    <div class="prototype-warning" role="note">
+      <span class="warning-symbol">!</span>
+      <div><strong>Design prototype — not for construction.</strong> This workspace demonstrates the intended combined workflow. Analysis, code checks, reinforcement and quantities below use illustrative sample data; no structural solver is connected.</div>
+      <button type="button" id="dismissPrototypeWarning" aria-label="Dismiss prototype notice">×</button>
+    </div>
+
+    <div class="structural-workspace">
+      <main class="structural-main">
+        <section class="module-view active" id="overviewView" data-view="overview">
+          <div class="section-heading">
+            <div><span class="eyebrow">PROJECT CONTROL CENTRE</span><h2>Structural Studio</h2><p>One coordinated path from building model to reviewed engineering outputs.</p></div>
+            <div class="heading-actions"><button class="button-secondary" type="button" data-jump-view="model">Open model</button><button class="button-primary" type="button" data-jump-view="analysis">Review analysis <span>→</span></button></div>
+          </div>
+          <div class="workflow-track" aria-label="Engineering workflow progress">
+            <div class="workflow-step done"><span>✓</span><div><strong>Drawing checked</strong><small>Architectural plan imported</small></div></div>
+            <div class="workflow-step done"><span>✓</span><div><strong>Model reviewed</strong><small>3 storeys · RC frame</small></div></div>
+            <div class="workflow-step current"><span>3</span><div><strong>Analysis setup</strong><small>Inputs need engineer review</small></div></div>
+            <div class="workflow-step"><span>4</span><div><strong>Design &amp; detail</strong><small>Not yet approved</small></div></div>
+          </div>
+          <div class="overview-grid">
+            <article class="surface-card model-preview-card">
+              <div class="card-heading"><div><span class="eyebrow">SHARED STRUCTURAL MODEL</span><h3>Building frame</h3></div><button class="icon-square" type="button" data-jump-view="model" aria-label="Open building model">↗</button></div>
+              <div class="model-viewport">
+                <div class="viewport-label">3D AXONOMETRIC · SCHEMATIC</div>
+                <svg id="framePreview" viewBox="0 0 680 360" role="img" aria-label="Schematic three-storey reinforced concrete frame with columns and beams">
+                  <defs>
+                    <linearGradient id="columnFace" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#55d9c0"/><stop offset="1" stop-color="#287e85"/></linearGradient>
+                    <linearGradient id="beamFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6db5ff"/><stop offset="1" stop-color="#3269ac"/></linearGradient>
+                    <pattern id="floorGrid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#253744" stroke-width="1"/></pattern>
+                  </defs>
+                  <path d="M70 308 L380 308 L612 188 L302 188 Z" fill="url(#floorGrid)" stroke="#263b4b" stroke-width="1.2"/>
+                  <g opacity=".28" stroke="#5a7a8e" stroke-dasharray="4 6"><path d="M130 82V310M235 82V310M340 82V310M445 82V310M550 82V245"/><path d="M92 285L324 165M92 217L324 97M92 149L324 29"/></g>
+                  <g class="model-beams" stroke="#63a9f7" stroke-width="8" stroke-linecap="round" fill="none">
+                    <path data-member="B01" d="M118 116L433 116M118 185L433 185M118 254L433 254M118 323L433 323"/>
+                    <path data-member="B02" d="M118 116L350 -4M118 185L350 65M118 254L350 134M118 323L350 203"/>
+                    <path data-member="B03" d="M433 116L665 -4M433 185L665 65M433 254L665 134M433 323L665 203"/>
+                    <path data-member="B04" d="M350 -4L665 -4M350 65L665 65M350 134L665 134M350 203L665 203"/>
+                  </g>
+                  <g class="model-columns" stroke="url(#columnFace)" stroke-width="10" stroke-linecap="round">
+                    <path data-member="C01" d="M118 116V323"/><path data-member="C02" d="M223 76V283"/><path data-member="C03" d="M328 35V242"/><path data-member="C04" d="M433 -4V203"/>
+                    <path data-member="C05" d="M350 -4V203"/><path data-member="C06" d="M455 -45V162"/><path data-member="C07" d="M560 -86V121"/><path data-member="C08" d="M665 -127V80"/>
+                  </g>
+                  <g fill="#d6e4ed" font-size="11" font-family="Inter, sans-serif"><text x="98" y="342">Grid A</text><text x="205" y="301">Grid B</text><text x="312" y="260">Grid C</text><text x="414" y="221">Grid D</text><text x="38" y="321">Level 00</text><text x="38" y="252">Level 01</text><text x="38" y="183">Level 02</text><text x="38" y="114">Roof</text></g>
+                  <g fill="#8fa8b7" font-size="10"><text x="485" y="302">SCHEMATIC MODEL</text><text x="485" y="318">Not a design output</text></g>
+                </svg>
+                <div class="viewport-legend"><span><i class="legend-beam"></i>Beam</span><span><i class="legend-column"></i>Column</span><span><i class="legend-slab"></i>Floor / slab</span></div>
+              </div>
+              <div class="model-preview-footer"><div><strong id="elementCount">18</strong><span>tracked members</span></div><div><strong>03</strong><span>storeys</span></div><div><strong>02</strong><span>open reviews</span></div><button class="text-link" type="button" data-jump-view="model">Inspect model →</button></div>
+            </article>
+            <article class="surface-card readiness-card">
+              <div class="card-heading"><div><span class="eyebrow">ENGINEER REVIEW</span><h3>Before you analyse</h3></div><span class="status-tag warning">2 items open</span></div>
+              <div class="readiness-score"><div class="score-ring"><strong>82<span>%</span></strong></div><div><strong>Model readiness</strong><p>Some project inputs still need confirmation.</p></div></div>
+              <div class="readiness-list">
+                <button type="button" class="readiness-item complete" data-jump-view="model"><span class="checkmark">✓</span><span><strong>Geometry reviewed</strong><small>Structural elements present</small></span><span>↗</span></button>
+                <button type="button" class="readiness-item complete" data-jump-view="loads"><span class="checkmark">✓</span><span><strong>Load cases prepared</strong><small>Example load cases loaded</small></span><span>↗</span></button>
+                <button type="button" class="readiness-item needs-review" data-jump-view="loads"><span class="checkmark">!</span><span><strong>Confirm imposed loads</strong><small>Verify against building use</small></span><span>↗</span></button>
+                <button type="button" class="readiness-item needs-review" data-jump-view="design"><span class="checkmark">!</span><span><strong>Confirm site data</strong><small>Geotechnical report not attached</small></span><span>↗</span></button>
+              </div>
+              <button class="button-secondary full-width" type="button" data-jump-view="loads">Resolve project inputs</button>
+            </article>
+          </div>
+          <article class="surface-card overview-bottom">
+            <div class="card-heading"><div><span class="eyebrow">NEXT IN THE WORKFLOW</span><h3>Continue the project</h3></div><span class="muted-label">Prototype journey</span></div>
+            <div class="next-actions">
+              <button type="button" class="next-action" data-jump-view="loads"><span class="next-action-icon">↓</span><span><strong>1. Define loads</strong><small>Cases, directions and combinations</small></span><span class="next-arrow">→</span></button>
+              <button type="button" class="next-action" data-jump-view="analysis"><span class="next-action-icon">⌁</span><span><strong>2. Review analysis</strong><small>Model validation and result views</small></span><span class="next-arrow">→</span></button>
+              <button type="button" class="next-action" data-jump-view="detailing"><span class="next-action-icon">▦</span><span><strong>3. Prepare detailing</strong><small>Rebar preferences and schedules</small></span><span class="next-arrow">→</span></button>
+            </div>
+          </article>
+        </section>
+
+        <section class="module-view" id="modelView" data-view="model" hidden>
+          <div class="section-heading"><div><span class="eyebrow">01 / MODEL</span><h2>Structural model</h2><p>One coordinated model for analysis, design, detailing and quantities.</p></div><div class="heading-actions"><button class="button-secondary" id="addStoreyButton" type="button">＋ Add storey</button><button class="button-primary" id="addStructuralMember" type="button">＋ Add member</button></div></div>
+          <div class="model-tools-row"><label class="field-inline"><span>Model view</span><select id="modelViewMode"><option>3D frame</option><option>Plan · Level 01</option><option>Elevation · Grid A</option></select></label><label class="field-inline"><span>Visible objects</span><select id="memberFilter"><option value="all">All members</option><option value="Column">Columns</option><option value="Beam">Beams</option><option value="Slab">Slabs</option><option value="Foundation">Foundations</option></select></label><span class="model-tool-note"><i class="state-dot"></i> Shared model · geometry is schematic</span></div>
+          <div class="model-management-grid">
+            <article class="surface-card model-table-card"><div class="card-heading"><div><h3>Structural elements</h3><p>Choose an element to inspect its current properties.</p></div><span class="status-tag info" id="modelMemberTotal">18 objects</span></div>
+              <div class="table-scroll"><table class="data-table"><thead><tr><th>Mark</th><th>Type</th><th>Storey</th><th>Section</th><th>Material</th><th>Review</th></tr></thead><tbody id="structuralElementRows"></tbody></table></div>
+            </article>
+            <aside class="surface-card selected-element-card"><div class="card-heading"><div><span class="eyebrow">SELECTION INSPECTOR</span><h3 id="selectedElementTitle">Column C01</h3></div><span class="selection-mark">●</span></div><p id="selectedElementDescription" class="muted-copy">Ground to Level 01 · RC column</p><div class="property-stack"><div><span>Section</span><strong id="selectedSection">300 × 300 mm</strong></div><div><span>Material</span><strong id="selectedMaterial">C30/37 concrete</strong></div><div><span>Member state</span><strong id="selectedStatus">Needs review</strong></div><div><span>Connected workflow</span><strong>Analysis → Design → Details</strong></div></div><label class="field-label" for="memberNote">Engineer note</label><textarea id="memberNote" rows="3" placeholder="Add a review note for this element..."></textarea><button class="button-secondary full-width" type="button" id="saveMemberNote">Save review note</button><p class="tiny-note">Edits remain in this browser prototype and do not alter a solver model.</p></aside>
+          </div>
+          <article class="surface-card level-strip-card"><div class="card-heading"><div><h3>Storey stack</h3><p>Levels can be managed independently while sharing one building model.</p></div></div><div class="storey-stack" id="storeyStack"><div class="storey-row"><span>RF</span><strong>Roof</strong><span>+9.600 m</span><small>Level 03</small></div><div class="storey-row"><span>03</span><strong>Level 02</strong><span>+6.400 m</span><small>Typical floor</small></div><div class="storey-row"><span>02</span><strong>Level 01</strong><span>+3.200 m</span><small>Typical floor</small></div><div class="storey-row"><span>01</span><strong>Ground</strong><span>±0.000 m</span><small>Base level</small></div></div></article>
+        </section>
+
+        <section class="module-view" id="loadsView" data-view="loads" hidden>
+          <div class="section-heading"><div><span class="eyebrow">02 / LOADS &amp; COMBINATIONS</span><h2>Loading setup</h2><p>Define project actions and review the combinations before analysis.</p></div><div class="heading-actions"><button class="button-secondary" id="addLoadCase" type="button">＋ Add load case</button><button class="button-primary" type="button" data-jump-view="analysis">Continue to analysis →</button></div></div>
+          <div class="input-callout"><span class="callout-icon">i</span><div><strong>Engineer confirmation required</strong><p>Sample loads are provided to show the workflow only. Confirm occupancy, self-weight settings, wind and seismic applicability, and the adopted design standard for the real project.</p></div></div>
+          <div class="loads-layout">
+            <article class="surface-card"><div class="card-heading"><div><h3>Load cases</h3><p>Use consistent units and record the source of each action.</p></div><span class="status-tag info">Sample values</span></div>
+              <div class="table-scroll"><table class="data-table"><thead><tr><th>Case</th><th>Description</th><th>Type</th><th>Direction</th><th>Representative value</th><th>Source</th></tr></thead><tbody id="loadCaseRows">
+                <tr><td><strong>G1</strong></td><td>Permanent action</td><td><span class="type-pill dead">Dead</span></td><td>Global −Z</td><td><input class="table-input load-value" aria-label="G1 representative value" type="number" value="1" min="0" step="0.1"> <span class="unit">factor</span></td><td>Model setting · demo</td></tr>
+                <tr><td><strong>Q1</strong></td><td>Imposed floor action</td><td><span class="type-pill live">Live</span></td><td>Global −Z</td><td><input class="table-input load-value" aria-label="Q1 representative value" type="number" value="2.5" min="0" step="0.1"> <span class="unit">kN/m²</span></td><td>Needs confirmation</td></tr>
+                <tr><td><strong>WX</strong></td><td>Wind action · X</td><td><span class="type-pill lateral">Wind</span></td><td>Global +X</td><td><input class="table-input load-value" aria-label="WX representative value" type="number" value="0.8" min="0" step="0.1"> <span class="unit">kN/m²</span></td><td>Placeholder only</td></tr>
+              </tbody></table></div>
+              <div class="table-footer"><span id="loadCaseCount">3 load cases</span><span>Loads shown are illustrative, not project recommendations.</span></div>
+            </article>
+            <article class="surface-card"><div class="card-heading"><div><h3>Combination sets</h3><p>Review the applicable limit states and combination rules.</p></div><button class="icon-square" type="button" id="addCombination" aria-label="Add combination">＋</button></div>
+              <div class="combination-list" id="combinationList"><div class="combination-row"><div><strong>ULS-01</strong><span>Ultimate · illustrative</span></div><code>1.35G + 1.50Q</code><span class="status-dot amber"></span></div><div class="combination-row"><div><strong>SLS-01</strong><span>Serviceability · illustrative</span></div><code>G + Q</code><span class="status-dot blue"></span></div><div class="combination-row"><div><strong>WIND-01</strong><span>Lateral scenario · illustrative</span></div><code>G + Q + WX</code><span class="status-dot violet"></span></div></div>
+              <label class="field-label" for="designCodeSelect">Project design basis</label><select class="wide-input" id="designCodeSelect"><option value="Eurocode">Eurocodes · EN 1990 / EN 1991 / EN 1992</option><option value="BS8110">British Standards · BS 8110 (legacy projects)</option><option value="ACI">ACI 318 / ASCE 7</option><option value="EngineerDefined">Engineer-defined / other supported standard</option></select>
+              <p class="tiny-note">Changing this selection updates the project label only in this prototype. Real combinations must be generated from verified code rules.</p>
+            </article>
+          </div>
+          <article class="surface-card load-flow-card"><div><span class="eyebrow">NEXT CHECK</span><h3>Are all actions represented?</h3><p>Confirm self-weight, partitions, finishes, imposed loads, equipment, wind, seismic action where applicable, and construction-stage effects where relevant.</p></div><button class="button-secondary" type="button" data-jump-view="analysis">Open model validation →</button></article>
+        </section>
+
+        <section class="module-view" id="analysisView" data-view="analysis" hidden>
+          <div class="section-heading"><div><span class="eyebrow">03 / STRUCTURAL ANALYSIS</span><h2>Analysis &amp; model validation</h2><p>Review the model state, analysis options, and result visualisation.</p></div><div class="heading-actions"><span class="status-tag warning">Solver not connected</span><button class="button-primary" id="previewAnalysis" type="button">Preview demo results</button></div></div>
+          <div class="solver-banner"><div class="solver-icon">⌁</div><div><strong>Analysis engine integration point</strong><p>This screen is ready to host a numerical solver. The current result set is static sample data and is not calculated from the model.</p></div><span class="solver-state">UI PROTOTYPE</span></div>
+          <div class="analysis-kpis"><div class="surface-card metric-card"><span>Model validation</span><strong id="validationMetric">3 <small>items</small></strong><em>Sample review queue</em></div><div class="surface-card metric-card"><span>Max displacement</span><strong>— <small>mm</small></strong><em>Awaiting solver</em></div><div class="surface-card metric-card"><span>Peak member force</span><strong>— <small>kN</small></strong><em>Awaiting solver</em></div><div class="surface-card metric-card"><span>Analysis status</span><strong class="metric-status" id="analysisStatusMetric">Not run</strong><em id="analysisRunTime">No calculation performed</em></div></div>
+          <div class="analysis-content-grid">
+            <article class="surface-card result-visual-card"><div class="card-heading"><div><h3>Result visualisation</h3><p>In the live product, these views will display actual solver output.</p></div><select id="resultDisplaySelect" aria-label="Result visualisation"><option>Undeformed model</option><option>Displacement · demo view</option><option>Bending moment · demo view</option><option>Shear force · demo view</option></select></div>
+              <div class="result-canvas" id="resultCanvas"><svg viewBox="0 0 680 320" role="img" aria-label="Schematic frame awaiting analysis results"><g stroke="#203441" stroke-width="1"><path d="M55 55H625M55 105H625M55 155H625M55 205H625M55 255H625M90 30V280M190 30V280M290 30V280M390 30V280M490 30V280M590 30V280"/></g><g fill="none" stroke="#45c2b2" stroke-width="6" stroke-linecap="round"><path d="M120 65V255M270 65V255M420 65V255M570 65V255"/></g><g fill="none" stroke="#5a9af0" stroke-width="5" stroke-linecap="round"><path d="M120 65H570M120 125H570M120 185H570M120 255H570"/></g><g fill="#95a9b9" font-family="Inter, sans-serif" font-size="11"><text x="18" y="69">Roof</text><text x="18" y="129">L02</text><text x="18" y="189">L01</text><text x="18" y="259">Base</text></g></svg><div class="result-overlay" id="resultOverlay"><span class="overlay-icon">⌁</span><strong>No analysis results yet</strong><p>Connect a validated solver to calculate displacements, reactions and internal forces.</p></div></div>
+              <div class="result-legend"><span><i class="legend-beam"></i>Frame member</span><span><i class="legend-column"></i>Column line</span><span class="muted-label">Illustration only</span></div>
+            </article>
+            <article class="surface-card validation-card"><div class="card-heading"><div><h3>Model validation</h3><p>Items for an engineer to resolve.</p></div><span class="status-tag warning">Review required</span></div><div class="validation-list"><div class="validation-item"><span class="validation-icon amber">!</span><div><strong>Confirm boundary conditions</strong><p>Support assumptions have not been validated.</p></div></div><div class="validation-item"><span class="validation-icon amber">!</span><div><strong>Review diaphragm assumptions</strong><p>Confirm the intended floor behaviour.</p></div></div><div class="validation-item"><span class="validation-icon blue">i</span><div><strong>Confirm lateral actions</strong><p>Wind and seismic applicability require project-specific review.</p></div></div></div><button class="button-secondary full-width" type="button" data-jump-view="loads">Review loads and setup</button></article>
+          </div>
+        </section>
+
+        <section class="module-view" id="designView" data-view="design" hidden>
+          <div class="section-heading"><div><span class="eyebrow">04 / MEMBER DESIGN</span><h2>Design checks</h2><p>Review concrete and steel member design from the same structural model.</p></div><div class="heading-actions"><span class="status-tag warning">No design engine</span><button class="button-primary" id="previewDesignChecks" type="button">Preview check states</button></div></div>
+          <div class="design-code-summary surface-card"><div class="code-emblem">EC</div><div><span class="eyebrow">CURRENT DESIGN BASIS</span><strong id="designCodeLabel">Eurocodes · EN 1992 / EN 1993</strong><p>National Annex, materials, load combinations and relevant clauses must be explicitly configured for a real project.</p></div><button class="button-secondary" type="button" data-jump-view="loads">Change project basis</button></div>
+          <div class="design-category-grid">
+            <button class="design-category active" type="button" data-design-category="concrete"><span class="category-icon concrete-icon">▦</span><span><strong>Reinforced concrete</strong><small>Beams · columns · slabs · walls</small></span><span class="category-arrow">→</span></button>
+            <button class="design-category" type="button" data-design-category="steel"><span class="category-icon steel-icon">╱</span><span><strong>Structural steel</strong><small>Members · stability · connections</small></span><span class="category-arrow">→</span></button>
+            <button class="design-category" type="button" data-design-category="foundation"><span class="category-icon foundation-icon">▤</span><span><strong>Foundations</strong><small>Footings · rafts · bearing inputs</small></span><span class="category-arrow">→</span></button>
+          </div>
+          <div class="design-results-grid" id="designResultsGrid">
+            <article class="surface-card design-result-card"><div class="result-card-top"><span class="member-type-icon">B</span><span class="status-tag muted">Not checked</span></div><h3>Beam design</h3><p>Flexure, shear, torsion where applicable, serviceability and reinforcement requirements.</p><div class="design-card-footer"><span>Members in model</span><strong>06</strong></div><button class="text-link" type="button" data-jump-view="detailing">Continue to detailing →</button></article>
+            <article class="surface-card design-result-card"><div class="result-card-top"><span class="member-type-icon">C</span><span class="status-tag muted">Not checked</span></div><h3>Column design</h3><p>Axial force and biaxial bending, slenderness, confinement and longitudinal reinforcement.</p><div class="design-card-footer"><span>Members in model</span><strong>08</strong></div><button class="text-link" type="button" data-jump-view="detailing">Review reinforcement →</button></article>
+            <article class="surface-card design-result-card"><div class="result-card-top"><span class="member-type-icon">S</span><span class="status-tag muted">Not checked</span></div><h3>Slabs &amp; walls</h3><p>Flexural design, shear checks, serviceability and relevant wall stability requirements.</p><div class="design-card-footer"><span>Members in model</span><strong>04</strong></div><button class="text-link" type="button" data-jump-view="detailing">Review slab details →</button></article>
+            <article class="surface-card design-result-card"><div class="result-card-top"><span class="member-type-icon">F</span><span class="status-tag warning">Input missing</span></div><h3>Foundation design</h3><p>Footing geometry, soil resistance, settlement inputs, punching shear and reinforcement.</p><div class="design-card-footer"><span>Geotechnical data</span><strong>Required</strong></div><button class="text-link" type="button" data-jump-view="geotech">Review site inputs →</button></article>
+          </div>
+          <article class="surface-card geotech-panel" id="geotechPanel"><div class="card-heading"><div><span class="eyebrow">SITE &amp; GEOTECHNICAL DATA</span><h3>Foundation inputs</h3></div><span class="status-tag warning">No report attached</span></div><div class="geotech-grid"><label><span>Allowable bearing pressure</span><div class="input-with-unit"><input id="bearingPressure" type="number" min="0" placeholder="Enter from report"><span>kN/m²</span></div></label><label><span>Data source</span><select id="bearingSource"><option value="">Choose source</option><option>Geotechnical investigation report</option><option>Engineer-verified project data</option></select></label><label><span>Groundwater / soil notes</span><input id="soilNotes" type="text" placeholder="e.g. see borehole log"></label><button class="button-secondary" type="button" id="saveGeotech">Save site inputs</button></div><p class="tiny-note">Do not infer bearing capacity from location. Enter a value only when supported by a suitable site investigation or accepted engineering evidence.</p></article>
+        </section>
+
+        <section class="module-view" id="detailingView" data-view="detailing" hidden>
+          <div class="section-heading"><div><span class="eyebrow">05 / DRAWINGS &amp; REINFORCEMENT</span><h2>Detailing studio</h2><p>Set engineer preferences, review generated detail proposals, and build schedules.</p></div><div class="heading-actions"><span class="status-tag warning">Prototype drawings</span><button class="button-primary" id="previewDetail" type="button">Preview detail sheet</button></div></div>
+          <div class="detail-setup-grid">
+            <article class="surface-card preference-card"><div class="card-heading"><div><h3>Engineer preferences</h3><p>Confirm these before detailing begins.</p></div><span class="status-tag info">Editable defaults</span></div>
+              <label class="field-label" for="concreteGrade">Concrete grade</label><select id="concreteGrade" class="wide-input"><option>C30/37</option><option>C25/30</option><option>C35/45</option><option>C40/50</option></select>
+              <label class="field-label" for="rebarGrade">Reinforcement grade</label><select id="rebarGrade" class="wide-input"><option>B500B · confirm project specification</option><option>Grade 460 · confirm governing standard</option><option>Grade 500 · confirm governing standard</option><option>Other / engineer specified</option></select>
+              <div class="two-fields"><label><span>Main bars</span><select id="mainBar"><option>Y12</option><option>Y16</option><option>Y20</option><option>Y25</option><option>Y32</option></select></label><label><span>Links / stirrups</span><select id="linkBar"><option>Y8</option><option>Y10</option><option>Y12</option></select></label></div>
+              <div class="two-fields"><label><span>Nominal cover</span><div class="input-with-unit"><input id="nominalCover" type="number" value="25" min="0"><span>mm</span></div></label><label><span>Drawing scale</span><select id="detailScale"><option>1:20</option><option>1:10</option><option>1:25</option><option>1:50</option></select></label></div>
+              <label class="field-label" for="detailStyle">Detailing preference</label><select id="detailStyle" class="wide-input"><option>Clear standard arrangement</option><option>Optimise congestion where permitted</option><option>Match company detailing standard</option></select>
+              <div class="preference-note"><span>i</span><p>Preferences guide the drawing proposal. They cannot override strength, anchorage, spacing, cover or code requirements.</p></div>
+            </article>
+            <article class="surface-card drawing-sheet-card"><div class="card-heading"><div><h3>Beam B01 · Detail preview</h3><p>Illustrative drawing layout — not a design result.</p></div><span class="sheet-label">S-DET-01</span></div>
+              <div class="detail-drawing" id="detailDrawing"><svg viewBox="0 0 600 430" role="img" aria-label="Illustrative reinforcement detail sheet for a beam"><rect x="14" y="14" width="572" height="402" fill="#f8fafc" stroke="#aab8c6"/><text x="34" y="40" fill="#172738" font-size="12" font-weight="700">BEAM B01 — LONGITUDINAL DETAIL</text><text x="34" y="57" fill="#526477" font-size="9">Schematic only · verify all dimensions and reinforcement</text><rect x="84" y="112" width="432" height="70" fill="#e8eef4" stroke="#344a5e" stroke-width="1.6"/><path d="M95 128H505M95 164H505" stroke="#bf493e" stroke-width="3"/><path d="M120 126V166M155 126V166M190 126V166M225 126V166M260 126V166M295 126V166M330 126V166M365 126V166M400 126V166M435 126V166M470 126V166" stroke="#276fa8" stroke-width="1.7"/><g fill="#344a5e" font-size="10"><text x="84" y="96">Section B01</text><text x="84" y="201">Illustrative span</text><text x="260" y="201">— verify project dimensions —</text></g><path d="M84 220V230H516V220M84 226V238M516 226V238" stroke="#425a6f" fill="none"/><text x="274" y="249" fill="#344a5e" font-size="11">L = project input</text><text x="35" y="292" fill="#172738" font-size="11" font-weight="700">TRANSVERSE SECTION</text><rect x="78" y="315" width="100" height="77" fill="#e8eef4" stroke="#344a5e" stroke-width="1.6"/><rect x="90" y="326" width="76" height="55" fill="none" stroke="#bf493e" stroke-width="2.4"/><circle cx="98" cy="334" r="4" fill="#bf493e"/><circle cx="158" cy="334" r="4" fill="#bf493e"/><circle cx="98" cy="373" r="4" fill="#bf493e"/><circle cx="158" cy="373" r="4" fill="#bf493e"/><text x="220" y="328" fill="#172738" font-size="10">Main bars: <tspan id="detailMainBarLabel">Y12</tspan> (preference only)</text><text x="220" y="348" fill="#172738" font-size="10">Links: <tspan id="detailLinkBarLabel">Y8</tspan> (spacing not designed)</text><text x="220" y="368" fill="#172738" font-size="10">Cover: <tspan id="detailCoverLabel">25</tspan> mm (confirm exposure and code)</text><path d="M34 397H566" stroke="#bcc9d5"/><text x="35" y="409" fill="#526477" font-size="8">CADDR · PREVIEW · NOT FOR CONSTRUCTION</text></svg></div>
+              <div class="detail-sheet-actions"><button class="button-secondary" type="button" data-jump-view="model">Back to model</button><button class="button-secondary" type="button" id="saveDetailPrefs">Save preferences</button></div>
+            </article>
+          </div>
+          <article class="surface-card bar-schedule-card"><div class="card-heading"><div><h3>Reinforcement schedule preview</h3><p>Marks and quantities are sample placeholders until linked to a verified design.</p></div><span class="status-tag muted">Not designed</span></div><div class="table-scroll"><table class="data-table"><thead><tr><th>Mark</th><th>Member</th><th>Bar</th><th>Shape</th><th>Qty</th><th>Cut length</th><th>Status</th></tr></thead><tbody id="barScheduleRows"><tr><td>B01-01</td><td>Beam B01</td><td>Y12</td><td>Straight</td><td>2</td><td>Not calculated</td><td><span class="status-tag muted">Placeholder</span></td></tr><tr><td>B01-02</td><td>Beam B01</td><td>Y8</td><td>Link</td><td>As required</td><td>Not calculated</td><td><span class="status-tag muted">Placeholder</span></td></tr></tbody></table></div></article>
+        </section>
+
+        <section class="module-view" id="quantitiesView" data-view="quantities" hidden>
+          <div class="section-heading"><div><span class="eyebrow">06 / QUANTITY TAKE-OFF</span><h2>Quantities &amp; cost planning</h2><p>Keep material take-off, rates, sources and revisions in one place.</p></div><div class="heading-actions"><button class="button-secondary" type="button" id="resetRates">Reset sample rates</button><button class="button-primary" type="button" id="downloadQuantities">Download CSV ↓</button></div></div>
+          <div class="quantity-summary-grid"><div class="surface-card metric-card"><span>Materials subtotal</span><strong id="quantityGrandTotal">₦16,565,500</strong><em>Illustrative sample estimate</em></div><div class="surface-card metric-card"><span>Quantity source</span><strong>Sample model</strong><em>No live take-off engine</em></div><div class="surface-card metric-card"><span>Price basis</span><strong>NGN · editable</strong><em>Replace with current quotations</em></div></div>
+          <article class="surface-card"><div class="card-heading"><div><h3>Material schedule</h3><p>Edit unit rates to explore the estimate. Quantities are examples, not measured from a real building.</p></div><span class="status-tag warning">Sample only</span></div>
+            <div class="table-scroll"><table class="data-table quantity-table"><thead><tr><th>Material</th><th>Quantity</th><th>Unit</th><th>Source</th><th>Rate (₦)</th><th>Amount (₦)</th></tr></thead><tbody id="quantityRows">
+              <tr data-material="Concrete"><td><strong>Ready-mix concrete</strong><small>Structural elements</small></td><td data-qty="42.5">42.50</td><td>m³</td><td>Example allowance</td><td><input class="rate-input" type="number" min="0" step="1000" value="145000" aria-label="Concrete rate in naira per cubic metre"></td><td class="line-amount">₦6,162,500</td></tr>
+              <tr data-material="Reinforcement"><td><strong>Reinforcement steel</strong><small>Bars and links</small></td><td data-qty="5.2">5.20</td><td>tonne</td><td>Example allowance</td><td><input class="rate-input" type="number" min="0" step="10000" value="1350000" aria-label="Steel rate in naira per tonne"></td><td class="line-amount">₦7,020,000</td></tr>
+              <tr data-material="Blocks"><td><strong>Concrete blocks</strong><small>Non-structural allowance</small></td><td data-qty="680">680</td><td>units</td><td>Example allowance</td><td><input class="rate-input" type="number" min="0" step="50" value="1100" aria-label="Block rate in naira each"></td><td class="line-amount">₦748,000</td></tr>
+              <tr data-material="Formwork"><td><strong>Formwork</strong><small>Contact surface allowance</small></td><td data-qty="310">310</td><td>m²</td><td>Example allowance</td><td><input class="rate-input" type="number" min="0" step="100" value="8500" aria-label="Formwork rate in naira per square metre"></td><td class="line-amount">₦2,635,000</td></tr>
+            </tbody><tfoot><tr><th colspan="5">Illustrative materials subtotal</th><th id="quantityFooterTotal">₦16,565,500</th></tr></tfoot></table></div>
+          </article>
+          <div class="quantity-notes-grid"><article class="surface-card"><h3>Trace each quantity</h3><p>A production version should link every quantity to a model element, drawing revision, formula or measurement source, and unit.</p></article><article class="surface-card"><h3>Keep estimate types separate</h3><p>Distinguish model-derived quantities, allowances, user-entered rates, supplier quotations, labour, equipment, overheads and contingency.</p></article></div>
+        </section>
+
+        <section class="module-view" id="reportsView" data-view="reports" hidden>
+          <div class="section-heading"><div><span class="eyebrow">07 / DOCUMENTATION</span><h2>Reports &amp; review package</h2><p>Collect the engineering trail behind a project before sharing its deliverables.</p></div><div class="heading-actions"><button class="button-secondary" type="button" id="printReport">Print / save PDF</button><button class="button-primary" type="button" id="downloadStructuralReport">Download demo report ↓</button></div></div>
+          <div class="report-status-banner"><div class="report-status-icon">☷</div><div><strong>Professional review is still outstanding</strong><p>This demonstration does not certify any design. A production report must be generated from validated calculation outputs and the approved model revision.</p></div><span class="status-tag warning">Draft</span></div>
+          <div class="report-layout">
+            <article class="surface-card report-checklist"><div class="card-heading"><div><h3>Report contents</h3><p>Select what the package should include.</p></div><span class="status-tag info" id="reportSelectionCount">5 selected</span></div>
+              <label class="report-option"><input type="checkbox" checked data-report-section="project"><span><strong>Project information</strong><small>Project name, units, design basis and revision</small></span></label>
+              <label class="report-option"><input type="checkbox" checked data-report-section="model"><span><strong>Model summary</strong><small>Storeys, member types and model validation notes</small></span></label>
+              <label class="report-option"><input type="checkbox" checked data-report-section="loads"><span><strong>Loads and combinations</strong><small>Entered actions, sources and assumptions</small></span></label>
+              <label class="report-option"><input type="checkbox" checked data-report-section="analysis"><span><strong>Analysis summary</strong><small>Solver status and relevant results</small></span></label>
+              <label class="report-option"><input type="checkbox" checked data-report-section="design"><span><strong>Design checks and detailing</strong><small>Member checks, preferences and outstanding items</small></span></label>
+              <label class="report-option"><input type="checkbox" data-report-section="quantities"><span><strong>Quantities and cost estimate</strong><small>Sample quantity schedule and rate basis</small></span></label>
+              <label class="report-option"><input type="checkbox" data-report-section="review"><span><strong>Engineer review record</strong><small>Reviewer, date, decisions and revision reference</small></span></label>
+            </article>
+            <article class="surface-card report-preview"><div class="report-preview-toolbar"><span class="document-icon">▤</span><div><strong>Caddr Structural Summary</strong><small>Draft · Riverside Medical Centre</small></div><span class="status-tag warning">Illustrative</span></div><div class="report-page"><span class="report-brand">CADDR / ENGINEERING</span><h2>Structural Design Summary</h2><p class="report-subtitle">Riverside Medical Centre · CDR-024</p><hr><div class="report-callout">PROTOTYPE DATA — NOT FOR CONSTRUCTION OR PROFESSIONAL SUBMISSION</div><h3>Project overview</h3><p>Three-storey reinforced-concrete frame demonstration. The project model, load cases and detailing preferences are sample information.</p><h3>Engineering status</h3><div class="report-line"><span>Structural solver</span><strong>Not connected</strong></div><div class="report-line"><span>Design engine</span><strong>Not connected</strong></div><div class="report-line"><span>Professional review</span><strong>Required</strong></div><h3>Outstanding inputs</h3><ul><li>Confirm imposed loads and relevant lateral actions.</li><li>Confirm site-specific geotechnical parameters.</li><li>Run validated analysis and code-based design checks.</li><li>Review and approve the resulting drawings and reports.</li></ul><div class="report-page-footer">Caddr · Preview document · No calculation has been performed</div></div></article>
+          </div>
+        </section>
+      </main>
+
+      <aside class="structural-ai-rail" aria-label="Caddr engineering assistant">
+        <div class="ai-rail-head"><div class="ai-avatar">✳</div><div><strong>Caddr AI</strong><span>Engineering copilot concept</span></div><button type="button" class="ai-rail-menu" id="clearAiConversation" title="Clear conversation">↺</button></div>
+        <div class="ai-context"><span class="context-dot"></span><span>Project context</span><strong id="aiContextLabel">Structural overview</strong></div>
+        <div class="ai-prototype-note"><strong>Prototype assistant</strong><span>Replies are examples, not live AI or engineering calculations.</span></div>
+        <div class="ai-messages" id="aiMessages" aria-live="polite">
+          <div class="ai-message assistant-message"><span class="message-avatar">✳</span><div><p>Hi. I can guide you through the intended structural workflow in this prototype.</p><p>Start by checking what we understand about the model, then confirm the loading and site information before design.</p><small>Example response · not a calculation</small></div></div>
+        </div>
+        <div class="ai-suggestion-block"><span class="eyebrow">TRY ASKING</span><button type="button" class="suggestion-chip" data-prompt="What must we confirm before analysis?">What must we confirm before analysis?</button><button type="button" class="suggestion-chip" data-prompt="What geotechnical information is missing?">What site data is missing?</button><button type="button" class="suggestion-chip" data-prompt="Explain the reinforcement preferences.">Explain rebar preferences</button></div>
+        <form id="aiPromptForm" class="ai-prompt-form"><label class="sr-only" for="aiPromptInput">Ask Caddr AI</label><textarea id="aiPromptInput" rows="2" maxlength="500" placeholder="Ask about this project…"></textarea><div class="ai-prompt-footer"><span>⌘ Enter to send</span><button type="submit" aria-label="Send prompt">↑</button></div></form>
+        <div class="ai-rail-footer"><span>◈</span> Built to explain the engineering workflow — not approve designs.</div>
+      </aside>
+    </div>
+    <footer class="structural-statusbar"><span><i class="state-dot"></i> Prototype workspace</span><span>Units: mm / kN</span><span id="structuralStatusMessage">Ready · Sample project loaded</span><button id="resetPrototype" type="button">Reset demo state</button></footer>
+  </div>
+  <div class="structural-toast" id="structuralToast" role="status" aria-live="polite"></div>
+  <script src="structural.js"></script>
+</body>
+</html>
