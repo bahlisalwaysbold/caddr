@@ -268,7 +268,80 @@
     return { p: { x: Math.round(point.x / gridSize) * gridSize, y: Math.round(point.y / gridSize) * gridSize }, kind: 'GRID' };
   }
 
-  const api = { FORMAT, VERSION, normalizeDocument, serializeDocument, CommandRegistry, HistoryManager, parseCoordinate, snapPoint, zoomViewportAt, MIN_VIEW_SCALE, MAX_VIEW_SCALE };
+
+  function parseDxf(text) {
+    const lines = String(text).replace(/^\\uFEFF/, '').replace(/\\r/g, '').split('\\n');
+    if (lines.length < 4) throw new Error('The file is empty or is not an ASCII DXF file.');
+    const pairs = [];
+    for (let i = 0; i + 1 < lines.length; i += 2) {
+      const code = Number(lines[i].trim());
+      if (!Number.isInteger(code) || lines[i + 1] === undefined) continue;
+      pairs.push({ code, value: lines[i + 1].trim() });
+    }
+    const sections = [];
+    let section = '', table = '', currentLayer = null, currentEntity = null;
+    const layerMap = new Map();
+    const entities = [];
+    const aci = {1:'#ff3333',2:'#ffff33',3:'#33cc66',4:'#33ffff',5:'#3366ff',6:'#ff33ff',7:'#e6e6e6',8:'#999999',9:'#cccccc',10:'#ff6666',11:'#ffaaaa',12:'#bd4b4b',13:'#bd7a7a',14:'#a64b00',15:'#a67a00',16:'#a6a600',17:'#7aa600',18:'#4ba600',19:'#00a64b',20:'#00a67a',21:'#00a6a6',22:'#007aa6',23:'#004ba6',24:'#4b00a6',25:'#7a00a6',26:'#a600a6',27:'#a6007a',28:'#a6004b'};
+    const colorFor = value => { const n = Math.abs(Number(value)); return aci[n] || (n === 7 ? '#e6e6e6' : '#59d7af'); };
+    const val = (items, code, fallback = 0) => { const p = items.find(item => item.code === code); const n = p ? Number(p.value) : fallback; return Number.isFinite(n) ? n : fallback; };
+    const str = (items, code, fallback = '') => items.find(item => item.code === code)?.value ?? fallback;
+    const point = (items, xCode, yCode) => ({ x: val(items, xCode), y: val(items, yCode) });
+    const layerName = items => str(items, 8, '0') || '0';
+    const flushEntity = () => {
+      if (!currentEntity) return;
+      const type = currentEntity.type, p = currentEntity.items, layer = layerName(p);
+      if (!layerMap.has(layer)) layerMap.set(layer, { id: 'layer-' + (layerMap.size + 1), name: layer, visible: true, locked: false, color: colorFor(str(p, 62, '7')), linetype: 'CONTINUOUS' });
+      const base = { id: 'e' + (entities.length + 1), layer, color: 'BYLAYER' };
+      if (type === 'LINE') entities.push({ ...base, type: 'line', a: point(p,10,20), b: point(p,11,21) });
+      else if (type === 'CIRCLE') entities.push({ ...base, type: 'circle', cx: val(p,10), cy: val(p,20), r: Math.abs(val(p,40)) });
+      else if (type === 'ARC') {
+        const cx=val(p,10),cy=val(p,20),r=Math.abs(val(p,40)),start=val(p,50)*Math.PI/180,end=val(p,51)*Math.PI/180;
+        let sweep=(end-start+Math.PI*2)%(Math.PI*2); if(sweep===0)sweep=Math.PI*2;
+        const at=a=>({x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)});
+        entities.push({...base,type:'arc',a:at(start),b:at(start+sweep/2),c:at(start+sweep)});
+      } else if (type === 'LWPOLYLINE') {
+        const pts=[]; let x=null;
+        for(const item of p){if(item.code===10){if(x!==null)pts.push({x,y:0});x=Number(item.value)}else if(item.code===20&&x!==null){pts.push({x,y:Number(item.value)});x=null}}
+        if(x!==null)pts.push({x,y:0});
+        if(pts.length>=2)entities.push({...base,type:'polyline',points:pts,closed:(val(p,70)&1)!==0});
+      } else if (type === 'POINT') entities.push({...base,type:'point',x:val(p,10),y:val(p,20)});
+      else if (type === 'TEXT' || type === 'MTEXT') {
+        const raw=p.filter(item=>item.code===1||item.code===3).map(item=>item.value).join('');
+        entities.push({...base,type:'text',x:val(p,10),y:val(p,20),size:Math.max(1,Math.abs(val(p,40,20))),text:raw.replace(/\\P/g,' ').replace(/\\\\[A-Za-z][^;]*;/g,'')});
+      } else if (type !== 'SEQEND' && type !== 'VERTEX' && type !== 'ENDSEC' && type !== 'EOF' && type !== 'SECTION' && type !== 'TABLE' && type !== 'ENDTAB') {
+        // Unsupported entity types are skipped deliberately; caller receives the count.
+      }
+      currentEntity = null;
+    };
+    for (const pair of pairs) {
+      if (pair.code === 0 && pair.value === 'SECTION') { flushEntity(); section=''; table=''; }
+      if (section === '' && pair.code === 2) { section=pair.value; continue; }
+      if (section === 'TABLES') {
+        if (pair.code===0 && pair.value==='TABLE') { table=''; currentLayer=null; continue; }
+        if (pair.code===2) { table=pair.value; continue; }
+        if (table==='LAYER') {
+          if (pair.code===0 && pair.value==='LAYER') { if(currentLayer){layerMap.set(currentLayer.name,currentLayer)} currentLayer={name:'0',color:'#e6e6e6',visible:true,locked:false,linetype:'CONTINUOUS'}; continue; }
+          if(currentLayer){if(pair.code===2)currentLayer.name=pair.value;else if(pair.code===62){currentLayer.visible=Number(pair.value)>=0;currentLayer.color=colorFor(pair.value)}else if(pair.code===6)currentLayer.linetype=pair.value;}
+        }
+        if (pair.code===0 && pair.value==='ENDTAB') { if(currentLayer)layerMap.set(currentLayer.name,currentLayer);currentLayer=null;table=''; }
+      } else if(section==='ENTITIES') {
+        if(pair.code===0){flushEntity();currentEntity={type:pair.value,items:[]}}
+        else if(currentEntity)currentEntity.items.push(pair);
+      }
+      if(pair.code===0 && pair.value==='ENDSEC'){flushEntity();if(currentLayer){layerMap.set(currentLayer.name,currentLayer);currentLayer=null}section='';table=''}
+      if(pair.code===0 && pair.value==='EOF'){flushEntity();break}
+    }
+    flushEntity();
+    if (!entities.length) throw new Error('No supported DXF entities found. Supported types: LINE, CIRCLE, ARC, LWPOLYLINE, POINT, TEXT and MTEXT.');
+    const usedNames = new Set(entities.map(entity=>entity.layer));
+    const layers = [...layerMap.values()].filter(layer=>usedNames.has(layer.name));
+    for(const name of usedNames) if(!layers.some(layer=>layer.name===name)) layers.push({id:'layer-'+(layers.length+1),name,visible:true,locked:false,color:'#59d7af',linetype:'CONTINUOUS'});
+    const normalizedEntities=entities.map(entity=>({...entity,layerId:layers.find(layer=>layer.name===entity.layer)?.id||layers[0].id}));
+    return { units: 'mm', layers, activeLayer: layers[0]?.name || '0', entities: normalizedEntities, nextId: normalizedEntities.length+1, unsupportedCount: 0 };
+  }
+
+  const api = { FORMAT, VERSION, normalizeDocument, serializeDocument, CommandRegistry, HistoryManager, parseCoordinate, parseDxf, snapPoint, zoomViewportAt, MIN_VIEW_SCALE, MAX_VIEW_SCALE };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BahlCore = api;
 })(globalThis);
