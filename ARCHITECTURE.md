@@ -1,4 +1,4 @@
-# BAHL CAD Architecture
+# Caddr CAD & Structural Workspace Architecture
 
 ## Current foundation
 
@@ -15,3 +15,7 @@ The canonical project envelope is `{ format: "BAHL-CAD", version: 1, document, v
 - Structural: future typed structural entities and relationships, independent of their SVG representation.
 
 The current application is still one UI module. Extract additional modules only as behavior moves behind these boundaries; do not replace the working renderer or introduce a framework migration as a prerequisite.
+
+## Structural Studio prototype
+
+`structural.html`, `structural.css`, and `structural.js` are a self-contained, dependency-free UI prototype for the intended integrated structural workflow. It is deliberately separated from the working 2D drawing kernel. Its sample analysis, design states, reinforcement detail, and quantity schedule are illustrative only. Future integration should consume a shared, typed structural model and validated numerical solvers rather than interpreting the prototype outputs as engineering results.
