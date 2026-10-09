@@ -8,11 +8,11 @@ This roadmap is intentionally incremental. Each slice must preserve legacy `.bah
 - Centralize command aliases, transaction history, coordinate parsing, and geometric snap candidates.
 - Wire existing drawing/edit workflows through undo/redo; add practical selection and grip improvements.
 - Keep the SVG renderer and current MVP workflows intact.
-- Add the basic 2D drawing/editing command set, precision toggles, and starter line constraints/parameters.
+- Add the basic 2D drawing/editing command set, precision toggles, starter line constraints/parameters, and common selection operations (select all/similar/previous/last).
 
 ## Next slices
 
-1. Precision and selection: fence selection, snap overrides, polar-angle configuration, and richer dynamic command prompts.
+1. Precision and selection: fence/lasso selection, polygon selection, selection cycling, snap overrides, polar-angle configuration, and richer dynamic command prompts.
 2. Editing kernel: expand edge cases and geometric test coverage for trim/extend, mirror/scale/stretch, fillet/chamfer, join/explode, and arrays; support more than line-based boundaries and selected entity types.
 3. Annotation and styles: associative dimensions, text styles, center marks/centerlines, and boundary-driven hatch regions.
 4. Document systems: layer manager, blocks/attributes, layouts/viewports, tables, schedules, and migration tests.

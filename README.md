@@ -14,6 +14,8 @@ Then open `http://localhost:5173`.
 
 **Viewport navigation:** use the mouse wheel to zoom around the pointer; use middle-mouse drag or hold **Space** and drag with the left mouse button to pan. Trackpad pinch gestures are handled through browser wheel events.
 
+**Selection:** drag left-to-right for window selection (fully enclosed objects); drag right-to-left for crossing selection (objects touched by the box). Use `Ctrl+A` / `SELECTALL`, `SELECTSIMILAR`, `SELECTPREVIOUS`, `SELECTLAST`, and `DESELECTALL` in the command line.
+
 ## Implemented
 
 - SVG-based vector geometry with millimetre working units
@@ -21,7 +23,7 @@ Then open `http://localhost:5173`.
 - Endpoint, midpoint, center, quadrant, intersection, grid and object-snap tracking
 - Ortho, 15-degree polar tracking, grid, snap and dynamic absolute/relative/polar coordinate input
 - Layers with visibility and active-layer switching
-- Selection + properties editor
+- Selection + properties editor, including click/window/crossing selection, Ctrl+A Select All, and Select Similar/Previous/Last commands
 - Move, copy, rotate, scale, mirror, line offset, trim/extend, fillet, chamfer, stretch, rectangular/polar/path arrays, break, join, explode and delete
 - Horizontal, vertical and line-length constraints, with named dimensional parameters in the Parameters Manager
 - Cursor-anchored zoom over a very broad range, smooth mouse-wheel/trackpad zoom, middle-mouse drag pan, and Space + left-drag pan
