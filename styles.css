@@ -223,3 +223,9 @@ button.window-icon{cursor:pointer}
 .text-editor-actions button:hover{filter:brightness(1.12)}
 .text-editor-actions button.primary{background:#078fc8;border-color:#14a7e6;color:#fff;font-weight:600}
 .text-editor-panel p{margin:10px 0 0;color:#8998aa;font-size:9px}
+
+
+/* Caddr Structural Studio entry point */
+.ribbon-tabs .structural-tab-link{display:flex;align-items:center;gap:5px;text-decoration:none;color:#8adcf7;border-bottom-color:#285b70;background:#1d303b;font-weight:650}
+.ribbon-tabs .structural-tab-link:hover{background:#294150;color:#d5f5ff}
+.ribbon-tabs .structural-tab-link span{font-size:10px;opacity:.75}

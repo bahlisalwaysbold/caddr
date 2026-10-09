@@ -1,4 +1,4 @@
-# Bahl CAD — Structural Drafting Core (MVP)
+# Caddr — CAD & Structural Engineering Workspace (MVP)
 
 A dependency-free browser prototype for the first layer of the Bahl engineering product: precise CAD-like drafting for structural workflows.
 
@@ -46,3 +46,8 @@ The next layers should add structural semantics rather than only more drawing co
 3. Broader DXF import/export coverage, units/header interpretation, and compatibility testing against AutoCAD workflows.
 4. Snapping upgrades, grips, window selection, trim/extend and block support.
 5. Structural model graph shared between analysis, detailing and AI assistants.
+
+
+## Structural Studio prototype
+
+Open `structural.html` (or select **Structural Studio** from the CAD ribbon) to explore the combined structural workflow: shared model, load cases and combinations, analysis review, concrete/steel design workflow, reinforcement detailing preferences, quantities and costs, and report assembly. This is a UI prototype with sample data; no structural solver or code-based design engine is connected, and it must not be used for engineering decisions or construction.

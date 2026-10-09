@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#20242a" />
-  <title>Bahl CAD — Drafting Workspace</title>
+  <title>Caddr — Drafting Workspace</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -20,7 +20,7 @@
 
     <header class="quickbar">
       <div class="quickbar-left">
-        <button class="brand-mark" data-command="new" aria-label="Bahl CAD home" title="New drawing">B</button>
+        <button class="brand-mark" data-command="new" aria-label="Caddr home" title="New drawing">C</button>
         <button class="quick-icon" data-command="new" aria-label="New drawing" title="New drawing">＋</button>
         <button class="quick-icon" data-command="open" aria-label="Open drawing" title="Open drawing">▱</button>
         <button class="quick-icon" data-command="save" aria-label="Save drawing" title="Save drawing">▣</button>
@@ -28,7 +28,7 @@
         <button class="quick-icon" data-command="undo" aria-label="Undo" title="Undo (Ctrl+Z)">↶</button>
         <button class="quick-icon" data-command="redo" aria-label="Redo" title="Redo (Ctrl+Y)">↷</button>
       </div>
-      <div class="document-title"><span>Bahl CAD</span><span class="document-divider">·</span><strong>Structural-Detail.bahl</strong><span class="unsaved-dot" title="Local working drawing"></span></div>
+      <div class="document-title"><span>Caddr</span><span class="document-divider">·</span><strong>Structural-Detail.bahl</strong><span class="unsaved-dot" title="Local working drawing"></span></div>
       <div class="quickbar-right">
         <label class="command-search"><span class="search-glyph">⌕</span><input id="commandSearch" type="search" autocomplete="off" placeholder="Search commands" aria-label="Search or run a command" /></label>
         <button class="export-button" data-command="importdxf">Import DXF</button><button class="export-button primary" data-command="dxf">Export DXF</button>
@@ -40,6 +40,7 @@
       <button class="ribbon-tab active" data-ribbon-target="home">Home</button>
       <button class="ribbon-tab" data-ribbon-target="insert">Insert</button>
       <button class="ribbon-tab" data-ribbon-target="annotate">Annotate</button>
+      <a class="ribbon-tab structural-tab-link" href="structural.html" title="Open Caddr Structural Studio">Structural Studio <span>↗</span></a>
       <button class="ribbon-tab" data-ribbon-target="parametric">Parametric</button>
       <button class="ribbon-tab" data-ribbon-target="view">View</button>
       <button class="ribbon-tab" data-ribbon-target="manage">Manage</button>
@@ -201,7 +202,7 @@
     <div class="work-area">
       <main class="canvas-area">
         <div class="canvas-wrap" id="canvasWrap">
-          <svg id="cadCanvas" xmlns="http://www.w3.org/2000/svg" aria-label="Bahl CAD drawing canvas">
+          <svg id="cadCanvas" xmlns="http://www.w3.org/2000/svg" aria-label="Caddr drawing canvas">
             <defs>
               <pattern id="gridMinor" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#2b3541" /></pattern>
               <pattern id="gridMajor" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#gridMinor)"/><path d="M 100 0 L 0 0 0 100" fill="none" stroke="#222c37" stroke-width="0.7" /></pattern>

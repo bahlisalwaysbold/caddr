@@ -1,4 +1,4 @@
-# BAHL CAD Roadmap
+# Caddr Roadmap
 
 This roadmap is intentionally incremental. Each slice must preserve legacy `.bahl` readability and make meaningful changes undoable and serializable.
 
@@ -26,3 +26,11 @@ This roadmap is intentionally incremental. Each slice must preserve legacy `.bah
 - Every geometry mutation uses a command transaction and round-trips through the versioned project format.
 - Add focused mathematical and workflow tests with each behavior slice; do not represent unimplemented features as functional controls.
 - Editing commands are an intentionally small 2D kernel, not full DWG/AutoCAD-compatible implementations; unsupported geometry combinations must report their limits.
+
+## Structural workflow UI prototype
+
+- [x] Add a separate Caddr Structural Studio navigation entry without replacing the current CAD canvas.
+- [x] Prototype model, load cases/combinations, analysis review, member-design categories, detailing preferences, quantity/cost schedule, and report summary.
+- [ ] Connect the shared typed model to CAD entities and persist structural properties.
+- [ ] Integrate a validated solver and code-based design engines; retain explicit review and approval gates.
+- [ ] Test every calculation against independently verified engineering examples before exposing results as design outputs.
