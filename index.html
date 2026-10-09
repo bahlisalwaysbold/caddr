@@ -218,6 +218,15 @@
           <div class="viewport-tools"><button id="viewportZoomIn" title="Zoom in" type="button">＋</button><button id="viewportFit" title="Zoom extents" type="button">⌕</button><button id="viewportVisibility" title="Toggle grid" type="button">◉</button></div>
           <div class="axis-widget"><span class="axis-y">Y</span><span class="axis-x">X</span><i></i><b></b></div>
           <div class="canvas-selection-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="text-editor-panel" id="textEditor" role="dialog" aria-modal="true" aria-labelledby="textEditorTitle" hidden>
+            <div class="text-editor-head"><strong id="textEditorTitle">Text</strong><button type="button" id="textEditorClose" aria-label="Close text editor">×</button></div>
+            <label for="textEditorValue">Contents</label>
+            <input id="textEditorValue" type="text" maxlength="500" value="BEAM B1" autocomplete="off" />
+            <label for="textEditorSize">Text height (drawing units)</label>
+            <input id="textEditorSize" type="number" min="0.1" max="1000000" step="any" value="20" />
+            <div class="text-editor-actions"><button type="button" id="textEditorCancel">Cancel</button><button type="button" id="textEditorPlace" class="primary">Place text</button></div>
+            <p>Enter to place · Esc to cancel</p>
+          </div>
         </div>
       </main>
 
