@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bahl CAD — Structural Drafting Core</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">B</div><div><strong>Bahl CAD</strong><span>Structural drafting core</span></div></div>
+      <div class="menu-group">
+        <button data-command="new">New</button>
+        <button data-command="open">Open</button>
+        <button data-command="save">Save</button>
+        <button data-command="undo" title="Undo (Ctrl+Z)">Undo</button>
+        <button data-command="redo" title="Redo (Ctrl+Y)">Redo</button>
+        <button data-command="svg">Export SVG</button>
+        <button data-command="dxf">Export DXF</button>
+      </div>
+      <div class="status-top"><span id="coordReadout">X 0.000  Y 0.000</span><span class="pill">MM</span><span class="pill green" id="snapState">SNAP ON</span></div>
+    </header>
+
+    <div class="workspace">
+      <aside class="leftbar">
+        <div class="tool-section">
+          <div class="section-title">Draw</div>
+          <button class="tool active" data-tool="select" title="Select (Esc / V)">↖<span>Select</span></button>
+          <button class="tool" data-tool="line" title="Line (L)">╱<span>Line</span></button>
+          <button class="tool" data-tool="polyline" title="Polyline (PL)">⌁<span>Polyline</span></button>
+          <button class="tool" data-tool="rect" title="Rectangle (REC)">□<span>Rectangle</span></button>
+          <button class="tool" data-tool="circle" title="Circle (C)">○<span>Circle</span></button>
+          <button class="tool" data-tool="arc" title="Arc (ARC)">◜<span>Arc</span></button>
+          <button class="tool" data-tool="ellipse" title="Ellipse (EL)">⬭<span>Ellipse</span></button>
+          <button class="tool" data-tool="text" title="Text (T)">T<span>Text</span></button>
+          <button class="tool" data-tool="dimension" title="Linear Dimension (D)">↔<span>Dimension</span></button>
+          <button class="tool" data-tool="polygon" title="Polygon (POL)">⬡<span>Polygon</span></button>
+          <button class="tool" data-tool="spline" title="Spline (SPL)">〰<span>Spline</span></button>
+          <button class="tool" data-tool="hatch" title="Hatch (HATCH)">▧<span>Hatch</span></button>
+          <button class="tool" data-tool="gradient" title="Gradient (GRAD)">◩<span>Gradient</span></button>
+          <button class="tool" data-tool="point" title="Point (PO)">·<span>Point</span></button>
+          <button class="tool" data-tool="revcloud" title="Revision cloud (REVCLOUD)">☁<span>Rev cloud</span></button>
+        </div>
+        <div class="tool-section">
+          <div class="section-title">Modify</div>
+          <button class="tool" data-command="move" title="Move (M)">✣<span>Move</span></button>
+          <button class="tool" data-command="copy" title="Copy (CO)">⧉<span>Copy</span></button>
+          <button class="tool" data-command="offset" title="Offset (O)">⊞<span>Offset</span></button>
+          <button class="tool" data-command="rotate" title="Rotate (RO)">↻<span>Rotate</span></button>
+          <button class="tool" data-command="scale" title="Scale (SC)">⤢<span>Scale</span></button>
+          <button class="tool" data-command="mirror" title="Mirror (MI)">⇋<span>Mirror</span></button>
+          <button class="tool" data-command="trim" title="Trim (TR)">✂<span>Trim</span></button>
+          <button class="tool" data-command="extend" title="Extend (EX)">↗<span>Extend</span></button>
+          <button class="tool" data-command="fillet" title="Fillet (F)">⌒<span>Fillet</span></button>
+          <button class="tool" data-command="chamfer" title="Chamfer (CHA)">◢<span>Chamfer</span></button>
+          <button class="tool" data-command="stretch" title="Stretch (S)">↔<span>Stretch</span></button>
+          <button class="tool" data-command="arrayrect" title="Rectangular array (ARRAYRECT)">▦<span>Rect array</span></button>
+          <button class="tool" data-command="arraypolar" title="Polar array (ARRAYPOLAR)">⟳<span>Polar array</span></button>
+          <button class="tool" data-command="arraypath" title="Path array (ARRAYPATH)">⤳<span>Path array</span></button>
+          <button class="tool" data-command="break" title="Break (BR)">⌁<span>Break</span></button>
+          <button class="tool" data-command="join" title="Join (J)">∪<span>Join</span></button>
+          <button class="tool" data-command="explode" title="Explode (X)">✣<span>Explode</span></button>
+          <button class="tool" data-command="delete" title="Delete">⌫<span>Delete</span></button>
+        </div>
+        <div class="tool-section bottom-tools">
+          <button class="tool" id="snapToggle">⌖<span>Snap</span></button>
+          <button class="tool" id="orthoToggle">└<span>Ortho</span></button>
+          <button class="tool" id="polarToggle">∠<span>Polar</span></button>
+          <button class="tool" id="trackingToggle">⊹<span>Tracking</span></button>
+          <button class="tool" id="dynamicToggle">↔<span>Dynamic</span></button>
+          <button class="tool" id="gridToggle">▦<span>Grid</span></button>
+          <button class="tool" id="fitView">⤢<span>Fit</span></button>
+        </div>
+      </aside>
+
+      <main class="canvas-area">
+        <div class="commandbar">
+          <div class="command-input-wrap"><span>Command</span><input id="commandInput" autocomplete="off" placeholder="Type a command…  L, REC, C, M, O, D, TR" /></div>
+          <div class="command-hint" id="commandHint">Select an object or start drawing.</div>
+        </div>
+        <div class="canvas-wrap" id="canvasWrap">
+          <svg id="cadCanvas" xmlns="http://www.w3.org/2000/svg" aria-label="Bahl CAD drawing canvas">
+            <defs>
+              <pattern id="gridMinor" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="#e9edf2" stroke-width="0.5" /></pattern>
+              <pattern id="gridMajor" width="50" height="50" patternUnits="userSpaceOnUse"><rect width="50" height="50" fill="url(#gridMinor)"/><path d="M 50 0 L 0 0 0 50" fill="none" stroke="#d5dbe3" stroke-width="0.8" /></pattern>
+              <pattern id="hatchPattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M 0 0 L 0 8" stroke="#526174" stroke-width="1" /></pattern>
+              <linearGradient id="gradientFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4d9de0" stop-opacity=".45"/><stop offset="1" stop-color="#f4d35e" stop-opacity=".18"/></linearGradient>
+            </defs>
+            <rect id="grid" x="0" y="0" width="100%" height="100%" fill="url(#gridMajor)" />
+            <g id="drawingRoot"></g>
+            <g id="cursorOverlay"></g>
+          </svg>
+          <div class="crosshair" id="crosshair"><i></i><b></b></div>
+          <div class="snap-badge" id="snapBadge">GRID</div>
+        </div>
+        <div class="canvas-status">
+          <span id="statusMessage">Ready.</span>
+          <span>Wheel: zoom · Middle/Space drag: pan · Esc: cancel</span>
+        </div>
+      </main>
+
+      <aside class="rightbar">
+        <section class="panel">
+          <div class="panel-head"><h3>Properties</h3><span id="selectionCount">0 selected</span></div>
+          <div id="properties" class="properties-empty">Select an object to inspect its geometry.</div>
+        </section>
+        <section class="panel constraints-panel">
+          <div class="panel-head"><h3>Constraints</h3><button id="addConstraint" class="icon-button" title="Add a constraint to the selected line">+</button></div>
+          <div id="constraints"></div>
+          <div class="panel-head parameters-head"><h3>Parameters Manager</h3><button id="addParameter" class="icon-button" title="Add parameter">+</button></div>
+          <div id="parameters"></div>
+        </section>
+        <section class="panel layers-panel">
+          <div class="panel-head"><h3>Layers</h3><button id="addLayer" class="icon-button">+</button></div>
+          <div id="layers"></div>
+        </section>
+        <section class="panel command-log-panel">
+          <div class="panel-head"><h3>Command log</h3></div>
+          <div id="commandLog" class="command-log"></div>
+        </section>
+      </aside>
+    </div>
+  </div>
+  <input type="file" id="fileInput" accept="application/json,.bahl,.json" hidden />
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
