@@ -32,6 +32,7 @@ Then open `http://localhost:5173`.
 - `.bahl` JSON save/open
 - SVG export
 - Basic DXF export for line/circle/polyline/text entities
+- ASCII DXF import for LINE, CIRCLE, ARC, LWPOLYLINE, POINT, TEXT and MTEXT, including basic layer names/colors
 - Starter structural-plan example
 
 Hatch and gradient apply to selected closed boundaries. The lightweight editing kernel supports line-based trim/extend, fillets and chamfers; it is not a full AutoCAD-compatible solver or editing kernel.
@@ -42,6 +43,6 @@ The next layers should add structural semantics rather than only more drawing co
 
 1. Columns, beams, slabs, walls and foundations as parametric objects.
 2. Rebar objects, bar marks, schedules and reinforcement annotations.
-3. DWG/DXF import/export hardening and compatibility testing against AutoCAD workflows.
+3. Broader DXF import/export coverage, units/header interpretation, and compatibility testing against AutoCAD workflows.
 4. Snapping upgrades, grips, window selection, trim/extend and block support.
 5. Structural model graph shared between analysis, detailing and AI assistants.
