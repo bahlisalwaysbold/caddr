@@ -209,3 +209,17 @@ button.window-icon{cursor:pointer}
   .drawing-tab{height:23px}
   .command-dock{height:60px;flex-basis:60px}
 }
+
+/* In-app CAD text editor (avoids browser-native prompt dialogs) */
+.text-editor-panel{position:absolute;z-index:12;width:min(300px,calc(100% - 24px));padding:13px;background:#252c35;border:1px solid #536173;border-radius:5px;box-shadow:0 12px 30px rgba(0,0,0,.42);color:#e8edf4}
+.text-editor-head{display:flex;align-items:center;justify-content:space-between;margin:-1px -1px 12px;padding-bottom:9px;border-bottom:1px solid #394452;font-size:12px}
+.text-editor-head button{width:24px;height:24px;border:1px solid transparent;border-radius:3px;background:transparent;color:#b9c5d3;font-size:18px;cursor:pointer}
+.text-editor-head button:hover{background:#394351;color:#fff}
+.text-editor-panel label{display:block;margin:9px 0 5px;font-size:10px;color:#aeb9c8}
+.text-editor-panel input{width:100%;height:30px;border:1px solid #485568;border-radius:3px;background:#171d25;color:#f0f5fa;padding:0 8px;outline:none}
+.text-editor-panel input:focus{border-color:#218ed7;box-shadow:0 0 0 1px #218ed7}
+.text-editor-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:13px}
+.text-editor-actions button{border:1px solid #4b5868;border-radius:3px;background:#303945;color:#dce5ef;padding:6px 11px;cursor:pointer}
+.text-editor-actions button:hover{filter:brightness(1.12)}
+.text-editor-actions button.primary{background:#078fc8;border-color:#14a7e6;color:#fff;font-weight:600}
+.text-editor-panel p{margin:10px 0 0;color:#8998aa;font-size:9px}
