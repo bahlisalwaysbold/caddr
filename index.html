@@ -90,7 +90,7 @@
         </div>
         <div class="ribbon-group utility-tools">
           <div class="ribbon-group-body">
-            <button class="tool ribbon-tool" id="homeFitView" data-command="fitview" title="Zoom to extents"><span class="tool-glyph">⌗</span><span>Zoom extents</span></button>
+            <button class="tool ribbon-tool" id="fitView" title="Zoom to extents"><span class="tool-glyph">⌗</span><span>Zoom extents</span></button>
             <button class="tool ribbon-tool" data-command="delete"><span class="tool-glyph">⌫</span><span>Delete</span></button>
           </div>
           <div class="ribbon-group-label">Utilities</div>
@@ -253,7 +253,7 @@
       <div class="status-tabs"><button class="status-tab active">Model</button><button class="status-tab">Layout1</button><button class="status-tab">Layout2</button><button class="status-tab add-tab" data-command="new">＋</button></div>
       <div class="status-message" id="statusMessage">Ready.</div>
       <div class="status-spacer"></div>
-      <span id="coordReadout" class="coord-readout">X 0.000&nbsp;&nbsp; Y 0.000</span>
+      <span id="coordReadout" class="coord-readout">X 0.000&nbsp;&nbsp; Y 0.000</span><span id="snapState" hidden>SNAP ON</span>
       <button class="status-toggle active" id="gridToggle" aria-pressed="true" title="Toggle grid">GRID</button>
       <button class="status-toggle active" id="snapToggle" aria-pressed="true" title="Toggle object snaps">OSNAP</button>
       <button class="status-toggle" id="orthoToggle" aria-pressed="false" title="Toggle ortho">ORTHO</button>
@@ -292,7 +292,7 @@
       const route = (sourceId, targetId) => {
         const source = document.getElementById(sourceId);
         const target = document.getElementById(targetId);
-        if (source && target) source.addEventListener('click', () => target.click());
+        if (source && target) source.addEventListener('click', () => { target.click(); source.classList.toggle('active', target.classList.contains('active')); });
       };
       route('ribbonAddConstraint', 'addConstraint');
       route('ribbonAddParameter', 'addParameter');
@@ -303,12 +303,12 @@
       route('ribbonTrackingToggle', 'trackingToggle');
       route('ribbonDynamicToggle', 'dynamicToggle');
       route('ribbonFitView', 'fitView');
-      route('homeFitView', 'fitView');
+      
       route('viewportFit', 'fitView');
       route('viewportVisibility', 'gridToggle');
       document.getElementById('viewportZoomIn').addEventListener('click', () => {
         const svg = document.getElementById('cadCanvas');
-        const event = new WheelEvent('wheel', { deltaY: -240, bubbles: true, cancelable: true });
+        const event = new WheelEvent('wheel', { deltaY: -160, clientX: svg.getBoundingClientRect().left + svg.getBoundingClientRect().width / 2, clientY: svg.getBoundingClientRect().top + svg.getBoundingClientRect().height / 2, bubbles: true, cancelable: true });
         svg.dispatchEvent(event);
       });
       const layerDisplay = document.getElementById('activeLayerDisplay');
