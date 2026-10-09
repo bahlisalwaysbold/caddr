@@ -59,6 +59,34 @@ test('coordinate parser supports absolute, relative, and polar input', () => {
   assert.ok(Math.abs(polar.y - 120) < 1e-8);
 });
 
+test('ASCII DXF import reads layers and common drafting entities', () => {
+  const dxf = [
+    '0','SECTION','2','TABLES','0','TABLE','2','LAYER',
+    '0','LAYER','2','S-CONC','62','3','6','CONTINUOUS',
+    '0','LAYER','2','S-TEXT','62','7','6','CONTINUOUS','0','ENDTAB','0','ENDSEC',
+    '0','SECTION','2','ENTITIES',
+    '0','LINE','8','S-CONC','10','0','20','0','11','100','21','0',
+    '0','CIRCLE','8','S-CONC','10','50','20','50','40','10',
+    '0','ARC','8','S-CONC','10','50','20','50','40','20','50','0','51','90',
+    '0','LWPOLYLINE','8','S-CONC','90','3','70','1','10','0','20','0','10','20','20','0','10','20','20','20',
+    '0','TEXT','8','S-TEXT','10','5','20','10','40','2.5','1','TEST',
+    '0','ENDSEC','0','EOF'
+  ].join('\\n');
+  const parsed = Core.parseDxf(dxf);
+  assert.equal(parsed.entities.length, 5);
+  assert.deepEqual(parsed.entities.map(e => e.type), ['line','circle','arc','polyline','text']);
+  assert.equal(parsed.entities[0].b.x, 100);
+  assert.equal(parsed.entities[1].r, 10);
+  assert.equal(parsed.entities[3].closed, true);
+  assert.equal(parsed.entities[4].text, 'TEST');
+  assert.ok(parsed.layers.some(layer => layer.name === 'S-CONC'));
+  assert.ok(parsed.layers.some(layer => layer.name === 'S-TEXT'));
+});
+
+test('ASCII DXF import rejects files with no supported entities', () => {
+  assert.throws(() => Core.parseDxf('0\\nSECTION\\n2\\nENTITIES\\n0\\nENDSEC\\n0\\nEOF'), /No supported DXF entities/);
+});
+
 test('viewport zoom keeps the world point under the cursor fixed', () => {
   const viewport = { x: 40, y: -20, scale: 2 };
   const cursor = { x: 420, y: 200 };
