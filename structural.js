@@ -134,6 +134,8 @@
   }
 
   function renderLevels() {
+    $("#modelCanvasMemberCount").textContent = String(state.members.length);
+    $("#modelCanvasStoreyCount").textContent = String(state.levels.length);
     const host = $("#storeyStack");
     if (!host) return;
     host.innerHTML = state.levels.map(level =>
@@ -504,7 +506,14 @@
     appendAiMessage("Conversation cleared. Ask about the current project's model, loads, site inputs or detailing workflow.", "assistant");
   });
 
-  $("#modelViewMode").addEventListener("change", event => toast("Model view set to " + event.target.value + ". The drawing viewport is schematic in this prototype."));
+  $("#modelViewMode").addEventListener("change", event => {
+    const elevation = event.target.value.startsWith("Elevation");
+    $("#planViewGroup").hidden = elevation;
+    $("#elevationViewGroup").hidden = !elevation;
+    $("#modelCanvasLabel").textContent = elevation ? "STRUCTURAL ELEVATION · GRID A" : "STRUCTURAL PLAN · LEVEL 01";
+    $("#structuralPlanPreview").setAttribute("aria-label", elevation ? "Schematic structural elevation with beams and columns" : "Schematic structural framing plan with beams and columns");
+    toast("Switched to " + event.target.value + ". Dimensions and member geometry remain schematic.");
+  });
   $("#bearingPressure").addEventListener("keydown", event => {
     if (event.key === "Enter") saveGeotechnicalInputs();
   });
