@@ -59,6 +59,27 @@ test('coordinate parser supports absolute, relative, and polar input', () => {
   assert.ok(Math.abs(polar.y - 120) < 1e-8);
 });
 
+test('viewport zoom keeps the world point under the cursor fixed', () => {
+  const viewport = { x: 40, y: -20, scale: 2 };
+  const cursor = { x: 420, y: 200 };
+  const beforeWorld = {
+    x: (cursor.x - viewport.x) / viewport.scale,
+    y: (cursor.y - viewport.y) / viewport.scale
+  };
+  const zoomed = Core.zoomViewportAt(viewport, cursor, 4);
+  assert.equal(zoomed.scale, 8);
+  assert.ok(Math.abs((cursor.x - zoomed.x) / zoomed.scale - beforeWorld.x) < 1e-9);
+  assert.ok(Math.abs((cursor.y - zoomed.y) / zoomed.scale - beforeWorld.y) < 1e-9);
+});
+
+test('viewport zoom supports a very broad bounded scale range', () => {
+  const cursor = { x: 100, y: 80 };
+  const zoomedIn = Core.zoomViewportAt({ x: 0, y: 0, scale: 1 }, cursor, 1e20);
+  const zoomedOut = Core.zoomViewportAt({ x: 0, y: 0, scale: 1 }, cursor, 1e-20);
+  assert.equal(zoomedIn.scale, Core.MAX_VIEW_SCALE);
+  assert.equal(zoomedOut.scale, Core.MIN_VIEW_SCALE);
+});
+
 test('snapping resolves geometric points before grid points', () => {
   const line = { type: 'line', a: { x: 0, y: 0 }, b: { x: 100, y: 0 } };
   assert.equal(Core.snapPoint({ x: 50, y: 1 }, [line], { threshold: 5 }).kind, 'MIDPOINT');

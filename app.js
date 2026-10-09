@@ -24,7 +24,7 @@
     layers:[{id:'layer-1',name:'Structural',visible:true,locked:false,color:'#111827'},{id:'layer-2',name:'Dimensions',visible:true,locked:false,color:'#1f4d95'},{id:'layer-3',name:'Text',visible:true,locked:false,color:'#8a5900'}],
     activeLayer:'Structural', entities:[], selection:[], tool:'select',
     constraints:[], parameters:[],
-    viewport:{x:0,y:0,scale:1}, interaction:null, nextId:1
+    viewport:{x:0,y:0,scale:1}, interaction:null, panKeyDown:false, nextId:1
   };
 
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -241,18 +241,40 @@
   svg.addEventListener('mousemove',ev=>{const raw=toWorld(ev.clientX,ev.clientY);const s=snapPoint(raw);state.lastWorldPoint=s.p;coordReadout.textContent=`X ${s.p.x.toFixed(3)}  Y ${s.p.y.toFixed(3)}`;crosshair.style.display='block';const r=wrap.getBoundingClientRect();crosshair.style.left=`${ev.clientX-r.left}px`;crosshair.style.top=`${ev.clientY-r.top}px`;snapBadge.style.display='block';snapBadge.style.left=`${ev.clientX-r.left+12}px`;snapBadge.style.top=`${ev.clientY-r.top+12}px`;snapBadge.textContent=s.kind;updateTool(s.p);if(state.interaction?.kind==='move'||state.interaction?.kind==='copy'){if(!state.interaction.start)return;state.interaction.current=s.p;renderPreview()}else if(state.interaction?.kind==='grip'){const i=state.interaction,e=state.entities.find(item=>item.id===i.entityId);if(e){updateGrip(e,i.key,s.p,i.original);render()}}});
   svg.addEventListener('mouseleave',()=>{crosshair.style.display='none';snapBadge.style.display='none'});
   svg.addEventListener('mousedown',ev=>{
-    if(ev.button===1||ev.shiftKey&&state.tool==='select'){state.interaction={kind:'pan',sx:ev.clientX,sy:ev.clientY,vx:state.viewport.x,vy:state.viewport.y};ev.preventDefault();return}
+    if(ev.button===1||(state.panKeyDown&&ev.button===0)||(ev.shiftKey&&state.tool==='select')){state.interaction={kind:'pan',sx:ev.clientX,sy:ev.clientY,vx:state.viewport.x,vy:state.viewport.y};state.pressStartedInteraction=false;wrap.classList.add('is-panning');ev.preventDefault();return}
     if(ev.button!==0)return;const grip=ev.target.closest?.('.cad-grip');if(grip){const e=state.entities.find(item=>item.id===grip.dataset.entityId);if(e&&!e.locked&&!layerByName(e.layer).locked)state.interaction={kind:'grip',entityId:e.id,key:grip.dataset.grip,original:clone(e),before:captureDocument()};ev.preventDefault();return}const p=snapPoint(toWorld(ev.clientX,ev.clientY)).p;
     if(state.interaction?.kind==='move'||state.interaction?.kind==='copy'){setStatus(state.interaction.start?'Pick destination point.':'Pick base point.');return}
     if(state.interaction&&state.interaction.kind===state.tool)return;
     const before=state.interaction;beginTool(p,ev.ctrlKey||ev.metaKey);state.pressStartedInteraction=Boolean(state.interaction&&state.interaction!==before&&state.tool!=='select')
   });
-  svg.addEventListener('mouseup',ev=>{if(ev.button!==0&&ev.button!==1)return;if(state.pressStartedInteraction){state.pressStartedInteraction=false;return}if(!state.interaction)return;const i=state.interaction;if(i.kind==='pan'){state.interaction=null;return}const p=snapPoint(toWorld(ev.clientX,ev.clientY)).p;if(i.kind==='select-box'){state.interaction=null;if(dist(i.start,p)<3/state.viewport.scale){const hit=hitTest(p);if(!i.additive)state.selection=[];if(hit){if(i.additive&&state.selection.includes(hit.id))state.selection=state.selection.filter(id=>id!==hit.id);else if(!state.selection.includes(hit.id))state.selection.push(hit.id)}render();setStatus(hit?`${hit.type} ${hit.id} selected`:'No object selected.')}else selectInBox(i.start,p,i.additive);return}if(i.kind==='grip'){history.record(`GRIP ${i.entityId}`,i.before);state.interaction=null;render();return}if(i.kind==='move'||i.kind==='copy'){if(!i.start){i.start=p;setStatus('Pick destination point.');return}const dx=p.x-i.start.x,dy=p.y-i.start.y,before=captureDocument(),sources=i.entityIds.map(id=>state.entities.find(x=>x.id===id)).filter(Boolean);if(sources.length){const targets=sources.map(e=>{if(i.kind==='move')return e;const copy=clone(e);copy.id=uid();copy.createdAt=new Date().toISOString();state.entities.push(copy);return copy});targets.forEach(target=>{moveEntity(target,dx,dy);target.modifiedAt=new Date().toISOString()});if(i.kind==='copy')state.selection=targets.map(e=>e.id);history.record(i.kind.toUpperCase(),before);render();log(`${i.kind.toUpperCase()} ${sources.length} object(s)`)}state.interaction=null;setTool('select');return}endTool(p)});
+  svg.addEventListener('mouseup',ev=>{if(ev.button!==0&&ev.button!==1)return;if(state.pressStartedInteraction){state.pressStartedInteraction=false;return}if(!state.interaction)return;const i=state.interaction;if(i.kind==='pan'){state.interaction=null;wrap.classList.remove('is-panning');return}const p=snapPoint(toWorld(ev.clientX,ev.clientY)).p;if(i.kind==='select-box'){state.interaction=null;if(dist(i.start,p)<3/state.viewport.scale){const hit=hitTest(p);if(!i.additive)state.selection=[];if(hit){if(i.additive&&state.selection.includes(hit.id))state.selection=state.selection.filter(id=>id!==hit.id);else if(!state.selection.includes(hit.id))state.selection.push(hit.id)}render();setStatus(hit?`${hit.type} ${hit.id} selected`:'No object selected.')}else selectInBox(i.start,p,i.additive);return}if(i.kind==='grip'){history.record(`GRIP ${i.entityId}`,i.before);state.interaction=null;render();return}if(i.kind==='move'||i.kind==='copy'){if(!i.start){i.start=p;setStatus('Pick destination point.');return}const dx=p.x-i.start.x,dy=p.y-i.start.y,before=captureDocument(),sources=i.entityIds.map(id=>state.entities.find(x=>x.id===id)).filter(Boolean);if(sources.length){const targets=sources.map(e=>{if(i.kind==='move')return e;const copy=clone(e);copy.id=uid();copy.createdAt=new Date().toISOString();state.entities.push(copy);return copy});targets.forEach(target=>{moveEntity(target,dx,dy);target.modifiedAt=new Date().toISOString()});if(i.kind==='copy')state.selection=targets.map(e=>e.id);history.record(i.kind.toUpperCase(),before);render();log(`${i.kind.toUpperCase()} ${sources.length} object(s)`)}state.interaction=null;setTool('select');return}endTool(p)});
   window.addEventListener('mousemove',ev=>{if(state.interaction?.kind==='pan'){state.viewport.x=state.interaction.vx+(ev.clientX-state.interaction.sx);state.viewport.y=state.interaction.vy+(ev.clientY-state.interaction.sy);applyViewport()}});
+  // Finish pan even if the mouse is released outside the drawing canvas.
+  window.addEventListener('mouseup',()=>{if(state.interaction?.kind==='pan'){state.interaction=null;wrap.classList.remove('is-panning')}});
+  window.addEventListener('blur',()=>{state.panKeyDown=false;wrap.classList.remove('pan-ready');if(state.interaction?.kind==='pan'){state.interaction=null;wrap.classList.remove('is-panning')}});
   function moveEntity(e,dx,dy){const move=p=>{p.x+=dx;p.y+=dy};if(e.type==='line'||e.type==='dimension'){move(e.a);move(e.b)}else if(e.type==='arc'){move(e.a);move(e.b);move(e.c)}else if(e.type==='rect'){e.x+=dx;e.y+=dy}else if(e.type==='circle'||e.type==='ellipse'){e.cx+=dx;e.cy+=dy}else if(['polyline','polygon','spline','revcloud'].includes(e.type))e.points.forEach(move);else if(e.type==='text'||e.type==='point'){e.x+=dx;e.y+=dy}}
   svg.addEventListener('dblclick',ev=>{const p=snapPoint(toWorld(ev.clientX,ev.clientY)).p;const h=hitTest(p);if(h&&h.type==='text'){const v=window.prompt('Edit text:',h.text);if(v!==null){h.text=v;render();}}});
-  svg.addEventListener('wheel',ev=>{ev.preventDefault();const before=toWorld(ev.clientX,ev.clientY);const factor=ev.deltaY<0?1.12:.89;state.viewport.scale=clamp(state.viewport.scale*factor,.1,20);const after=toWorld(ev.clientX,ev.clientY);state.viewport.x+=(after.x-before.x)*state.viewport.scale;state.viewport.y+=(after.y-before.y)*state.viewport.scale;applyViewport()}, {passive:false});
+  svg.addEventListener('wheel',ev=>{
+    // Covers wheel mice, smooth trackpads, and Ctrl+wheel trackpad-pinch
+    // gestures. Zoom is anchored to the pointer rather than the canvas origin.
+    ev.preventDefault();
+    const rect=svg.getBoundingClientRect();
+    const viewBox=svg.viewBox.baseVal;
+    const screenPoint={
+      x:(ev.clientX-rect.left)*(viewBox.width/Math.max(1,rect.width)),
+      y:(ev.clientY-rect.top)*(viewBox.height/Math.max(1,rect.height))
+    };
+    const deltaScale=ev.deltaMode===1?16:ev.deltaMode===2?wrap.clientHeight:1;
+    const deltaY=ev.deltaY*deltaScale;
+    const sensitivity=ev.ctrlKey?0.0035:0.0015;
+    const factor=Math.exp(clamp(-deltaY*sensitivity,-1.5,1.5));
+    Object.assign(state.viewport,Core.zoomViewportAt(state.viewport,screenPoint,factor));
+    applyViewport();
+  }, {passive:false});
   document.addEventListener('keydown',ev=>{
+    const target=ev.target;
+    const editingTarget=Boolean(target?.closest?.('input, textarea, select, [contenteditable="true"]'));
+    if(ev.code==='Space'&&!editingTarget){ev.preventDefault();state.panKeyDown=true;wrap.classList.add('pan-ready');return}
     if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='z'){ev.preventDefault();command(ev.shiftKey?'REDO':'UNDO');return}
     if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='y'){ev.preventDefault();command('REDO');return}
     if(document.activeElement===commandInput){
@@ -267,7 +289,7 @@
       }
       return
     }
-    if(ev.key==='Escape'){if(state.interaction?.kind==='grip')restoreDocument(state.interaction.before);state.interaction=null;state.selection=[];setTool('select');render();setStatus('Cancelled.');return}
+    if(ev.key==='Escape'){if(state.interaction?.kind==='grip')restoreDocument(state.interaction.before);state.interaction=null;wrap.classList.remove('is-panning');state.selection=[];setTool('select');render();setStatus('Cancelled.');return}
     if(ev.key==='Enter'&&['polyline','spline','revcloud'].includes(state.interaction?.kind)){finishPolyline();return}
     if((ev.key==='Delete'||ev.key==='Backspace')&&state.selection.length){deleteSelection();return}
     if(ev.key==='F3'){state.snap=!state.snap;document.getElementById('snapState').textContent=state.snap?'SNAP ON':'SNAP OFF';document.getElementById('snapToggle').classList.toggle('active',state.snap);return}
@@ -276,6 +298,7 @@
     if(ev.key==='F11'){state.tracking=!state.tracking;document.getElementById('trackingToggle').classList.toggle('active',state.tracking);return}
     const k=ev.key.toUpperCase();if(k==='L')setTool('line');else if(k==='C')setTool('circle');else if(k==='V')setTool('select');else if(k==='T')setTool('text');else if(k==='D')setTool('dimension');else if(k==='M')modifyMove();else if(k==='O')modifyOffset();else if(k==='R')modifyRotate();else if(k==='P')setTool('polyline');
   });
+  window.addEventListener('keyup',ev=>{if(ev.code==='Space'){state.panKeyDown=false;wrap.classList.remove('pan-ready')}});
   document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
   document.querySelectorAll('[data-command]').forEach(b=>b.addEventListener('click',()=>{const c=b.dataset.command;if(c==='new')newDrawing();else if(c==='open')fileInput.click();else if(c==='save')saveBahl();else if(c==='svg')exportSvg();else if(c==='dxf')exportDxf();else command(c)}));
   document.getElementById('snapToggle').addEventListener('click',()=>{state.snap=!state.snap;document.getElementById('snapState').textContent=state.snap?'SNAP ON':'SNAP OFF';document.getElementById('snapToggle').classList.toggle('active',state.snap)});

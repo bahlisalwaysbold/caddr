@@ -146,6 +146,32 @@
     clear() { this.undoStack.length = 0; this.redoStack.length = 0; }
   }
 
+  // A very broad practical zoom range avoids the tiny hard limits of the
+  // first prototype while keeping transforms numerically stable.
+  const MIN_VIEW_SCALE = 1e-6;
+  const MAX_VIEW_SCALE = 1e6;
+
+  function zoomViewportAt(viewport, screenPoint, factor) {
+    const oldScale = Number.isFinite(viewport?.scale) && viewport.scale > 0 ? viewport.scale : 1;
+    const oldX = Number.isFinite(viewport?.x) ? viewport.x : 0;
+    const oldY = Number.isFinite(viewport?.y) ? viewport.y : 0;
+    const screenX = Number.isFinite(screenPoint?.x) ? screenPoint.x : 0;
+    const screenY = Number.isFinite(screenPoint?.y) ? screenPoint.y : 0;
+    const multiplier = Number.isFinite(factor) && factor > 0 ? factor : 1;
+    const requestedScale = oldScale * multiplier;
+    const scale = Math.max(MIN_VIEW_SCALE, Math.min(MAX_VIEW_SCALE, requestedScale));
+
+    // Keep the world coordinate underneath the cursor fixed on screen.
+    const worldX = (screenX - oldX) / oldScale;
+    const worldY = (screenY - oldY) / oldScale;
+    return {
+      ...viewport,
+      x: screenX - worldX * scale,
+      y: screenY - worldY * scale,
+      scale
+    };
+  }
+
   function parseCoordinate(input, reference = { x: 0, y: 0 }) {
     const text = String(input).trim().replace(/\s+/g, '');
     if (!text) return null;
@@ -242,7 +268,7 @@
     return { p: { x: Math.round(point.x / gridSize) * gridSize, y: Math.round(point.y / gridSize) * gridSize }, kind: 'GRID' };
   }
 
-  const api = { FORMAT, VERSION, normalizeDocument, serializeDocument, CommandRegistry, HistoryManager, parseCoordinate, snapPoint };
+  const api = { FORMAT, VERSION, normalizeDocument, serializeDocument, CommandRegistry, HistoryManager, parseCoordinate, snapPoint, zoomViewportAt, MIN_VIEW_SCALE, MAX_VIEW_SCALE };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BahlCore = api;
 })(globalThis);

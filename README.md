@@ -12,6 +12,8 @@ python -m http.server 5173
 
 Then open `http://localhost:5173`.
 
+**Viewport navigation:** use the mouse wheel to zoom around the pointer; use middle-mouse drag or hold **Space** and drag with the left mouse button to pan. Trackpad pinch gestures are handled through browser wheel events.
+
 ## Implemented
 
 - SVG-based vector geometry with millimetre working units
@@ -22,6 +24,7 @@ Then open `http://localhost:5173`.
 - Selection + properties editor
 - Move, copy, rotate, scale, mirror, line offset, trim/extend, fillet, chamfer, stretch, rectangular/polar/path arrays, break, join, explode and delete
 - Horizontal, vertical and line-length constraints, with named dimensional parameters in the Parameters Manager
+- Cursor-anchored zoom over a very broad range, smooth mouse-wheel/trackpad zoom, middle-mouse drag pan, and Space + left-drag pan
 - Zoom, pan, fit-to-extents
 - Keyboard shortcuts for common commands
 - `.bahl` JSON save/open
