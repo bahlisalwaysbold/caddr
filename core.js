@@ -270,7 +270,7 @@
 
 
   function parseDxf(text) {
-    const lines = String(text).replace(/^\\uFEFF/, '').replace(/\\r/g, '').split('\\n');
+    const lines = String(text).replace(/^\uFEFF/, '').replace(/\r/g, '').split('\n');
     if (lines.length < 4) throw new Error('The file is empty or is not an ASCII DXF file.');
     const pairs = [];
     for (let i = 0; i + 1 < lines.length; i += 2) {
@@ -279,7 +279,7 @@
       pairs.push({ code, value: lines[i + 1].trim() });
     }
     const sections = [];
-    let section = '', table = '', currentLayer = null, currentEntity = null;
+    let section = '', table = '', expectTableName = false, currentLayer = null, currentEntity = null;
     const layerMap = new Map();
     const entities = [];
     const aci = {1:'#ff3333',2:'#ffff33',3:'#33cc66',4:'#33ffff',5:'#3366ff',6:'#ff33ff',7:'#e6e6e6',8:'#999999',9:'#cccccc',10:'#ff6666',11:'#ffaaaa',12:'#bd4b4b',13:'#bd7a7a',14:'#a64b00',15:'#a67a00',16:'#a6a600',17:'#7aa600',18:'#4ba600',19:'#00a64b',20:'#00a67a',21:'#00a6a6',22:'#007aa6',23:'#004ba6',24:'#4b00a6',25:'#7a00a6',26:'#a600a6',27:'#a6007a',28:'#a6004b'};
@@ -318,13 +318,13 @@
       if (pair.code === 0 && pair.value === 'SECTION') { flushEntity(); section=''; table=''; }
       if (section === '' && pair.code === 2) { section=pair.value; continue; }
       if (section === 'TABLES') {
-        if (pair.code===0 && pair.value==='TABLE') { table=''; currentLayer=null; continue; }
-        if (pair.code===2) { table=pair.value; continue; }
+        if (pair.code===0 && pair.value==='TABLE') { table=''; currentLayer=null; expectTableName=true; continue; }
+        if (pair.code===2 && expectTableName) { table=pair.value; expectTableName=false; continue; }
         if (table==='LAYER') {
-          if (pair.code===0 && pair.value==='LAYER') { if(currentLayer){layerMap.set(currentLayer.name,currentLayer)} currentLayer={name:'0',color:'#e6e6e6',visible:true,locked:false,linetype:'CONTINUOUS'}; continue; }
+          if (pair.code===0 && pair.value==='LAYER') { if(currentLayer)layerMap.set(currentLayer.name,currentLayer); currentLayer={name:'0',color:'#e6e6e6',visible:true,locked:false,linetype:'CONTINUOUS'}; continue; }
           if(currentLayer){if(pair.code===2)currentLayer.name=pair.value;else if(pair.code===62){currentLayer.visible=Number(pair.value)>=0;currentLayer.color=colorFor(pair.value)}else if(pair.code===6)currentLayer.linetype=pair.value;}
         }
-        if (pair.code===0 && pair.value==='ENDTAB') { if(currentLayer)layerMap.set(currentLayer.name,currentLayer);currentLayer=null;table=''; }
+        if (pair.code===0 && pair.value==='ENDTAB') { if(currentLayer)layerMap.set(currentLayer.name,currentLayer);currentLayer=null;table='';expectTableName=false; }
       } else if(section==='ENTITIES') {
         if(pair.code===0){flushEntity();currentEntity={type:pair.value,items:[]}}
         else if(currentEntity)currentEntity.items.push(pair);
