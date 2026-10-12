@@ -325,6 +325,11 @@ def analyze_model(raw_model: Any) -> dict[str, Any]:
         "FX": "RxnFX", "FY": "RxnFY", "FZ": "RxnFZ",
         "MX": "RxnMX", "MY": "RxnMY", "MZ": "RxnMZ",
     }
+    member_metadata = {
+        item.get("id"): item
+        for item in data.get("members", [])
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
     for combo_name in combo_names:
         combo_nodes = []
         for node_id, node in model.nodes.items():
@@ -341,8 +346,25 @@ def analyze_model(raw_model: Any) -> dict[str, Any]:
         combo_members = []
         for member_id, member in model.members.items():
             length = _metric(member, "L")
+            meta = member_metadata.get(member_id, {})
+            samples = []
+            sample_count = 17
+            if length is not None and length > 0:
+                for sample_index in range(sample_count):
+                    x = length * sample_index / (sample_count - 1)
+                    samples.append({
+                        "x": x,
+                        "shearFy": _metric(member, "shear", "Fy", x, combo_name),
+                        "shearFz": _metric(member, "shear", "Fz", x, combo_name),
+                        "momentY": _metric(member, "moment", "My", x, combo_name),
+                        "momentZ": _metric(member, "moment", "Mz", x, combo_name),
+                        "deflectionY": _metric(member, "deflection", "dy", x, combo_name),
+                        "deflectionZ": _metric(member, "deflection", "dz", x, combo_name),
+                    })
             combo_members.append({
                 "memberId": member_id,
+                "label": meta.get("label", member_id),
+                "kind": meta.get("kind", "member"),
                 "length": length,
                 "maxAxial": _metric(member, "max_axial", combo_name),
                 "minAxial": _metric(member, "min_axial", combo_name),
@@ -358,6 +380,7 @@ def analyze_model(raw_model: Any) -> dict[str, Any]:
                 "minDeflectionY": _metric(member, "min_deflection", "dy", combo_name),
                 "maxDeflectionZ": _metric(member, "max_deflection", "dz", combo_name),
                 "minDeflectionZ": _metric(member, "min_deflection", "dz", combo_name),
+                "diagramSamples": samples,
             })
         combinations.append({
             "name": combo_name,
