@@ -47,39 +47,63 @@
         <div class="structural-main-grid">
           <div class="structural-left-column">
             <section class="structural-panel" id="model">
-              <div class="structural-panel-heading"><div><span class="area-number">01</span><div><h2>Building model</h2><p>Define the geometry and the structural elements.</p></div></div><span class="area-status status-preview">Setup concept</span></div>
-              <div class="model-preview">
-                <div class="model-preview-info"><span class="preview-caption">SCHEMATIC MODEL</span><strong>RC frame — 3 levels</strong><p>Illustrative geometry only. This is not a calculated structural model.</p><div class="model-legend"><span><i class="legend-column"></i>Columns</span><span><i class="legend-beam"></i>Beams</span><span><i class="legend-slab"></i>Slab levels</span></div></div>
-                <svg viewBox="0 0 370 230" role="img" aria-label="Schematic three-storey reinforced concrete frame illustration">
-                  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
-                    <g stroke="#b1c2d8" stroke-width="1"><path d="M36 186 180 218 337 175M36 130 180 162 337 119M36 76 180 108 337 65M36 24 180 56 337 13" stroke-dasharray="3 5" opacity=".7"/></g>
-                    <g stroke="#2f72ce" stroke-width="4"><path d="M63 32v153M112 44v153M161 55v153M210 39v153M259 25v153M308 14v153"/></g>
-                    <g stroke="#74a0df" stroke-width="5"><path d="M63 32 112 44 161 55 210 39 259 25 308 14M63 83 112 96 161 107 210 91 259 77 308 66M63 134 112 147 161 158 210 142 259 128 308 117M63 185 112 197 161 208 210 192 259 178 308 167"/></g>
-                    <g stroke="#b0cdf6" stroke-width="1.2" opacity=".9"><path d="M63 32 20 55 20 208 161 240M63 83 20 106M63 134 20 157M112 44 69 67 69 220M161 55 118 78M210 39 167 62M259 25 216 48M308 14 265 37"/></g>
-                    <g fill="#477fca" stroke="#fff" stroke-width="1.5"><circle cx="63" cy="83" r="3.5"/><circle cx="112" cy="96" r="3.5"/><circle cx="161" cy="107" r="3.5"/><circle cx="210" cy="91" r="3.5"/><circle cx="259" cy="77" r="3.5"/><circle cx="308" cy="66" r="3.5"/></g>
-                  </g>
-                </svg>
+              <div class="structural-panel-heading"><div><span class="area-number">01</span><div><h2>Interactive structural model</h2><p>Select a beam or column in the diagram to inspect and edit its section.</p></div></div><span class="area-status status-connected">Editable model</span></div>
+              <div class="model-toolbar">
+                <div class="model-toolbar-info"><span class="model-ready-dot"></span><strong id="modelCountLabel">10 members · 9 joints</strong><small>Ground + 2 upper levels</small></div>
+                <div class="model-toolbar-actions">
+                  <div class="model-view-switch" role="group" aria-label="Structural diagram view">
+                    <button class="model-view-button active" type="button" data-diagram-mode="model" aria-pressed="true">Model</button>
+                    <button class="model-view-button" type="button" data-diagram-mode="moment" aria-pressed="false">Moments</button>
+                    <button class="model-view-button" type="button" data-diagram-mode="shear" aria-pressed="false">Shear</button>
+                    <button class="model-view-button" type="button" data-diagram-mode="deflection" aria-pressed="false">Deflection</button>
+                  </div>
+                  <button class="quiet-button" id="resetFrameModel" type="button" title="Reset the sample frame and its member properties">Reset</button>
+                </div>
               </div>
-              <div class="model-settings-grid"><div class="setting-field"><span>Grid system</span><strong>Rectangular grid <small>›</small></strong></div><div class="setting-field"><span>Material definition</span><strong>Concrete + reinforcement <small>›</small></strong></div><div class="setting-field"><span>Member families</span><strong>Columns · Beams · Slabs <small>›</small></strong></div><div class="setting-field"><span>Foundation system</span><strong>To be defined <small>›</small></strong></div></div>
-              <div class="panel-action-row"><span class="subtle-help">Model editor is a planned integration.</span><button class="button button-secondary" type="button" data-not-ready="Model editing is not wired up yet.">Configure model <span>→</span></button></div>
+              <div class="interactive-model-layout">
+                <div class="diagram-stage">
+                  <svg id="structuralDiagram" viewBox="0 0 720 390" role="img" aria-label="Interactive two-bay, two-storey frame model. Select beams and columns to edit their properties." tabindex="0"></svg>
+                  <div class="diagram-caption"><span id="diagramModeLabel">MODEL VIEW</span><span>Click a beam or column to select it</span></div>
+                  <div class="diagram-legend" id="diagramLegend"><span><i class="legend-beam"></i>Beams</span><span><i class="legend-column"></i>Columns</span><span><i class="legend-joint"></i>Joints</span></div>
+                </div>
+                <aside class="member-inspector" aria-label="Selected structural member properties">
+                  <div class="inspector-top"><span class="preview-caption">MEMBER INSPECTOR</span><span class="member-type-badge" id="selectedMemberType">BEAM</span></div>
+                  <h3 id="selectedMemberTitle">Beam B1 · Level 1</h3>
+                  <p class="inspector-member-id" id="selectedMemberSubtitle">BEAM_B1_L1</p>
+                  <div class="inspector-fields">
+                    <label for="memberWidth">Section width <span>mm</span><input id="memberWidth" type="number" min="100" max="1500" step="10" value="250" /></label>
+                    <label for="memberDepth">Section depth <span>mm</span><input id="memberDepth" type="number" min="100" max="2000" step="10" value="450" /></label>
+                    <label for="memberLoad" id="memberLoadField">Uniform downward line load <span>kN/m</span><input id="memberLoad" type="number" min="0" max="500" step="0.5" value="12" /></label>
+                  </div>
+                  <div class="section-property-preview" id="sectionPropertyPreview"><span>Section properties</span><div><small>Area</small><strong id="sectionArea">0.1125 m²</strong></div><div><small>Inertia*</small><strong id="sectionInertia">—</strong></div><p>*Calculated from the rectangular dimensions; not a code design check.</p></div>
+                  <div class="inspector-result-preview" id="selectedMemberResults" hidden><div class="inspector-results-heading">LATEST ANALYSIS <span id="inspectorComboName">—</span></div><div><small>Peak moment</small><strong id="inspectorMoment">—</strong></div><div><small>Peak shear</small><strong id="inspectorShear">—</strong></div><div><small>Peak deflection</small><strong id="inspectorDeflection">—</strong></div></div>
+                  <div class="inspector-actions"><button class="button button-primary" id="applyMemberChanges" type="button">Apply properties</button><button class="quiet-button" id="resetMemberProperties" type="button">Reset member</button></div>
+                  <p class="inspector-help" id="memberInspectorHelp">Choose a member, edit the section or line load, then run analysis below. Changes invalidate previous results.</p>
+                </aside>
+              </div>
+              <div class="model-footnote"><span>i</span><p><strong>Editable demonstration frame.</strong> This model uses idealised joints, fixed bases, assumed elastic concrete properties and entered beam line loads. It does not yet derive slab loads, self-weight, walls, diaphragm action or reinforcement from architectural drawings. Geometry is schematic, not to scale.</p></div>
             </section>
 
             <section class="structural-panel" id="loads">
-              <div class="structural-panel-heading"><div><span class="area-number">02</span><div><h2>Loads & combinations</h2><p>Set the loading assumptions before analysis.</p></div></div><span class="area-status status-preview">Planned</span></div>
-              <div class="load-case-grid"><div class="load-case"><span class="load-symbol">G</span><span><strong>Dead load</strong><small>Self-weight & permanent actions</small></span><span class="load-state">Case</span></div><div class="load-case"><span class="load-symbol live-load">Q</span><span><strong>Imposed load</strong><small>Use-dependent variable actions</small></span><span class="load-state">Case</span></div><div class="load-case"><span class="load-symbol wind-load">W</span><span><strong>Wind load</strong><small>Exposure & direction to be defined</small></span><span class="load-state">Case</span></div></div>
-              <div class="combination-preview"><div><strong>Load combinations</strong><small>Combination builder is not connected yet</small></div><span class="combination-pill">ULS</span><span class="combination-pill service">SLS</span><button type="button" class="text-action" data-not-ready="Load cases and code-based combinations require the analysis engine.">Set up <span>→</span></button></div>
+              <div class="structural-panel-heading"><div><span class="area-number">02</span><div><h2>Loads & combinations</h2><p>Line loads are attached to the actual beam members in the diagram.</p></div></div><span class="area-status status-connected">Model-linked</span></div>
+              <div class="load-case-live">
+                <div class="load-symbol">G</div><div class="load-case-live-copy"><strong>Applied gravity line loads</strong><small>Global −Y · kN/m · edit any beam in the model or list</small></div><span class="live-tag">EDITABLE</span>
+              </div>
+              <div class="beam-load-list" id="beamLoadList" aria-label="Beam gravity line loads"></div>
+              <div class="combination-live-row"><div><strong>G_SERVICE</strong><small>Current demonstration combination</small></div><span class="combination-pill service">1.0 × G</span></div>
+              <p class="load-code-note">This is an explicit test load, not a code-prescribed load combination. No load factors are inferred automatically. Add dead, imposed, wind and other applicable cases as separate verified inputs in later development.</p>
             </section>
 
             <section class="structural-panel" id="analysis">
-              <div class="structural-panel-heading"><div><span class="area-number">03</span><div><h2>Analysis & model checks</h2><p>First real connection: a controlled sample beam sent to the solver API.</p></div></div><span class="area-status status-preview" id="engineBadge">Checking engine</span></div>
+              <div class="structural-panel-heading"><div><span class="area-number">03</span><div><h2>Analysis & model checks</h2><p>Run the current editable frame model through the structural analysis API.</p></div></div><span class="area-status status-preview" id="engineBadge">Checking engine</span></div>
               <div class="analysis-live-card">
                 <div class="analysis-live-icon">∿</div>
                 <div class="analysis-live-copy">
                   <strong>Run a sample beam analysis</strong>
-                  <p>Caddr sends a test model to PyNiteFEA and displays its calculated support reactions, peak moment, shear and deflection.</p>
+                  <p>Caddr sends the active frame geometry, section properties and beam line loads to PyNiteFEA, then displays its calculated reactions, internal forces and deflections.</p>
                   <div id="solverConnection" class="solver-connection pending"><i></i><span id="solverConnectionText">Checking analysis service…</span></div>
                 </div>
-                <button class="button button-primary" type="button" id="runDemoAnalysis" disabled>Run sample analysis <span>→</span></button>
+                <button class="button button-primary" type="button" id="runDemoAnalysis" disabled>Run Analysis <span>→</span></button>
               </div>
               <p class="solver-boundary-note"><strong>Important:</strong> this first test analyses a separate simply supported beam. It does not analyse the building illustration above and it does not perform reinforced-concrete code design.</p>
               <div id="analysisError" class="analysis-error" role="alert" hidden></div>
