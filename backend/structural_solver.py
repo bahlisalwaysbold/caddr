@@ -127,7 +127,7 @@ def _metric(obj: Any, method_name: str, *args: Any) -> float | None:
             value = value[0]
         value = float(value)
         return value if math.isfinite(value) else None
-    except (AttributeError, KeyError, TypeError, ValueError, ZeroDivisionError):
+    except Exception:
         return None
 
 
@@ -200,6 +200,11 @@ def _build_and_validate(raw_model: Any) -> tuple[FEModel3D, dict, set[str], list
         length = math.sqrt(sum((positions[ni][i] - positions[nj][i]) ** 2 for i in range(3)))
         if not math.isfinite(length) or length <= 1e-9:
             raise ModelInputError("Member " + member_id + " has zero or invalid length.")
+        member["iNode"] = ni
+        member["jNode"] = nj
+        member["materialId"] = material_id
+        member["sectionId"] = section_id
+        member["rotation"] = _number(member.get("rotation", 0), "Member " + member_id + ".rotation")
         member_lengths[member_id] = length
 
     load_cases: set[str] = set()
