@@ -49,7 +49,7 @@
             <section class="structural-panel" id="model">
               <div class="structural-panel-heading"><div><span class="area-number">01</span><div><h2>Interactive structural model</h2><p>Select a beam or column in the diagram to inspect and edit its section.</p></div></div><span class="area-status status-connected">Editable model</span></div>
               <div class="model-toolbar">
-                <div class="model-toolbar-info"><span class="model-ready-dot"></span><strong id="modelCountLabel">10 members · 9 joints</strong><small>Ground + 2 upper levels</small></div>
+                <div class="model-toolbar-info"><span class="model-ready-dot"></span><strong id="modelCountLabel">10 members · 9 joints</strong><small id="modelLevelSummary">Ground + 2 upper levels</small></div>
                 <div class="model-toolbar-actions">
                   <div class="model-view-switch" role="group" aria-label="Structural diagram view">
                     <button class="model-view-button active" type="button" data-diagram-mode="model" aria-pressed="true">Model</button>
@@ -154,7 +154,7 @@
       </div>
     </main>
   </div>
-  <dialog class="modal settings-modal" id="settingsDialog"><form method="dialog"><div class="modal-head"><div><span class="panel-kicker">PROJECT SETUP</span><h2>Project settings</h2><p>These are prototype settings for the sample project.</p></div><button type="button" class="modal-close" id="closeSettings" aria-label="Close">×</button></div><label class="form-label" for="structureType">Structure type</label><select id="structureType" class="form-input"><option>Reinforced concrete building</option><option>Steel frame building</option><option>Masonry structure</option><option>Mixed structural system</option></select><label class="form-label" for="storeyCount">Number of storeys</label><select id="storeyCount" class="form-input"><option>1 storey</option><option>2 storeys</option><option selected>3 storeys</option><option>4 storeys</option><option>5 storeys</option><option>6+ storeys</option></select><div class="modal-actions"><button type="button" id="cancelSettings" class="button button-secondary">Cancel</button><button type="submit" id="saveSettings" class="button button-primary">Save preview settings</button></div></form></dialog>
+  <dialog class="modal settings-modal" id="settingsDialog"><form method="dialog"><div class="modal-head"><div><span class="panel-kicker">PROJECT SETUP</span><h2>Project settings</h2><p>These are prototype settings for the sample project.</p></div><button type="button" class="modal-close" id="closeSettings" aria-label="Close">×</button></div><label class="form-label" for="structureType">Structural system</label><select id="structureType" class="form-input"><option selected>Reinforced concrete frame (current prototype)</option></select><label class="form-label" for="storeyCount">Model levels including the base</label><select id="storeyCount" class="form-input"><option value="2">2 levels · Ground + 1 upper</option><option value="3" selected>3 levels · Ground + 2 upper</option><option value="4">4 levels · Ground + 3 upper</option><option value="5">5 levels · Ground + 4 upper</option></select><div class="modal-actions"><button type="button" id="cancelSettings" class="button button-secondary">Cancel</button><button type="submit" id="saveSettings" class="button button-primary">Save preview settings</button></div></form></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
