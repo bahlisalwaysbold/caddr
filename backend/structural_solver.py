@@ -311,7 +311,7 @@ def _build_and_validate(raw_model: Any) -> tuple[FEModel3D, dict, set[str], list
 def analyze_model(raw_model: Any) -> dict[str, Any]:
     model, data, load_cases, combo_names = _build_and_validate(raw_model)
     try:
-        model.analyze_linear(check_stability=True, check_statics=True)
+        model.analyze_linear(sparse=False, check_stability=True, check_statics=True)
     except Exception as exc:
         raise SolverRunError(
             "The model could not be solved. Check for unstable supports, disconnected members, "
