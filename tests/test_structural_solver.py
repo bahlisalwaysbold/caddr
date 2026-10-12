@@ -9,7 +9,7 @@ def sample_beam_model():
         "units": "kN-m",
         "nodes": [
             {"id": "N1", "x": 0, "y": 0, "z": 0, "supports": {"DX": True, "DY": True, "DZ": True}},
-            {"id": "N2", "x": 6, "y": 0, "z": 0, "supports": {"DX": True, "DY": True, "DZ": True}},
+            {"id": "N2", "x": 6, "y": 0, "z": 0, "supports": {"DX": True, "DY": True, "DZ": True, "RX": True}},
         ],
         "materials": [
             {"id": "SteelDemo", "E": 200000000, "G": 76923077, "nu": 0.3, "rho": 78.5},
