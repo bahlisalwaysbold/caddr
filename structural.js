@@ -18,11 +18,15 @@
   };
   const X_GRID = [0, 4, 8];
   const GRID_NAMES = ["A", "B", "C"];
-  const LEVELS = [
-    { id: "L0", label: "FOUNDATION", y: 0 },
-    { id: "L1", label: "LEVEL 1 · +3.3 m", y: 3.3 },
-    { id: "L2", label: "LEVEL 2 · +6.6 m", y: 6.6 }
-  ];
+  function makeLevels(count) {
+    const safeCount = Math.max(2, Math.min(5, Math.round(Number(count) || 3)));
+    return Array.from({ length: safeCount }, (_, index) => ({
+      id: "L" + index,
+      label: index === 0 ? "FOUNDATION" : "LEVEL " + index + " · +" + (index * 3.3).toFixed(1) + " m",
+      y: Number((index * 3.3).toFixed(3))
+    }));
+  }
+  let LEVELS = makeLevels(3);
   const DISPLAY = {
     model: { title: "MODEL VIEW", unit: "", fields: [] },
     moment: { title: "BENDING MOMENT DIAGRAM", unit: "kN·m", beam: "momentZ", column: "momentY", fields: ["maxMomentZ", "minMomentZ"] },
@@ -47,7 +51,7 @@
   function makeDefaultMembers() {
     const result = [];
     for (let span = 0; span < 2; span++) {
-      for (let level = 1; level <= 2; level++) {
+      for (let level = 1; level < LEVELS.length; level++) {
         const id = "BEAM_B" + (span + 1) + "_L" + level;
         result.push({
           id, kind: "beam",
@@ -59,7 +63,7 @@
       }
     }
     for (let grid = 0; grid < 3; grid++) {
-      for (let level = 0; level < 2; level++) {
+      for (let level = 0; level < LEVELS.length - 1; level++) {
         const id = "COL_" + GRID_NAMES[grid] + "_L" + level + "_L" + (level + 1);
         result.push({
           id, kind: "column",
@@ -78,7 +82,12 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const saved = JSON.parse(raw);
-      if (!saved || typeof saved !== "object" || !saved.members || typeof saved.members !== "object") return;
+      if (!saved || typeof saved !== "object") return;
+      if (Number.isInteger(saved.levels) && saved.levels >= 2 && saved.levels <= 5) {
+        LEVELS = makeLevels(saved.levels);
+        members = makeDefaultMembers();
+      }
+      if (!saved.members || typeof saved.members !== "object") return;
       members.forEach(member => {
         const candidate = saved.members[member.id];
         if (!candidate || typeof candidate !== "object") return;
@@ -99,6 +108,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         version: 1,
         units: "kN-m",
+        levels: LEVELS.length,
         members: Object.fromEntries(members.map(member => [member.id, {
           width: member.width, depth: member.depth, load: member.load
         }]))
@@ -214,9 +224,10 @@
 
   function pointFor(nodeId) {
     const coords = nodeCoordinates()[nodeId];
+    const height = Math.max(1, LEVELS[LEVELS.length - 1].y);
     return {
       x: 115 + (coords.x / 8) * 490,
-      y: 321 - (coords.y / 6.6) * 205
+      y: 321 - (coords.y / height) * 205
     };
   }
 
@@ -330,6 +341,7 @@
   }
 
   function renderDiagram() {
+    updateModelCounts();
     const coordinateMap = nodeCoordinates();
     const resultMap = memberResultMap();
     const scale = modeGlobalScale();
@@ -426,6 +438,14 @@
       button.disabled = button.dataset.diagramMode !== "model" && !latestAnalysis;
       button.title = button.disabled ? "Run analysis to inspect this diagram." : "";
     });
+  }
+
+  function updateModelCounts() {
+    const jointCount = Object.keys(nodeCoordinates()).length;
+    $("#modelCountLabel").textContent = members.length + " members · " + jointCount + " joints";
+    $("#modelLevelSummary").textContent = "Ground + " + (LEVELS.length - 1) + " upper levels";
+    $(".summary-card:nth-child(2) > strong").innerHTML = LEVELS.length + ' <small>levels</small>';
+    $(".summary-card:nth-child(2) > small").textContent = "Ground + " + (LEVELS.length - 1) + " upper levels";
   }
 
   function selectMember(id) {
@@ -549,6 +569,7 @@
   }
 
   function resetFrameModel() {
+    LEVELS = makeLevels(3);
     members = makeDefaultMembers();
     selectedMemberId = members.find(member => member.kind === "beam")?.id || members[0]?.id || null;
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
@@ -749,8 +770,33 @@
     settingsDialog.addEventListener("click", event => { if (event.target === settingsDialog) settingsDialog.close(); });
     $("#saveSettings").addEventListener("click", event => {
       event.preventDefault();
-      showToast("The settings dialog is still a preview and does not rebuild the frame geometry yet.");
+      const requestedLevels = Number($("#storeyCount").value);
+      if (!Number.isInteger(requestedLevels) || requestedLevels < 2 || requestedLevels > 5) {
+        showToast("Choose between 2 and 5 model levels including the base.");
+        return;
+      }
+      const previous = Object.fromEntries(members.map(member => [member.id, {
+        width: member.width, depth: member.depth, load: member.load
+      }]));
+      LEVELS = makeLevels(requestedLevels);
+      members = makeDefaultMembers();
+      members.forEach(member => {
+        const old = previous[member.id];
+        if (!old) return;
+        member.width = old.width;
+        member.depth = old.depth;
+        member.load = old.load;
+      });
+      if (!members.some(member => member.id === selectedMemberId)) {
+        selectedMemberId = members.find(member => member.kind === "beam")?.id || members[0]?.id || null;
+      }
+      persistMemberEdits();
+      invalidateResults();
+      drawInspector();
+      updateLoadList();
+      renderDiagram();
       settingsDialog.close();
+      showToast("Frame rebuilt with " + LEVELS.length + " levels. Run analysis again for the updated geometry.");
     });
     document.addEventListener("keydown", event => {
       if (event.key === "Escape" && settingsDialog.open) settingsDialog.close();
