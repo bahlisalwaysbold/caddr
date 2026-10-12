@@ -41,7 +41,7 @@
           <article class="summary-card"><span class="summary-label">STRUCTURE TYPE</span><strong>RC building</strong><small>Reinforced concrete</small><span class="summary-card-icon">⌂</span></article>
           <article class="summary-card"><span class="summary-label">STOREYS</span><strong>3 <small>levels</small></strong><small>Ground + 2 upper floors</small><span class="summary-card-icon">▤</span></article>
           <article class="summary-card"><span class="summary-label">DESIGN WORKFLOW</span><strong>Early setup</strong><small>Model definition preview</small><span class="summary-card-icon">◇</span></article>
-          <article class="summary-card summary-card-muted"><span class="summary-label">SOLVER STATUS</span><strong>Not connected</strong><small>No structural results generated</small><span class="summary-card-icon">∿</span></article>
+          <article class="summary-card summary-card-muted" id="solverSummaryCard"><span class="summary-label">SOLVER STATUS</span><strong id="solverStatusText">Checking…</strong><small id="solverStatusDetail">Checking the analysis service</small><span class="summary-card-icon">∿</span></article>
         </section>
 
         <section class="structural-workflow" aria-labelledby="structuralWorkflowHeading">
@@ -88,8 +88,24 @@
             </section>
 
             <section class="structural-panel" id="analysis">
-              <div class="structural-panel-heading"><div><span class="area-number">03</span><div><h2>Analysis & model checks</h2><p>The planned review before member design.</p></div></div><span class="area-status status-disconnected">Engine disconnected</span></div>
-              <div class="analysis-placeholder"><div class="analysis-graphic"><span>∿</span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div><strong>No analysis has been run</strong><p>Once a verified solver is connected, this area can show model stability checks, reactions, deflections, bending moments, shear forces and axial forces.</p><button class="button button-disabled" type="button" disabled>Run structural analysis <span>⌁</span></button></div></div>
+              <div class="structural-panel-heading"><div><span class="area-number">03</span><div><h2>Analysis & model checks</h2><p>First real connection: a controlled sample beam sent to the solver API.</p></div></div><span class="area-status status-preview" id="engineBadge">Checking engine</span></div>
+              <div class="analysis-live-card">
+                <div class="analysis-live-icon">∿</div>
+                <div class="analysis-live-copy">
+                  <strong>Run a sample beam analysis</strong>
+                  <p>Caddr sends a test model to PyNiteFEA and displays its calculated support reactions, peak moment, shear and deflection.</p>
+                  <div id="solverConnection" class="solver-connection pending"><i></i><span id="solverConnectionText">Checking analysis service…</span></div>
+                </div>
+                <button class="button button-primary" type="button" id="runDemoAnalysis" disabled>Run sample analysis <span>→</span></button>
+              </div>
+              <p class="solver-boundary-note"><strong>Important:</strong> this first test analyses a separate simply supported beam. It does not analyse the building illustration above and it does not perform reinforced-concrete code design.</p>
+              <div id="analysisError" class="analysis-error" role="alert" hidden></div>
+              <div id="analysisResults" class="analysis-results" aria-live="polite" hidden>
+                <div class="results-heading"><div><h3>Calculated sample results</h3><p id="analysisResultMeta">—</p></div><span class="result-validity">Solver response received</span></div>
+                <div id="analysisSummary" class="analysis-summary-grid"></div>
+                <div class="results-table-wrap" id="analysisTable"></div>
+                <p class="result-footnote">Demonstration output for this defined elastic beam model only. Review model assumptions, units, stability and results before any engineering use.</p>
+              </div>
             </section>
           </div>
 
