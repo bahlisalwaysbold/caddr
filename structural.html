@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#172B4D" />
+  <title>Caddr — Structural Workspace</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="structural.css" />
+  <script src="structural.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Caddr overview"><span class="brand-mark">C<span></span></span><span class="brand-copy"><strong>Caddr</strong><small>ENGINEERING WORKSPACE</small></span></a>
+      <button class="workspace-switch" type="button" id="workspaceSwitch"><span class="workspace-avatar">B</span><span class="workspace-name"><strong>Bahl workspace</strong><small>Personal workspace</small></span><span class="switch-chevron">⌄</span></button>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav-group">
+        <a class="nav-link" href="index.html"><span class="nav-icon">▦</span>Overview</a>
+        <a class="nav-link" href="index.html#projects"><span class="nav-icon">▣</span>Projects</a>
+        <a class="nav-link" href="cad.html"><span class="nav-icon">⌗</span>CAD drafting</a>
+        <a class="nav-link active" href="structural.html"><span class="nav-icon">⌂</span>Structural design</a>
+        <a class="nav-link" href="index.html#files"><span class="nav-icon">▤</span>Files & drawings</a>
+      </nav>
+      <div class="nav-label nav-label-spaced">STRUCTURAL WORKFLOW</div>
+      <nav class="nav-group">
+        <a class="nav-link" href="#model"><span class="nav-icon">◇</span>Model setup</a>
+        <a class="nav-link" href="#loads"><span class="nav-icon">⇣</span>Loads & combinations</a>
+        <a class="nav-link" href="#analysis"><span class="nav-icon">∿</span>Analysis</a>
+        <a class="nav-link" href="#design"><span class="nav-icon">⌂</span>Member design</a>
+        <a class="nav-link" href="#detailing"><span class="nav-icon">⌁</span>Reinforcement</a>
+        <a class="nav-link" href="#quantities"><span class="nav-icon">▥</span>Quantities & BOQ</a>
+      </nav>
+      <div class="sidebar-bottom"><a class="nav-link" href="#limitations"><span class="nav-icon">?</span>Prototype status</a><div class="profile-mini"><div class="profile-avatar">BL</div><div><strong>Bahl</strong><small>Workspace owner</small></div><button type="button" class="more-button" id="profileMore" aria-label="Profile options">···</button></div></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><div class="breadcrumbs"><a href="index.html">Caddr</a><span class="crumb-slash">/</span><a href="index.html#projects">Projects</a><span class="crumb-slash">/</span><strong>Structural design</strong></div><div class="topbar-actions"><a class="button button-secondary top-cad-button" href="cad.html">⌗ Open CAD</a><button class="icon-button" id="statusButton" type="button" aria-label="Prototype status">i</button><div class="top-avatar" aria-label="Bahl profile">BL</div></div></header>
+      <div class="page-content structural-content">
+        <div class="structural-breadcrumb-row"><div><div class="eyebrow"><span class="eyebrow-dot"></span> STRUCTURAL WORKSPACE <span class="prototype-chip">CONCEPT PREVIEW</span></div><h1>Residential Block A</h1><p>A connected structural workflow — model, analyse, design, detail and quantify.</p></div><div class="structural-actions"><span class="sample-status"><i></i> Sample project</span><button class="button button-primary" id="modelSettingsButton" type="button">Project settings <span>⚙</span></button></div></div>
+        <section class="structural-summary-grid" aria-label="Project setup snapshot">
+          <article class="summary-card"><span class="summary-label">STRUCTURE TYPE</span><strong>RC building</strong><small>Reinforced concrete</small><span class="summary-card-icon">⌂</span></article>
+          <article class="summary-card"><span class="summary-label">STOREYS</span><strong>3 <small>levels</small></strong><small>Ground + 2 upper floors</small><span class="summary-card-icon">▤</span></article>
+          <article class="summary-card"><span class="summary-label">DESIGN WORKFLOW</span><strong>Early setup</strong><small>Model definition preview</small><span class="summary-card-icon">◇</span></article>
+          <article class="summary-card summary-card-muted"><span class="summary-label">SOLVER STATUS</span><strong>Not connected</strong><small>No structural results generated</small><span class="summary-card-icon">∿</span></article>
+        </section>
+
+        <section class="structural-workflow" aria-labelledby="structuralWorkflowHeading">
+          <div class="section-heading"><div><h2 id="structuralWorkflowHeading">Structural workflow</h2><p>Arrange the work in the order an engineer would follow.</p></div><span class="workflow-count">6 WORK AREAS</span></div>
+          <div class="structural-stage-track" role="list">
+            <a class="structural-stage active" href="#model" role="listitem"><span>01</span><b>Model setup</b><small>Grids & members</small></a>
+            <span class="stage-line"></span>
+            <a class="structural-stage" href="#loads" role="listitem"><span>02</span><b>Loads</b><small>Cases & combinations</small></a>
+            <span class="stage-line"></span>
+            <a class="structural-stage" href="#analysis" role="listitem"><span>03</span><b>Analysis</b><small>Model behaviour</small></a>
+            <span class="stage-line"></span>
+            <a class="structural-stage" href="#design" role="listitem"><span>04</span><b>Member design</b><small>Capacity checks</small></a>
+            <span class="stage-line"></span>
+            <a class="structural-stage" href="#detailing" role="listitem"><span>05</span><b>Detailing</b><small>Rebar & drawings</small></a>
+            <span class="stage-line"></span>
+            <a class="structural-stage" href="#quantities" role="listitem"><span>06</span><b>Quantities</b><small>Schedules & BOQ</small></a>
+          </div>
+        </section>
+
+        <div class="structural-main-grid">
+          <div class="structural-left-column">
+            <section class="structural-panel" id="model">
+              <div class="structural-panel-heading"><div><span class="area-number">01</span><div><h2>Building model</h2><p>Define the geometry and the structural elements.</p></div></div><span class="area-status status-preview">Setup concept</span></div>
+              <div class="model-preview">
+                <div class="model-preview-info"><span class="preview-caption">SCHEMATIC MODEL</span><strong>RC frame — 3 levels</strong><p>Illustrative geometry only. This is not a calculated structural model.</p><div class="model-legend"><span><i class="legend-column"></i>Columns</span><span><i class="legend-beam"></i>Beams</span><span><i class="legend-slab"></i>Slab levels</span></div></div>
+                <svg viewBox="0 0 370 230" role="img" aria-label="Schematic three-storey reinforced concrete frame illustration">
+                  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+                    <g stroke="#b1c2d8" stroke-width="1"><path d="M36 186 180 218 337 175M36 130 180 162 337 119M36 76 180 108 337 65M36 24 180 56 337 13" stroke-dasharray="3 5" opacity=".7"/></g>
+                    <g stroke="#2f72ce" stroke-width="4"><path d="M63 32v153M112 44v153M161 55v153M210 39v153M259 25v153M308 14v153"/></g>
+                    <g stroke="#74a0df" stroke-width="5"><path d="M63 32 112 44 161 55 210 39 259 25 308 14M63 83 112 96 161 107 210 91 259 77 308 66M63 134 112 147 161 158 210 142 259 128 308 117M63 185 112 197 161 208 210 192 259 178 308 167"/></g>
+                    <g stroke="#b0cdf6" stroke-width="1.2" opacity=".9"><path d="M63 32 20 55 20 208 161 240M63 83 20 106M63 134 20 157M112 44 69 67 69 220M161 55 118 78M210 39 167 62M259 25 216 48M308 14 265 37"/></g>
+                    <g fill="#477fca" stroke="#fff" stroke-width="1.5"><circle cx="63" cy="83" r="3.5"/><circle cx="112" cy="96" r="3.5"/><circle cx="161" cy="107" r="3.5"/><circle cx="210" cy="91" r="3.5"/><circle cx="259" cy="77" r="3.5"/><circle cx="308" cy="66" r="3.5"/></g>
+                  </g>
+                </svg>
+              </div>
+              <div class="model-settings-grid"><div class="setting-field"><span>Grid system</span><strong>Rectangular grid <small>›</small></strong></div><div class="setting-field"><span>Material definition</span><strong>Concrete + reinforcement <small>›</small></strong></div><div class="setting-field"><span>Member families</span><strong>Columns · Beams · Slabs <small>›</small></strong></div><div class="setting-field"><span>Foundation system</span><strong>To be defined <small>›</small></strong></div></div>
+              <div class="panel-action-row"><span class="subtle-help">Model editor is a planned integration.</span><button class="button button-secondary" type="button" data-not-ready="Model editing is not wired up yet.">Configure model <span>→</span></button></div>
+            </section>
+
+            <section class="structural-panel" id="loads">
+              <div class="structural-panel-heading"><div><span class="area-number">02</span><div><h2>Loads & combinations</h2><p>Set the loading assumptions before analysis.</p></div></div><span class="area-status status-preview">Planned</span></div>
+              <div class="load-case-grid"><div class="load-case"><span class="load-symbol">G</span><span><strong>Dead load</strong><small>Self-weight & permanent actions</small></span><span class="load-state">Case</span></div><div class="load-case"><span class="load-symbol live-load">Q</span><span><strong>Imposed load</strong><small>Use-dependent variable actions</small></span><span class="load-state">Case</span></div><div class="load-case"><span class="load-symbol wind-load">W</span><span><strong>Wind load</strong><small>Exposure & direction to be defined</small></span><span class="load-state">Case</span></div></div>
+              <div class="combination-preview"><div><strong>Load combinations</strong><small>Combination builder is not connected yet</small></div><span class="combination-pill">ULS</span><span class="combination-pill service">SLS</span><button type="button" class="text-action" data-not-ready="Load cases and code-based combinations require the analysis engine.">Set up <span>→</span></button></div>
+            </section>
+
+            <section class="structural-panel" id="analysis">
+              <div class="structural-panel-heading"><div><span class="area-number">03</span><div><h2>Analysis & model checks</h2><p>The planned review before member design.</p></div></div><span class="area-status status-disconnected">Engine disconnected</span></div>
+              <div class="analysis-placeholder"><div class="analysis-graphic"><span>∿</span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div><strong>No analysis has been run</strong><p>Once a verified solver is connected, this area can show model stability checks, reactions, deflections, bending moments, shear forces and axial forces.</p><button class="button button-disabled" type="button" disabled>Run structural analysis <span>⌁</span></button></div></div>
+            </section>
+          </div>
+
+          <div class="structural-right-column">
+            <section class="structural-panel" id="design">
+              <div class="structural-panel-heading"><div><span class="area-number">04</span><div><h2>Member design</h2><p>Design workflow inspired by integrated building design tools.</p></div></div></div>
+              <div class="design-module-list">
+                <div class="design-module"><span class="design-icon">C</span><span><strong>Columns</strong><small>Axial force, moments, slenderness</small></span><span class="module-chevron">›</span></div>
+                <div class="design-module"><span class="design-icon">B</span><span><strong>Beams</strong><small>Flexure, shear, serviceability</small></span><span class="module-chevron">›</span></div>
+                <div class="design-module"><span class="design-icon">S</span><span><strong>Slabs</strong><small>Thickness, reinforcement, deflection</small></span><span class="module-chevron">›</span></div>
+                <div class="design-module"><span class="design-icon">F</span><span><strong>Foundations</strong><small>Bearing, bending, punching shear</small></span><span class="module-chevron">›</span></div>
+              </div>
+              <div class="code-selection"><span>Design code</span><strong>Choose per project <span>⌄</span></strong><small>Examples: Eurocode 2, BS 8110, applicable national annex.</small></div>
+              <div class="engine-note"><span>i</span><span>Code selection and design checks are display concepts. No member capacities are being calculated.</span></div>
+            </section>
+
+            <section class="structural-panel" id="detailing">
+              <div class="structural-panel-heading"><div><span class="area-number">05</span><div><h2>Reinforcement & detailing</h2><p>Connect the structural model to production drawings.</p></div></div><span class="area-status status-preview">Planned</span></div>
+              <div class="detail-feature"><span class="detail-feature-icon">⌁</span><div><strong>Rebar detailing</strong><p>Longitudinal bars, links/stirrups, cover rules, bar marks and bending schedules.</p></div></div>
+              <div class="detail-feature"><span class="detail-feature-icon">⌗</span><div><strong>Drawing generation</strong><p>Beam, column, slab and foundation detail sheets linked to the model.</p></div></div>
+              <a class="button button-secondary full-button" href="cad.html">Open CAD drafting <span>↗</span></a>
+            </section>
+
+            <section class="structural-panel" id="quantities">
+              <div class="structural-panel-heading"><div><span class="area-number">06</span><div><h2>Quantities & BOQ</h2><p>Planned model-linked take-off.</p></div></div><span class="area-status status-preview">Planned</span></div>
+              <div class="quantity-preview"><div><span>Concrete</span><strong>— <small>m³</small></strong><i>Awaiting model</i></div><div><span>Reinforcement</span><strong>— <small>kg</small></strong><i>Awaiting design</i></div><div><span>Formwork</span><strong>— <small>m²</small></strong><i>Awaiting model</i></div></div>
+              <p class="quantity-footnote">Quantities are intentionally blank until they can be calculated from a real model.</p>
+            </section>
+
+            <section class="structural-panel future-panel" id="budgeting">
+              <div class="future-panel-heading"><span class="future-icon">₦</span><div><h2>Budgeting & planning</h2><p>Materials, rates, cost options and construction sequence linked to quantities.</p></div></div>
+              <div class="future-chips"><span>Material pricing</span><span>Cost comparison</span><span>Work sequence</span></div>
+              <div id="planning"></div>
+            </section>
+          </div>
+        </div>
+        <section class="disclaimer-panel" id="limitations"><span class="disclaimer-icon">!</span><div><strong>Important prototype boundary</strong><p>This page is a workflow and UX preview, not engineering software that can certify a structure. It does not solve a structural model, select reinforcement, check a design code or produce validated quantities. Those parts must be connected to tested calculations and reviewed by a qualified engineer before real project use.</p></div></section>
+        <footer class="page-footer"><span>Caddr · Engineering work, connected.</span><a href="index.html">Back to overview ↑</a></footer>
+      </div>
+    </main>
+  </div>
+  <dialog class="modal settings-modal" id="settingsDialog"><form method="dialog"><div class="modal-head"><div><span class="panel-kicker">PROJECT SETUP</span><h2>Project settings</h2><p>These are prototype settings for the sample project.</p></div><button type="button" class="modal-close" id="closeSettings" aria-label="Close">×</button></div><label class="form-label" for="structureType">Structure type</label><select id="structureType" class="form-input"><option>Reinforced concrete building</option><option>Steel frame building</option><option>Masonry structure</option><option>Mixed structural system</option></select><label class="form-label" for="storeyCount">Number of storeys</label><select id="storeyCount" class="form-input"><option>1 storey</option><option>2 storeys</option><option selected>3 storeys</option><option>4 storeys</option><option>5 storeys</option><option>6+ storeys</option></select><div class="modal-actions"><button type="button" id="cancelSettings" class="button button-secondary">Cancel</button><button type="submit" id="saveSettings" class="button button-primary">Save preview settings</button></div></form></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
