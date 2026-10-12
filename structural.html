@@ -99,19 +99,19 @@
               <div class="analysis-live-card">
                 <div class="analysis-live-icon">∿</div>
                 <div class="analysis-live-copy">
-                  <strong>Run a sample beam analysis</strong>
+                  <strong>Run analysis on this frame</strong>
                   <p>Caddr sends the active frame geometry, section properties and beam line loads to PyNiteFEA, then displays its calculated reactions, internal forces and deflections.</p>
                   <div id="solverConnection" class="solver-connection pending"><i></i><span id="solverConnectionText">Checking analysis service…</span></div>
                 </div>
                 <button class="button button-primary" type="button" id="runDemoAnalysis" disabled>Run Analysis <span>→</span></button>
               </div>
-              <p class="solver-boundary-note"><strong>Important:</strong> this first test analyses a separate simply supported beam. It does not analyse the building illustration above and it does not perform reinforced-concrete code design.</p>
+              <p class="solver-boundary-note"><strong>Important:</strong> this action analyses the current idealised frame and its entered beam line loads. It does not perform reinforced-concrete code design or reinforcement selection.</p>
               <div id="analysisError" class="analysis-error" role="alert" hidden></div>
               <div id="analysisResults" class="analysis-results" aria-live="polite" hidden>
-                <div class="results-heading"><div><h3>Calculated sample results</h3><p id="analysisResultMeta">—</p></div><span class="result-validity">Solver response received</span></div>
+                <div class="results-heading"><div><h3>Calculated frame results</h3><p id="analysisResultMeta">—</p></div><span class="result-validity">Solver response received</span></div>
                 <div id="analysisSummary" class="analysis-summary-grid"></div>
                 <div class="results-table-wrap" id="analysisTable"></div>
-                <p class="result-footnote">Demonstration output for this defined elastic beam model only. Review model assumptions, units, stability and results before any engineering use.</p>
+                <p class="result-footnote">Output for this defined linear-elastic frame model only. Review model assumptions, units, stability and results before any engineering use.</p>
               </div>
             </section>
           </div>
