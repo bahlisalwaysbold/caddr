@@ -46,3 +46,32 @@ The next layers should add structural semantics rather than only more drawing co
 3. Broader DXF import/export coverage, units/header interpretation, and compatibility testing against AutoCAD workflows.
 4. Snapping upgrades, grips, window selection, trim/extend and block support.
 5. Structural model graph shared between analysis, detailing and AI assistants.
+
+
+## Structural analysis API (first live integration)
+
+The first solver connection uses **PyNiteFEA 3.2.0** behind Vercel's Python runtime. Its MIT license and capabilities are documented in the upstream [PyNite repository](https://github.com/SoundsSerious/PyNite). The frontend calls:
+
+- `GET /api/structural/health` — reports whether PyNiteFEA is available.
+- `POST /api/structural/analyze` — validates a submitted structural model, runs a linear-elastic finite-element analysis, and returns nodal reactions/displacements plus member force/deflection summaries.
+
+The API currently accepts nodes, six-DOF supports, elastic materials, section properties, beam/frame members, nodal loads, member point loads, distributed loads, and explicitly named load combinations. It uses one consistent unit system supplied in the request and **does not convert units automatically**. Requests are limited to 100 nodes, 160 members, 500 loads and 20 combinations in this prototype.
+
+### Run locally
+
+Use Python 3.12, then:
+
+```bash
+python -m venv .venv
+# Windows PowerShell:
+.venv\\Scripts\\Activate.ps1
+# macOS/Linux:
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python -m http.server 5173
+```
+
+The static HTML frontend can run with the simple HTTP server, but the `/api` endpoints are Vercel serverless functions and are **not** provided by `python -m http.server`. For a local end-to-end test, run a compatible Vercel development environment or create a small local API adapter.
+
+The first UI action runs a known six-metre simply supported test beam with a uniform load. It proves the path from Caddr to a real calculation library; it does not analyse the building preview, perform reinforced-concrete design, select reinforcement, or verify code compliance. Those remain explicit next steps and require test cases reviewed by structural engineers.
