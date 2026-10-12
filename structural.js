@@ -168,7 +168,6 @@
       };
     });
 
-    const memberLookup = Object.fromEntries(memberPayload.map(member => [member.id, member]));
     const nodesById = Object.fromEntries(nodes.map(node => [node.id, node]));
     const loads = members.filter(member => member.kind === "beam").map(member => {
       const start = nodesById[member.iNode];
@@ -199,8 +198,7 @@
         rotation: member.rotation
       })),
       loads,
-      combinations: [{ name: "G_SERVICE", factors: { G: 1.0 } }],
-      displayMeta: { memberLookup }
+      combinations: [{ name: "G_SERVICE", factors: { G: 1.0 } }]
     };
   }
 
@@ -321,13 +319,14 @@
     const path = diagramPoints.map((p, index) => (index ? "L " : "M ") + p.x.toFixed(2) + " " + p.y.toFixed(2)).join(" ");
     const fillPath = "M " + p1.x + " " + p1.y + " " + diagramPoints.map(p => "L " + p.x.toFixed(2) + " " + p.y.toFixed(2)).join(" ") + " L " + p2.x + " " + p2.y + " Z";
     const peak = selectedMetricResult(member, result);
-    const color = diagramColor(currentMode, peak === null ? 0 : peak);
+    const signedValues = samples.map(sample => Number(sample[field])).filter(value => Number.isFinite(value));
+    const signedPeak = signedValues.sort((a, b) => Math.abs(b) - Math.abs(a))[0] || 0;
+    const color = diagramColor(currentMode, signedPeak);
     const isSelected = member.id === selectedMemberId;
     const mid = diagramPoints[Math.floor(diagramPoints.length / 2)];
     const unit = DISPLAY[currentMode].unit;
-    const label = isSelected && peak !== null ? svgText(mid.x, mid.y - 9, formatNumber(currentMode === "deflection" ? peak * 1000 : peak, currentMode === "deflection" ? 3 : 1) + " " + unit, "diagram-value-label") : "";
     return '<path d="' + fillPath + '" class="diagram-area ' + (isSelected ? "selected" : "") + '" fill="' + color + '" fill-opacity="' + (isSelected ? "0.32" : "0.13") + '" stroke="none"/>' +
-      '<path d="' + path + '" class="diagram-curve ' + (isSelected ? "selected" : "") + '" stroke="' + color + '"/>' + label;
+      '<path d="' + path + '" class="diagram-curve ' + (isSelected ? "selected" : "") + '" stroke="' + color + '"/>';
   }
 
   function renderDiagram() {
@@ -392,7 +391,7 @@
       if (currentMode !== "model" && selected && result) {
         const value = selectedMetricResult(member, result);
         const midX = (p1.x + p2.x) / 2, midY = (p1.y + p2.y) / 2;
-        if (value !== null) parts.push(svgText(midX + 9, midY - 8, formatNumber(currentMode === "deflection" ? value * 1000 : value, currentMode === "deflection" ? 3 : 1), "selected-diagram-label"));
+        if (value !== null) parts.push(svgText(midX + 9, midY - 8, formatNumber(currentMode === "deflection" ? value * 1000 : value, currentMode === "deflection" ? 3 : 1) + " " + DISPLAY[currentMode].unit, "selected-diagram-label"));
       }
     });
 
