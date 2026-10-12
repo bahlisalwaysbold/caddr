@@ -135,7 +135,7 @@
       metricCard("PEAK BENDING MOMENT", peakMoment, "kN·m"),
       metricCard("PEAK SHEAR", peakShear, "kN"),
       metricCard("MAX DEFLECTION", peakDeflection === null ? null : peakDeflection * 1000, "mm", 3),
-      metricCard("SOLVER", data.version, "PyNiteFEA", 0)
+      metricCard("NODES SOLVED", nodes.length, "nodes", 0)
     );
     $("#analysisResultMeta").textContent = (data.modelName || "Sample beam") + " · " + combo.name + " · linear-elastic analysis";
     const nodeRows = nodes.map(node => [
@@ -166,7 +166,7 @@
     units: "kN-m",
     nodes: [
       { id: "N1", x: 0, y: 0, z: 0, supports: { DX: true, DY: true, DZ: true } },
-      { id: "N2", x: 6, y: 0, z: 0, supports: { DX: true, DY: true, DZ: true } }
+      { id: "N2", x: 6, y: 0, z: 0, supports: { DX: true, DY: true, DZ: true, RX: true } }
     ],
     materials: [
       { id: "SteelDemo", E: 200000000, G: 76923077, nu: 0.3, rho: 78.5 }
