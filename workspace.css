@@ -213,6 +213,15 @@ body:has(#engineeringWorkspace) .structural-content > .page-footer { display:non
   #engineeringWorkspace #structuralDiagram { height:clamp(300px, 58vh, 500px); min-height:300px; }
   #engineeringWorkspace #workspaceDesignGrid { grid-template-columns:minmax(0,1fr); }
   #engineeringWorkspace #workspaceDesignGrid > #design { grid-column:auto; }
+  #engineeringWorkspace.explorer-collapsed .workspace-layout { grid-template-rows:minmax(440px,1fr) minmax(250px,auto); }
+  #engineeringWorkspace.conversation-collapsed .workspace-layout { grid-template-rows:minmax(90px,auto) minmax(440px,1fr); }
+  #engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-rows:minmax(0,1fr); }
+  #engineeringWorkspace:fullscreen .workspace-layout,
+  #engineeringWorkspace.workspace-fullscreen-fallback .workspace-layout { grid-template-rows:minmax(0,1fr); }
+  #engineeringWorkspace:fullscreen .workspace-center,
+  #engineeringWorkspace.workspace-fullscreen-fallback .workspace-center { min-height:0; overflow:hidden; }
+  #engineeringWorkspace:fullscreen .workspace-panels,
+  #engineeringWorkspace.workspace-fullscreen-fallback .workspace-panels { overflow:auto; }
   #engineeringWorkspace .workspace-statusline { flex-wrap:wrap; }
 }
 @media (prefers-reduced-motion:reduce) {
