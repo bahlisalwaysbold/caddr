@@ -2,333 +2,144 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#20242a" />
-  <title>Bahl CAD — Drafting Workspace</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#172B4D" />
+  <meta name="description" content="Caddr — one connected workspace for engineering design, structural workflows, detailing and project quantities." />
+  <title>Caddr — Engineering Workspace</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="dashboard.js" defer></script>
 </head>
 <body>
   <div class="app-shell">
-    <header class="windowbar">
-      <div class="windowbar-title">Workspace</div>
-      <div class="windowbar-actions" aria-label="Workspace controls">
-        <span class="window-icon" title="Workspace settings">☷</span>
-        <span class="window-icon" title="Maximize workspace">↗</span>
-        <button class="window-icon download-icon" data-command="save" aria-label="Save drawing" title="Save drawing">⇩</button>
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Caddr overview">
+        <span class="brand-mark">C<span></span></span>
+        <span class="brand-copy"><strong>Caddr</strong><small>ENGINEERING WORKSPACE</small></span>
+      </a>
+      <button class="workspace-switch" type="button" id="workspaceSwitch">
+        <span class="workspace-avatar">B</span><span class="workspace-name"><strong>Bahl workspace</strong><small>Personal workspace</small></span><span class="switch-chevron">⌄</span>
+      </button>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav-group">
+        <a class="nav-link active" href="index.html"><span class="nav-icon">▦</span>Overview</a>
+        <a class="nav-link" href="#projects"><span class="nav-icon">▣</span>Projects<span class="nav-count" id="projectNavCount">3</span></a>
+        <a class="nav-link" href="cad.html"><span class="nav-icon">⌗</span>CAD drafting</a>
+        <a class="nav-link" href="structural.html"><span class="nav-icon">⌂</span>Structural design</a>
+        <a class="nav-link" href="#files"><span class="nav-icon">▤</span>Files & drawings</a>
+      </nav>
+      <div class="nav-label nav-label-spaced">PROJECT WORKFLOW</div>
+      <nav class="nav-group">
+        <a class="nav-link" href="structural.html#model"><span class="nav-icon">◇</span>Model & design</a>
+        <a class="nav-link" href="structural.html#detailing"><span class="nav-icon">⌁</span>Detailing</a>
+        <a class="nav-link" href="structural.html#quantities"><span class="nav-icon">▥</span>Quantities & BOQ</a>
+        <a class="nav-link" href="structural.html#budgeting"><span class="nav-icon">₦</span>Budgeting</a>
+        <a class="nav-link" href="structural.html#planning"><span class="nav-icon">◷</span>Planning</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <a class="nav-link" href="#help"><span class="nav-icon">?</span>Help & feedback</a>
+        <div class="profile-mini"><div class="profile-avatar">BL</div><div><strong>Bahl</strong><small>Workspace owner</small></div><button type="button" class="more-button" id="profileMore" aria-label="Profile options">···</button></div>
       </div>
-    </header>
+    </aside>
 
-    <header class="quickbar">
-      <div class="quickbar-left">
-        <button class="brand-mark" data-command="new" aria-label="Bahl CAD home" title="New drawing">B</button>
-        <button class="quick-icon" data-command="new" aria-label="New drawing" title="New drawing">＋</button>
-        <button class="quick-icon" data-command="open" aria-label="Open drawing" title="Open drawing">▱</button>
-        <button class="quick-icon" data-command="save" aria-label="Save drawing" title="Save drawing">▣</button>
-        <span class="quick-separator"></span>
-        <button class="quick-icon" data-command="undo" aria-label="Undo" title="Undo (Ctrl+Z)">↶</button>
-        <button class="quick-icon" data-command="redo" aria-label="Redo" title="Redo (Ctrl+Y)">↷</button>
-      </div>
-      <div class="document-title"><span>Bahl CAD</span><span class="document-divider">·</span><strong>Structural-Detail.bahl</strong><span class="unsaved-dot" title="Local working drawing"></span></div>
-      <div class="quickbar-right">
-        <label class="command-search"><span class="search-glyph">⌕</span><input id="commandSearch" type="search" autocomplete="off" placeholder="Search commands" aria-label="Search or run a command" /></label>
-        <button class="export-button" data-command="importdxf">Import DXF</button><button class="export-button primary" data-command="dxf">Export DXF</button>
-        <button class="export-button" data-command="svg">Export SVG</button>
-      </div>
-    </header>
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumbs"><span>Caddr</span><span class="crumb-slash">/</span><strong>Overview</strong></div>
+        <div class="topbar-actions">
+          <label class="global-search"><span aria-hidden="true">⌕</span><input id="globalSearch" type="search" placeholder="Search projects and files" aria-label="Search projects and files" /><kbd>Ctrl K</kbd></label>
+          <button class="icon-button" id="notificationsButton" type="button" aria-label="Notifications" title="Notifications">♧<i></i></button>
+          <div class="top-avatar" aria-label="Bahl profile">BL</div>
+        </div>
+      </header>
 
-    <nav class="ribbon-tabs" aria-label="CAD ribbon tabs">
-      <button class="ribbon-tab active" data-ribbon-target="home">Home</button>
-      <button class="ribbon-tab" data-ribbon-target="insert">Insert</button>
-      <button class="ribbon-tab" data-ribbon-target="annotate">Annotate</button>
-      <button class="ribbon-tab" data-ribbon-target="parametric">Parametric</button>
-      <button class="ribbon-tab" data-ribbon-target="view">View</button>
-      <button class="ribbon-tab" data-ribbon-target="manage">Manage</button>
-      <button class="ribbon-tab" data-ribbon-target="output">Output</button>
-      <button class="ribbon-tab" data-ribbon-target="collaborate">Collaborate</button>
-    </nav>
-
-    <section class="ribbon" aria-label="Drawing tools">
-      <div class="ribbon-page active" data-ribbon-page="home">
-        <div class="ribbon-group draw-tools">
-          <div class="ribbon-group-body">
-            <button class="tool ribbon-tool active" data-tool="select" title="Select (Esc / V)"><span class="tool-glyph">↖</span><span>Select</span></button>
-            <button class="tool ribbon-tool" data-tool="line" title="Line (L)"><span class="tool-glyph line-glyph">╱</span><span>Line</span></button>
-            <button class="tool ribbon-tool" data-tool="polyline" title="Polyline (PL)"><span class="tool-glyph">⌁</span><span>Polyline</span></button>
-            <button class="tool ribbon-tool" data-tool="circle" title="Circle (C)"><span class="tool-glyph">○</span><span>Circle</span></button>
-            <button class="tool ribbon-tool" data-tool="arc" title="Arc (ARC)"><span class="tool-glyph">◜</span><span>Arc</span></button>
-            <button class="tool ribbon-tool" data-tool="rect" title="Rectangle (REC)"><span class="tool-glyph">▱</span><span>Rectangle</span></button>
-          </div>
-          <div class="ribbon-group-label">Draw</div>
-        </div>
-        <div class="ribbon-group modify-tools">
-          <div class="ribbon-group-body compact-tools">
-            <button class="tool ribbon-tool compact" data-command="move"><span class="tool-glyph">✣</span><span>Move</span></button>
-            <button class="tool ribbon-tool compact" data-command="copy"><span class="tool-glyph">▢</span><span>Copy</span></button>
-            <button class="tool ribbon-tool compact" data-command="stretch"><span class="tool-glyph">↔</span><span>Stretch</span></button>
-            <button class="tool ribbon-tool compact" data-command="rotate"><span class="tool-glyph">↻</span><span>Rotate</span></button>
-            <button class="tool ribbon-tool compact" data-command="mirror"><span class="tool-glyph">⇋</span><span>Mirror</span></button>
-            <button class="tool ribbon-tool compact" data-command="scale"><span class="tool-glyph">⤢</span><span>Scale</span></button>
-            <button class="tool ribbon-tool compact" data-command="trim"><span class="tool-glyph">⌁</span><span>Trim</span></button>
-            <button class="tool ribbon-tool compact" data-command="fillet"><span class="tool-glyph">⌒</span><span>Fillet</span></button>
-            <button class="tool ribbon-tool compact" data-command="arrayrect"><span class="tool-glyph">▦</span><span>Array</span></button>
-          </div>
-          <div class="ribbon-group-label">Modify</div>
-        </div>
-        <div class="ribbon-group annotate-tools">
-          <div class="ribbon-group-body">
-            <button class="tool ribbon-tool" data-tool="text"><span class="tool-glyph text-glyph">T</span><span>Text</span></button>
-            <button class="tool ribbon-tool" data-tool="dimension"><span class="tool-glyph">↔</span><span>Dimension</span></button>
-            <button class="tool ribbon-tool" data-tool="point"><span class="tool-glyph">·</span><span>Point</span></button>
-          </div>
-          <div class="ribbon-group-label">Annotate</div>
-        </div>
-        <div class="ribbon-group layer-tools">
-          <div class="ribbon-group-body layer-ribbon-body">
-            <button class="layer-choice" type="button" id="activeLayerDisplay" title="Change active layer from the Layers panel"><span class="layer-swatch-preview"></span><span><small>Current layer</small><strong>S-CONC</strong></span><span class="layer-chevron">⌄</span></button>
-            <div class="layer-quick-actions"><button class="tool ribbon-tool compact" data-command="join"><span class="tool-glyph">∪</span><span>Join</span></button><button class="tool ribbon-tool compact" data-command="explode"><span class="tool-glyph">✣</span><span>Explode</span></button></div>
-          </div>
-          <div class="ribbon-group-label">Layers &amp; objects</div>
-        </div>
-        <div class="ribbon-group utility-tools">
-          <div class="ribbon-group-body">
-            <button class="tool ribbon-tool" id="fitView" title="Zoom to extents"><span class="tool-glyph">⌗</span><span>Zoom extents</span></button>
-            <button class="tool ribbon-tool" data-command="delete"><span class="tool-glyph">⌫</span><span>Delete</span></button>
-          </div>
-          <div class="ribbon-group-label">Utilities</div>
-        </div>
-      </div>
-
-      <div class="ribbon-page" data-ribbon-page="insert" hidden>
-        <div class="ribbon-group">
-          <div class="ribbon-group-body ribbon-wide">
-            <button class="tool ribbon-tool" data-tool="rect"><span class="tool-glyph">▱</span><span>Rectangle</span></button>
-            <button class="tool ribbon-tool" data-tool="ellipse"><span class="tool-glyph">⬭</span><span>Ellipse</span></button>
-            <button class="tool ribbon-tool" data-tool="polygon"><span class="tool-glyph">⬡</span><span>Polygon</span></button>
-            <button class="tool ribbon-tool" data-tool="spline"><span class="tool-glyph">〰</span><span>Spline</span></button>
-            <button class="tool ribbon-tool" data-tool="hatch"><span class="tool-glyph">▧</span><span>Hatch</span></button>
-            <button class="tool ribbon-tool" data-tool="gradient"><span class="tool-glyph">◩</span><span>Gradient</span></button>
-            <button class="tool ribbon-tool" data-tool="revcloud"><span class="tool-glyph">☁</span><span>Revision cloud</span></button>
-          </div>
-          <div class="ribbon-group-label">Geometry &amp; fills</div>
-        </div>
-        <div class="ribbon-group">
-          <div class="ribbon-group-body ribbon-wide">
-            <button class="tool ribbon-tool" data-command="arrayrect"><span class="tool-glyph">▦</span><span>Rectangular array</span></button>
-            <button class="tool ribbon-tool" data-command="arraypolar"><span class="tool-glyph">⟳</span><span>Polar array</span></button>
-            <button class="tool ribbon-tool" data-command="arraypath"><span class="tool-glyph">⤳</span><span>Path array</span></button>
-          </div>
-          <div class="ribbon-group-label">Repeat objects</div>
-        </div>
-      </div>
-
-      <div class="ribbon-page" data-ribbon-page="annotate" hidden>
-        <div class="ribbon-group">
-          <div class="ribbon-group-body ribbon-wide">
-            <button class="tool ribbon-tool" data-tool="text"><span class="tool-glyph text-glyph">T</span><span>Text</span></button>
-            <button class="tool ribbon-tool" data-tool="dimension"><span class="tool-glyph">↔</span><span>Linear dimension</span></button>
-            <button class="tool ribbon-tool" data-tool="point"><span class="tool-glyph">·</span><span>Point</span></button>
-          </div>
-          <div class="ribbon-group-label">Annotations</div>
-        </div>
-      </div>
-
-      <div class="ribbon-page" data-ribbon-page="parametric" hidden>
-        <div class="ribbon-group">
-          <div class="ribbon-group-body ribbon-wide">
-            <button class="tool ribbon-tool" id="ribbonAddConstraint" type="button"><span class="tool-glyph">⊕</span><span>Add constraint</span></button>
-            <button class="tool ribbon-tool" id="ribbonAddParameter" type="button"><span class="tool-glyph">ƒx</span><span>New parameter</span></button>
-          </div>
-          <div class="ribbon-group-label">Constraints &amp; parameters</div>
-        </div>
-        <div class="ribbon-note">Starter constraints currently support horizontal, vertical and line-length rules.</div>
-      </div>
-
-      <div class="ribbon-page" data-ribbon-page="view" hidden>
-        <div class="ribbon-group">
-          <div class="ribbon-group-body ribbon-wide">
-            <button class="tool ribbon-tool" id="ribbonGridToggle"><span class="tool-glyph">▦</span><span>Grid</span></button>
-            <button class="tool ribbon-tool" id="ribbonSnapToggle"><span class="tool-glyph">⌖</span><span>Object snaps</span></button>
-            <button class="tool ribbon-tool" id="ribbonOrthoToggle"><span class="tool-glyph">└</span><span>Ortho</span></button>
-            <button class="tool ribbon-tool" id="ribbonPolarToggle"><span class="tool-glyph">∠</span><span>Polar tracking</span></button>
-            <button class="tool ribbon-tool" id="ribbonTrackingToggle"><span class="tool-glyph">⊹</span><span>Snap tracking</span></button>
-            <button class="tool ribbon-tool" id="ribbonDynamicToggle"><span class="tool-glyph">↔</span><span>Dynamic input</span></button>
-            <button class="tool ribbon-tool" id="ribbonFitView"><span class="tool-glyph">⌗</span><span>Zoom extents</span></button>
-          </div>
-          <div class="ribbon-group-label">Viewport controls</div>
-        </div>
-        <div class="ribbon-note">Wheel to zoom · middle mouse or Space + drag to pan · Esc to cancel.</div>
-      </div>
-
-      <div class="ribbon-page" data-ribbon-page="manage" hidden>
-        <div class="ribbon-group">
-          <div class="ribbon-group-body ribbon-wide">
-            <button class="tool ribbon-tool" data-command="new"><span class="tool-glyph">＋</span><span>New drawing</span></button>
-            <button class="tool ribbon-tool" data-command="open"><span class="tool-glyph">▱</span><span>Open drawing</span></button>
-            <button class="tool ribbon-tool" data-command="save"><span class="tool-glyph">▣</span><span>Save .bahl</span></button>
-            <button class="tool ribbon-tool" data-command="undo"><span class="tool-glyph">↶</span><span>Undo</span></button>
-            <button class="tool ribbon-tool" data-command="redo"><span class="tool-glyph">↷</span><span>Redo</span></button>
-          </div>
-          <div class="ribbon-group-label">Drawing &amp; history</div>
-        </div>
-        <div class="ribbon-note">Use the right-side Layers panel to change the active layer and control visibility.</div>
-      </div>
-
-      <div class="ribbon-page" data-ribbon-page="output" hidden>
-        <div class="ribbon-group">
-          <div class="ribbon-group-body ribbon-wide">
-            <button class="tool ribbon-tool" data-command="save"><span class="tool-glyph">▣</span><span>Save drawing</span></button>
-            <button class="tool ribbon-tool" data-command="dxf"><span class="tool-glyph">⇩</span><span>Export DXF</span></button>
-            <button class="tool ribbon-tool" data-command="svg"><span class="tool-glyph">⇩</span><span>Export SVG</span></button>
-          </div>
-          <div class="ribbon-group-label">Drawing output</div>
-        </div>
-        <div class="ribbon-note">DXF export is currently a basic subset; verify complex drawings in your target CAD software.</div>
-      </div>
-
-      <div class="ribbon-page" data-ribbon-page="collaborate" hidden>
-        <div class="ribbon-note collaboration-note"><strong>Local-first prototype.</strong> Cloud collaboration, live co-editing and shared review are not implemented yet.</div>
-      </div>
-    </section>
-
-    <div class="drawing-tabbar">
-      <button class="drawing-tab active">Start</button>
-      <button class="drawing-tab current">Structural-Detail* <span>×</span></button>
-      <button class="drawing-tab add-tab" data-command="new" title="New drawing">＋</button>
-      <div class="drawing-tab-fill"></div>
-      <span class="drawing-tab-meta">TOP · 2D Wireframe</span>
-    </div>
-
-    <div class="work-area">
-      <main class="canvas-area">
-        <div class="canvas-wrap" id="canvasWrap">
-          <svg id="cadCanvas" xmlns="http://www.w3.org/2000/svg" aria-label="Bahl CAD drawing canvas">
-            <defs>
-              <pattern id="gridMinor" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#2b3541" /></pattern>
-              <pattern id="gridMajor" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#gridMinor)"/><path d="M 100 0 L 0 0 0 100" fill="none" stroke="#222c37" stroke-width="0.7" /></pattern>
-              <pattern id="hatchPattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M 0 0 L 0 8" stroke="#526174" stroke-width="1" /></pattern>
-              <linearGradient id="gradientFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4d9de0" stop-opacity=".45"/><stop offset="1" stop-color="#f4d35e" stop-opacity=".18"/></linearGradient>
-            </defs>
-            <rect id="grid" x="0" y="0" width="100%" height="100%" fill="url(#gridMajor)" />
-            <g id="drawingRoot"></g>
-            <g id="cursorOverlay"></g>
-          </svg>
-          <div class="crosshair" id="crosshair"><i></i><b></b></div>
-          <div class="snap-badge" id="snapBadge">GRID</div>
-          <div class="view-cube"><span>TOP</span></div>
-          <div class="viewport-tools"><button id="viewportZoomIn" title="Zoom in" type="button">＋</button><button id="viewportFit" title="Zoom extents" type="button">⌕</button><button id="viewportVisibility" title="Toggle grid" type="button">◉</button></div>
-          <div class="axis-widget"><span class="axis-y">Y</span><span class="axis-x">X</span><i></i><b></b></div>
-          <div class="canvas-selection-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-          <div class="text-editor-panel" id="textEditor" role="dialog" aria-modal="true" aria-labelledby="textEditorTitle" hidden>
-            <div class="text-editor-head"><strong id="textEditorTitle">Text</strong><button type="button" id="textEditorClose" aria-label="Close text editor">×</button></div>
-            <label for="textEditorValue">Contents</label>
-            <input id="textEditorValue" type="text" maxlength="500" value="BEAM B1" autocomplete="off" />
-            <label for="textEditorSize">Text height (drawing units)</label>
-            <input id="textEditorSize" type="number" min="0.1" max="1000000" step="any" value="20" />
-            <div class="text-editor-actions"><button type="button" id="textEditorCancel">Cancel</button><button type="button" id="textEditorPlace" class="primary">Place text</button></div>
-            <p>Enter to place · Esc to cancel</p>
-          </div>
-        </div>
-      </main>
-
-      <aside class="rightbar">
-        <section class="panel properties-panel">
-          <div class="panel-head"><h3>Properties</h3><span id="selectionCount">0 selected</span></div>
-          <div id="properties" class="properties-empty">Select an object to inspect its geometry.</div>
+      <div class="page-content">
+        <section class="welcome-row">
+          <div><div class="eyebrow"><span class="eyebrow-dot"></span> YOUR ENGINEERING DESK</div><h1>Good morning. <span>Let’s get building.</span></h1><p>Bring your drawings, structural design and project decisions into one connected workspace.</p></div>
+          <div class="welcome-actions"><button class="button button-secondary" id="importDrawingButton" type="button"><span>↑</span> Import drawing</button><button class="button button-primary" id="newProjectButton" type="button"><span>＋</span> New project</button><input id="drawingUpload" type="file" accept=".dxf,.bahl,.json,.dwg" hidden /></div>
         </section>
-        <details class="panel panel-details">
-          <summary><span>Constraints</span><button id="addConstraint" class="icon-button" type="button" title="Add a constraint to the selected line">＋</button></summary>
-          <div class="panel-content"><div id="constraints"></div></div>
-        </details>
-        <details class="panel panel-details">
-          <summary><span>Parameters manager</span><button id="addParameter" class="icon-button" type="button" title="Add parameter">＋</button></summary>
-          <div class="panel-content"><div id="parameters"></div></div>
-        </details>
-        <details class="panel panel-details" open>
-          <summary><span>Layers</span><button id="addLayer" class="icon-button" type="button" title="Create a layer">＋</button></summary>
-          <div class="panel-content"><div id="layers"></div></div>
-        </details>
-        <details class="panel panel-details">
-          <summary><span>Command history</span></summary>
-          <div class="panel-content"><div id="commandLog" class="command-log"></div></div>
-        </details>
-      </aside>
-    </div>
 
-    <section class="command-dock" aria-label="Command line">
-      <div class="command-history-line"><span class="prompt-mark">›</span><span id="commandHint">Select an object or start drawing.</span></div>
-      <div class="command-entry"><span class="command-entry-label">Command</span><span class="command-caret">›</span><input id="commandInput" autocomplete="off" placeholder="Type a command" aria-label="Type a CAD command" /><span class="command-entry-help">Enter to run · Esc to cancel</span></div>
-    </section>
+        <section class="hero-card">
+          <div class="hero-copy">
+            <div class="hero-label"><span class="pulse-dot"></span> ONE CONNECTED WORKFLOW</div>
+            <h2>From first brief<br />to build-ready information.</h2>
+            <p>Keep the project journey connected — from design and structural modelling to detailing, quantities, cost and planning.</p>
+            <div class="hero-actions"><a class="button button-light" href="structural.html">Explore structural workspace <span>↗</span></a><a class="hero-text-link" href="#projects">Browse projects <span>↓</span></a></div>
+          </div>
+          <div class="hero-visual" aria-label="Abstract connected structural frame illustration">
+            <div class="visual-glow"></div>
+            <svg viewBox="0 0 360 260" role="img" aria-label="Isometric structural frame line illustration">
+              <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">
+                <path d="M52 80 177 22 307 83 181 143Z" opacity=".55"/>
+                <path d="M52 80v112l129 61V143M307 83v111l-126 59M177 22v111" opacity=".9"/>
+                <path d="M52 136 177 78 307 140M52 192l129-60 126 62" opacity=".48"/>
+                <path d="M93 99v112M135 60v131M220 102v112M265 82v111" opacity=".7"/>
+                <path d="m52 80 41 19 42-39 42 18 43 24 45-20 42 1M52 136l41 20 42-20 42 21 43-20 45 21 42-18" opacity=".6"/>
+                <path d="m93 99 42 17 42-38 43 24 45-20M93 155l42 20 42-21 43 20 45-22" opacity=".55"/>
+                <path d="M177 22 135 60 93 99M177 78l-42 37v77M220 102l-39 41v110M265 82l-45 20v112" opacity=".4"/>
+              </g>
+              <g fill="#8CB9FF"><circle cx="52" cy="80" r="4"/><circle cx="177" cy="22" r="4"/><circle cx="307" cy="83" r="4"/><circle cx="181" cy="143" r="4"/><circle cx="181" cy="253" r="4"/></g>
+            </svg>
+            <div class="visual-chip chip-top"><span class="chip-icon">⌗</span><span><strong>CAD</strong><small>Draft precisely</small></span></div>
+            <div class="visual-chip chip-bottom"><span class="chip-icon chip-blue">▥</span><span><strong>Structure</strong><small>Connect the model</small></span></div>
+          </div>
+          <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+        </section>
 
-    <footer class="statusbar">
-      <div class="status-tabs"><button class="status-tab active">Model</button><button class="status-tab">Layout1</button><button class="status-tab">Layout2</button><button class="status-tab add-tab" data-command="new">＋</button></div>
-      <div class="status-message" id="statusMessage">Ready.</div>
-      <div class="status-spacer"></div>
-      <span id="coordReadout" class="coord-readout">X 0.000&nbsp;&nbsp; Y 0.000</span><span id="snapState" hidden>SNAP ON</span>
-      <button class="status-toggle active" id="gridToggle" aria-pressed="true" title="Toggle grid">GRID</button>
-      <button class="status-toggle active" id="snapToggle" aria-pressed="true" title="Toggle object snaps">OSNAP</button>
-      <button class="status-toggle" id="orthoToggle" aria-pressed="false" title="Toggle ortho">ORTHO</button>
-      <button class="status-toggle" id="polarToggle" aria-pressed="false" title="Toggle polar tracking">POLAR</button>
-      <button class="status-toggle" id="trackingToggle" aria-pressed="false" title="Toggle object snap tracking">OTRACK</button>
-      <button class="status-toggle active" id="dynamicToggle" aria-pressed="true" title="Toggle dynamic input">DYN</button>
-      <span class="lineweight-indicator">LWT</span><span class="scale-indicator">1:50</span>
-    </footer>
+        <section class="section-block" id="projects">
+          <div class="section-heading"><div><h2>Pick up where you left off</h2><p>Your recent projects, ready to continue.</p></div><button class="plain-link plain-button" id="viewAllProjects" type="button">View all projects <span>→</span></button></div>
+          <div class="project-grid" id="projectGrid">
+            <article class="project-card searchable" data-search="residential block a building structural model">
+              <div class="project-preview preview-residential"><span class="preview-tag">BUILDING</span><svg viewBox="0 0 220 116" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4"><path d="M35 90V33l75-21 76 21v57M35 33l75 24 76-24M110 57v51M57 41v54M82 49v55M137 49v55M163 41v54M35 61l75 23 76-23M35 90l75 18 76-18"/><path d="M57 41 110 12 163 41M82 49l28-37 27 37" opacity=".5"/></g></svg><span class="preview-orb"></span></div>
+              <div class="project-card-body"><div class="project-title-row"><h3>Residential Block A</h3><span class="status status-blue">In progress</span></div><p>Reinforced concrete · 3 storeys</p><div class="project-meta"><span>Updated recently</span><button class="card-more" type="button" aria-label="More options for Residential Block A">···</button></div><a class="card-open" href="structural.html">Open project <span>→</span></a></div>
+            </article>
+            <article class="project-card searchable" data-search="commercial warehouse frame building structural">
+              <div class="project-preview preview-warehouse"><span class="preview-tag">COMMERCIAL</span><svg viewBox="0 0 220 116" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M25 90V36l85-25 85 25v54M25 36l85 26 85-26M110 62v45M52 44v54M82 53v54M138 53v54M168 44v54M25 63l85 25 85-25M25 90l85 17 85-17"/><path d="M52 44l58-33 58 33M82 53l28-42 28 42" opacity=".5"/></g></svg></div>
+              <div class="project-card-body"><div class="project-title-row"><h3>Warehouse Frame</h3><span class="status status-neutral">Concept</span></div><p>Steel frame · Preliminary layout</p><div class="project-meta"><span>Sample project</span><button class="card-more" type="button" aria-label="More options for Warehouse Frame">···</button></div><a class="card-open" href="structural.html">Open project <span>→</span></a></div>
+            </article>
+            <article class="project-card searchable" data-search="duplex foundation design building">
+              <div class="project-preview preview-duplex"><span class="preview-tag">RESIDENTIAL</span><svg viewBox="0 0 220 116" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M32 91V50l46-29 46 29v41M78 21v90M32 50l46 27 46-27M124 91V43l39-23 31 23v48M163 20v91M124 43l39 24 31-24M32 70l46 25 46-25M124 69l39 23 31-23"/></g></svg></div>
+              <div class="project-card-body"><div class="project-title-row"><h3>Duplex Foundation</h3><span class="status status-neutral">Planning</span></div><p>Pad foundations · Design brief</p><div class="project-meta"><span>Sample project</span><button class="card-more" type="button" aria-label="More options for Duplex Foundation">···</button></div><a class="card-open" href="structural.html">Open project <span>→</span></a></div>
+            </article>
+          </div>
+          <div class="empty-state" id="projectEmpty" hidden><strong>No matching projects</strong><span>Try another search or create a new project.</span></div>
+        </section>
+
+        <section class="lower-grid">
+          <div class="panel-card structural-card" id="structural">
+            <div class="panel-heading"><div><span class="panel-kicker">STRUCTURAL WORKSPACE</span><h2>Model it. Check it. Detail it.</h2></div><span class="panel-icon">⌂</span></div>
+            <p class="panel-description">A structural workflow taking inspiration from the modelling and design depth of ProtaStructure and Orion — connected to Caddr drafting and project quantities.</p>
+            <div class="capability-list">
+              <a href="structural.html#model"><span class="capability-icon">01</span><span><strong>Building model</strong><small>Grids, storeys, columns, beams and slabs</small></span><span class="capability-arrow">↗</span></a>
+              <a href="structural.html#analysis"><span class="capability-icon">02</span><span><strong>Loads & analysis</strong><small>Load cases, combinations and model checks</small></span><span class="capability-arrow">↗</span></a>
+              <a href="structural.html#design"><span class="capability-icon">03</span><span><strong>Member design</strong><small>Columns, beams, slabs and foundations</small></span><span class="capability-arrow">↗</span></a>
+              <a href="structural.html#detailing"><span class="capability-icon">04</span><span><strong>Reinforcement & detailing</strong><small>Rebar marks, schedules and drawing output</small></span><span class="capability-arrow">↗</span></a>
+            </div>
+            <a class="button button-primary full-button" href="structural.html">Open structural workspace <span>→</span></a>
+            <div class="honesty-note"><span>i</span> Workflow preview only — engineering calculations are not connected yet.</div>
+          </div>
+
+          <div class="panel-card files-card" id="files">
+            <div class="panel-heading"><div><span class="panel-kicker">RECENT FILES</span><h2>Your working files</h2></div><a class="icon-link" href="cad.html" title="Open CAD drafting">↗</a></div>
+            <div class="file-list">
+              <a class="file-row searchable" data-search="structural detail bahl cad drawing" href="cad.html"><span class="file-icon file-cad">CAD</span><span class="file-info"><strong>Structural-Detail</strong><small>CAD drawing · .bahl</small></span><span class="file-date">Local</span><span class="file-arrow">→</span></a>
+              <a class="file-row searchable" data-search="reinforcement layout dxf drawing" href="cad.html"><span class="file-icon file-dxf">DXF</span><span class="file-info"><strong>Reinforcement-Layout</strong><small>Drawing exchange · .dxf</small></span><span class="file-date">Sample</span><span class="file-arrow">→</span></a>
+              <a class="file-row searchable" data-search="column schedule quantities csv" href="structural.html#quantities"><span class="file-icon file-csv">BOQ</span><span class="file-info"><strong>Column-Schedule</strong><small>Quantities preview</small></span><span class="file-date">Preview</span><span class="file-arrow">→</span></a>
+            </div>
+            <a class="plain-link files-foot-link" href="cad.html">Go to CAD drafting <span>→</span></a>
+          </div>
+        </section>
+        <footer class="page-footer"><span>Caddr · Engineering work, connected.</span><span>Prototype workspace <i class="footer-dot"></i> Local-first</span></footer>
+      </div>
+    </main>
   </div>
 
-  <input type="file" id="fileInput" accept=".dxf,application/dxf,text/plain,application/json,.bahl,.json" hidden />
-  <script src="core.js"></script>
-  <script src="app.js"></script>
-  <script>
-    (() => {
-      const tabs = [...document.querySelectorAll('[data-ribbon-target]')];
-      const pages = [...document.querySelectorAll('[data-ribbon-page]')];
-      tabs.forEach(tab => tab.addEventListener('click', () => {
-        const name = tab.dataset.ribbonTarget;
-        tabs.forEach(item => item.classList.toggle('active', item === tab));
-        pages.forEach(page => {
-          const active = page.dataset.ribbonPage === name;
-          page.hidden = !active;
-          page.classList.toggle('active', active);
-        });
-      }));
-      const commandSearch = document.getElementById('commandSearch');
-      commandSearch.addEventListener('keydown', event => {
-        if (event.key !== 'Enter' || !commandSearch.value.trim()) return;
-        const input = document.getElementById('commandInput');
-        input.value = commandSearch.value.trim();
-        commandSearch.value = '';
-        input.focus();
-        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      });
-      const route = (sourceId, targetId) => {
-        const source = document.getElementById(sourceId);
-        const target = document.getElementById(targetId);
-        if (source && target) source.addEventListener('click', () => { target.click(); source.classList.toggle('active', target.classList.contains('active')); });
-      };
-      route('ribbonAddConstraint', 'addConstraint');
-      route('ribbonAddParameter', 'addParameter');
-      route('ribbonGridToggle', 'gridToggle');
-      route('ribbonSnapToggle', 'snapToggle');
-      route('ribbonOrthoToggle', 'orthoToggle');
-      route('ribbonPolarToggle', 'polarToggle');
-      route('ribbonTrackingToggle', 'trackingToggle');
-      route('ribbonDynamicToggle', 'dynamicToggle');
-      route('ribbonFitView', 'fitView');
-      
-      route('viewportFit', 'fitView');
-      route('viewportVisibility', 'gridToggle');
-      document.getElementById('viewportZoomIn').addEventListener('click', () => {
-        const svg = document.getElementById('cadCanvas');
-        const event = new WheelEvent('wheel', { deltaY: -160, clientX: svg.getBoundingClientRect().left + svg.getBoundingClientRect().width / 2, clientY: svg.getBoundingClientRect().top + svg.getBoundingClientRect().height / 2, bubbles: true, cancelable: true });
-        svg.dispatchEvent(event);
-      });
-      const layerDisplay = document.getElementById('activeLayerDisplay');
-      layerDisplay.addEventListener('click', () => {
-        const layers = document.getElementById('layers');
-        const panel = layers.closest('details');
-        if (panel) panel.open = true;
-        layers.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      });
-    })();
-  </script>
+  <dialog class="modal" id="newProjectDialog" aria-labelledby="newProjectTitle">
+    <form method="dialog" id="newProjectForm">
+      <div class="modal-head"><div><span class="panel-kicker">START SOMETHING NEW</span><h2 id="newProjectTitle">Create a project</h2><p>Set up the project space. You can refine details as the workflow grows.</p></div><button type="button" class="modal-close" id="closeProjectDialog" aria-label="Close">×</button></div>
+      <label class="form-label" for="projectName">Project name</label><input class="form-input" id="projectName" name="projectName" required maxlength="70" placeholder="e.g. Three-bedroom residence" />
+      <label class="form-label" for="projectType">Project type</label><select class="form-input" id="projectType" name="projectType"><option>Building structure</option><option>Residential</option><option>Commercial</option><option>Infrastructure (later phase)</option></select>
+      <div class="modal-actions"><button type="button" class="button button-secondary" id="cancelProjectButton">Cancel</button><button type="submit" class="button button-primary">Create project <span>→</span></button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
