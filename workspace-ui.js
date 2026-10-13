@@ -728,6 +728,10 @@
     });
   });
   setupConversation();
+  // The load list is another view of the same members. Selecting from it returns to the one model viewport.
+  $("#beamLoadList")?.addEventListener("click", event => {
+    if (event.target.closest(".beam-load-row")) setTab("model");
+  }, true);
   renderExplorer();
   setTab(activeTab, false);
   setCollapsed("explorer", shell.classList.contains("explorer-collapsed"));
