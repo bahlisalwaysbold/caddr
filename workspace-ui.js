@@ -31,6 +31,9 @@
   }
   if (detailing && slots.drawings) slots.drawings.append(detailing);
   if (source) source.remove();
+  // The live sections have been reparented into the workspace; discard the hidden staging tree.
+  const staging = $("#workspaceSourceStaging");
+  if (staging) staging.remove();
 
   const STORE_KEY = "caddr.structural-workspace-ui.v1";
   const CHAT_KEY = "caddr.project-conversation.residential-block-a.v1";
