@@ -145,7 +145,7 @@
   function syncContext() {
     const ctx = projectContext();
     if (ctx.member.id && lastObservedMemberId && ctx.member.id !== lastObservedMemberId) {
-      const level = ctx.member.title.match(/level\\s+(\\d+)/i);
+      const level = ctx.member.title.match(/level\s+(\d+)/i);
       if (level) activeStorey = "Level " + level[1] + " · +" + (Number(level[1]) * 3.3).toFixed(1) + " m";
       else if (/foundation/i.test(ctx.member.title)) activeStorey = "Foundation / Ground";
     }
