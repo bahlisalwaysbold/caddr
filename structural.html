@@ -11,42 +11,8 @@
   <script src="structural.js" defer></script>
   <script src="workspace-ui.js" defer></script>
 </head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="Main navigation">
-      <a class="brand" href="index.html" aria-label="Caddr overview"><span class="brand-mark">C<span></span></span><span class="brand-copy"><strong>Caddr</strong><small>ENGINEERING WORKSPACE</small></span></a>
-      <button class="workspace-switch" type="button" id="workspaceSwitch"><span class="workspace-avatar">B</span><span class="workspace-name"><strong>Bahl workspace</strong><small>Personal workspace</small></span><span class="switch-chevron">⌄</span></button>
-      <div class="nav-label">WORKSPACE</div>
-      <nav class="nav-group">
-        <a class="nav-link" href="index.html"><span class="nav-icon">▦</span>Overview</a>
-        <a class="nav-link" href="index.html#projects"><span class="nav-icon">▣</span>Projects</a>
-        <a class="nav-link" href="cad.html"><span class="nav-icon">⌗</span>CAD drafting</a>
-        <a class="nav-link active" href="structural.html"><span class="nav-icon">⌂</span>Structural design</a>
-        <a class="nav-link" href="index.html#files"><span class="nav-icon">▤</span>Files & drawings</a>
-      </nav>
-      <div class="nav-label nav-label-spaced">STRUCTURAL WORKFLOW</div>
-      <nav class="nav-group">
-        <a class="nav-link" href="#model"><span class="nav-icon">◇</span>Model setup</a>
-        <a class="nav-link" href="#loads"><span class="nav-icon">⇣</span>Loads & combinations</a>
-        <a class="nav-link" href="#analysis"><span class="nav-icon">∿</span>Analysis</a>
-        <a class="nav-link" href="#design"><span class="nav-icon">⌂</span>Member design</a>
-        <a class="nav-link" href="#detailing"><span class="nav-icon">⌁</span>Reinforcement</a>
-        <a class="nav-link" href="#quantities"><span class="nav-icon">▥</span>Quantities & BOQ</a>
-      </nav>
-      <div class="sidebar-bottom"><a class="nav-link" href="#limitations"><span class="nav-icon">?</span>Prototype status</a><div class="profile-mini"><div class="profile-avatar">BL</div><div><strong>Bahl</strong><small>Workspace owner</small></div><button type="button" class="more-button" id="profileMore" aria-label="Profile options">···</button></div></div>
-    </aside>
-    <main class="main-area">
-      <header class="topbar"><div class="breadcrumbs"><a href="index.html">Caddr</a><span class="crumb-slash">/</span><a href="index.html#projects">Projects</a><span class="crumb-slash">/</span><strong>Structural design</strong></div><div class="topbar-actions"><a class="button button-secondary top-cad-button" href="cad.html">⌗ Open CAD</a><button class="icon-button" id="statusButton" type="button" aria-label="Prototype status">i</button><div class="top-avatar" aria-label="Bahl profile">BL</div></div></header>
-      <div class="page-content structural-content">
-        <div class="structural-breadcrumb-row"><div><div class="eyebrow"><span class="eyebrow-dot"></span> STRUCTURAL WORKSPACE <span class="prototype-chip">CONCEPT PREVIEW</span></div><h1>Residential Block A</h1><p>A connected structural workflow — model, analyse, design, detail and quantify.</p></div><div class="structural-actions"><span class="sample-status"><i></i> Sample project</span><button class="button button-primary" id="modelSettingsButton" type="button">Project settings <span>⚙</span></button></div></div>
-        <section class="structural-summary-grid" aria-label="Project setup snapshot">
-          <article class="summary-card"><span class="summary-label">STRUCTURE TYPE</span><strong>RC building</strong><small>Reinforced concrete</small><span class="summary-card-icon">⌂</span></article>
-          <article class="summary-card"><span class="summary-label">STOREYS</span><strong>3 <small>levels</small></strong><small>Ground + 2 upper floors</small><span class="summary-card-icon">▤</span></article>
-          <article class="summary-card"><span class="summary-label">DESIGN WORKFLOW</span><strong>Early setup</strong><small>Model definition preview</small><span class="summary-card-icon">◇</span></article>
-          <article class="summary-card summary-card-muted" id="solverSummaryCard"><span class="summary-label">SOLVER STATUS</span><strong id="solverStatusText">Checking…</strong><small id="solverStatusDetail">Checking the analysis service</small><span class="summary-card-icon">∿</span></article>
-        </section>
-
-        <section class="engineering-workspace-shell" id="engineeringWorkspace" aria-label="Caddr structural engineering workspace">
+<body class="caddr-structural-page">
+<section class="engineering-workspace-shell" id="engineeringWorkspace" aria-label="Caddr structural engineering workspace">
           <header class="workspace-toolbar">
             <div class="workspace-brand">
               <a class="workspace-brand-mark" href="index.html" aria-label="Back to Caddr projects">C</a>
@@ -62,6 +28,7 @@
             <div class="workspace-actions">
               <button class="ws-control" id="toggleExplorer" type="button" aria-pressed="true" aria-expanded="true" title="Hide Project Explorer">◂ Explorer</button>
               <button class="ws-control" id="toggleConversation" type="button" aria-pressed="true" aria-expanded="true" title="Hide Project conversation">Conversation ▸</button>
+              <button class="ws-control" id="modelSettingsButton" type="button" title="Open project model settings">⚙ Settings</button>
               <a class="ws-control" id="openCADWorkspace" href="cad.html" title="Open the existing CAD drafting workspace">⌗ CAD</a>
               <button class="ws-control primary" id="toggleWorkspaceFullscreen" type="button" aria-pressed="false" title="Expand the model workspace to full screen">⛶ Full screen</button>
             </div>
@@ -129,117 +96,115 @@
           </footer>
         </section>
 
-        <div class="structural-main-grid">
-          <div class="structural-left-column">
-            <section class="structural-panel" id="model">
-              <div class="structural-panel-heading"><div><span class="area-number">01</span><div><h2>Interactive structural model</h2><p>Select a beam or column in the diagram to inspect and edit its section.</p></div></div><span class="area-status status-connected">Editable model</span></div>
-              <div class="model-toolbar">
-                <div class="model-toolbar-info"><span class="model-ready-dot"></span><strong id="modelCountLabel">10 members · 9 joints</strong><small id="modelLevelSummary">Ground + 2 upper levels</small></div>
-                <div class="model-toolbar-actions">
-                  <div class="model-view-switch" role="group" aria-label="Structural diagram view">
-                    <button class="model-view-button active" type="button" data-diagram-mode="model" aria-pressed="true">Model</button>
-                    <button class="model-view-button" type="button" data-diagram-mode="moment" aria-pressed="false">Moments</button>
-                    <button class="model-view-button" type="button" data-diagram-mode="shear" aria-pressed="false">Shear</button>
-                    <button class="model-view-button" type="button" data-diagram-mode="deflection" aria-pressed="false">Deflection</button>
+  <div id="workspaceSourceStaging" class="workspace-source-staging" hidden aria-hidden="true">
+    <div class="structural-main-grid">
+              <div class="structural-left-column">
+                <section class="structural-panel" id="model">
+                  <div class="structural-panel-heading"><div><span class="area-number">01</span><div><h2>Interactive structural model</h2><p>Select a beam or column in the diagram to inspect and edit its section.</p></div></div><span class="area-status status-connected">Editable model</span></div>
+                  <div class="model-toolbar">
+                    <div class="model-toolbar-info"><span class="model-ready-dot"></span><strong id="modelCountLabel">10 members · 9 joints</strong><small id="modelLevelSummary">Ground + 2 upper levels</small></div>
+                    <div class="model-toolbar-actions">
+                      <div class="model-view-switch" role="group" aria-label="Structural diagram view">
+                        <button class="model-view-button active" type="button" data-diagram-mode="model" aria-pressed="true">Model</button>
+                        <button class="model-view-button" type="button" data-diagram-mode="moment" aria-pressed="false">Moments</button>
+                        <button class="model-view-button" type="button" data-diagram-mode="shear" aria-pressed="false">Shear</button>
+                        <button class="model-view-button" type="button" data-diagram-mode="deflection" aria-pressed="false">Deflection</button>
+                      </div>
+                      <button class="quiet-button" id="resetFrameModel" type="button" title="Reset the sample frame and its member properties">Reset</button>
+                    </div>
                   </div>
-                  <button class="quiet-button" id="resetFrameModel" type="button" title="Reset the sample frame and its member properties">Reset</button>
-                </div>
-              </div>
-              <div class="interactive-model-layout">
-                <div class="diagram-stage">
-                  <svg id="structuralDiagram" viewBox="0 0 720 390" role="img" aria-label="Interactive two-bay, two-storey frame model. Select beams and columns to edit their properties." tabindex="0"></svg>
-                  <div class="diagram-caption"><span id="diagramModeLabel">MODEL VIEW</span><span>Click a beam or column to select it</span></div>
-                  <div class="diagram-legend" id="diagramLegend"><span><i class="legend-beam"></i>Beams</span><span><i class="legend-column"></i>Columns</span><span><i class="legend-joint"></i>Joints</span></div>
-                </div>
-                <aside class="member-inspector" aria-label="Selected structural member properties">
-                  <div class="inspector-top"><span class="preview-caption">MEMBER INSPECTOR</span><span class="member-type-badge" id="selectedMemberType">BEAM</span></div>
-                  <h3 id="selectedMemberTitle">Beam B1 · Level 1</h3>
-                  <p class="inspector-member-id" id="selectedMemberSubtitle">BEAM_B1_L1</p>
-                  <div class="inspector-fields">
-                    <label for="memberWidth">Section width <span>mm</span><input id="memberWidth" type="number" min="100" max="1500" step="10" value="250" /></label>
-                    <label for="memberDepth">Section depth <span>mm</span><input id="memberDepth" type="number" min="100" max="2000" step="10" value="450" /></label>
-                    <label for="memberLoad" id="memberLoadField">Uniform downward line load <span>kN/m</span><input id="memberLoad" type="number" min="0" max="500" step="0.5" value="12" /></label>
+                  <div class="interactive-model-layout">
+                    <div class="diagram-stage">
+                      <svg id="structuralDiagram" viewBox="0 0 720 390" role="img" aria-label="Interactive two-bay, two-storey frame model. Select beams and columns to edit their properties." tabindex="0"></svg>
+                      <div class="diagram-caption"><span id="diagramModeLabel">MODEL VIEW</span><span>Click a beam or column to select it</span></div>
+                      <div class="diagram-legend" id="diagramLegend"><span><i class="legend-beam"></i>Beams</span><span><i class="legend-column"></i>Columns</span><span><i class="legend-joint"></i>Joints</span></div>
+                    </div>
+                    <aside class="member-inspector" aria-label="Selected structural member properties">
+                      <div class="inspector-top"><span class="preview-caption">MEMBER INSPECTOR</span><span class="member-type-badge" id="selectedMemberType">BEAM</span></div>
+                      <h3 id="selectedMemberTitle">Beam B1 · Level 1</h3>
+                      <p class="inspector-member-id" id="selectedMemberSubtitle">BEAM_B1_L1</p>
+                      <div class="inspector-fields">
+                        <label for="memberWidth">Section width <span>mm</span><input id="memberWidth" type="number" min="100" max="1500" step="10" value="250" /></label>
+                        <label for="memberDepth">Section depth <span>mm</span><input id="memberDepth" type="number" min="100" max="2000" step="10" value="450" /></label>
+                        <label for="memberLoad" id="memberLoadField">Uniform downward line load <span>kN/m</span><input id="memberLoad" type="number" min="0" max="500" step="0.5" value="12" /></label>
+                      </div>
+                      <div class="section-property-preview" id="sectionPropertyPreview"><span>Section properties</span><div><small>Area</small><strong id="sectionArea">0.1125 m²</strong></div><div><small>Inertia*</small><strong id="sectionInertia">—</strong></div><p>*Calculated from the rectangular dimensions; not a code design check.</p></div>
+                      <div class="inspector-result-preview" id="selectedMemberResults" hidden><div class="inspector-results-heading">LATEST ANALYSIS <span id="inspectorComboName">—</span></div><div><small>Peak moment</small><strong id="inspectorMoment">—</strong></div><div><small>Peak shear</small><strong id="inspectorShear">—</strong></div><div><small>Peak deflection</small><strong id="inspectorDeflection">—</strong></div></div>
+                      <div class="inspector-actions"><button class="button button-primary" id="applyMemberChanges" type="button">Apply properties</button><button class="quiet-button" id="resetMemberProperties" type="button">Reset member</button></div>
+                      <p class="inspector-help" id="memberInspectorHelp">Choose a member, edit the section or line load, then run analysis below. Changes invalidate previous results.</p>
+                    </aside>
                   </div>
-                  <div class="section-property-preview" id="sectionPropertyPreview"><span>Section properties</span><div><small>Area</small><strong id="sectionArea">0.1125 m²</strong></div><div><small>Inertia*</small><strong id="sectionInertia">—</strong></div><p>*Calculated from the rectangular dimensions; not a code design check.</p></div>
-                  <div class="inspector-result-preview" id="selectedMemberResults" hidden><div class="inspector-results-heading">LATEST ANALYSIS <span id="inspectorComboName">—</span></div><div><small>Peak moment</small><strong id="inspectorMoment">—</strong></div><div><small>Peak shear</small><strong id="inspectorShear">—</strong></div><div><small>Peak deflection</small><strong id="inspectorDeflection">—</strong></div></div>
-                  <div class="inspector-actions"><button class="button button-primary" id="applyMemberChanges" type="button">Apply properties</button><button class="quiet-button" id="resetMemberProperties" type="button">Reset member</button></div>
-                  <p class="inspector-help" id="memberInspectorHelp">Choose a member, edit the section or line load, then run analysis below. Changes invalidate previous results.</p>
-                </aside>
+                  <div class="model-footnote"><span>i</span><p><strong>Editable demonstration frame.</strong> This model uses idealised joints, fixed bases, assumed elastic concrete properties and entered beam line loads. It does not yet derive slab loads, self-weight, walls, diaphragm action or reinforcement from architectural drawings. Geometry is schematic, not to scale.</p></div>
+                </section>
+    
+                <section class="structural-panel" id="loads">
+                  <div class="structural-panel-heading"><div><span class="area-number">02</span><div><h2>Loads & combinations</h2><p>Line loads are attached to the actual beam members in the diagram.</p></div></div><span class="area-status status-connected">Model-linked</span></div>
+                  <div class="load-case-live">
+                    <div class="load-symbol">G</div><div class="load-case-live-copy"><strong>Applied gravity line loads</strong><small>Global −Y · kN/m · edit any beam in the model or list</small></div><span class="live-tag">EDITABLE</span>
+                  </div>
+                  <div class="beam-load-list" id="beamLoadList" aria-label="Beam gravity line loads"></div>
+                  <div class="combination-live-row"><div><strong>G_SERVICE</strong><small>Current demonstration combination</small></div><span class="combination-pill service">1.0 × G</span></div>
+                  <p class="load-code-note">This is an explicit test load, not a code-prescribed load combination. No load factors are inferred automatically. Add dead, imposed, wind and other applicable cases as separate verified inputs in later development.</p>
+                </section>
+    
+                <section class="structural-panel" id="analysis">
+                  <div class="structural-panel-heading"><div><span class="area-number">03</span><div><h2>Analysis & model checks</h2><p>Run the current editable frame model through the structural analysis API.</p></div></div><span class="area-status status-preview" id="engineBadge">Checking engine</span></div>
+                  <div class="analysis-live-card">
+                    <div class="analysis-live-icon">∿</div>
+                    <div class="analysis-live-copy">
+                      <strong>Run analysis on this frame</strong>
+                      <p>Caddr sends the active frame geometry, section properties and beam line loads to PyNiteFEA, then displays its calculated reactions, internal forces and deflections.</p>
+                      <div id="solverConnection" class="solver-connection pending"><i></i><span id="solverConnectionText">Checking analysis service…</span></div>
+                    </div>
+                    <button class="button button-primary" type="button" id="runDemoAnalysis" disabled>Run Analysis <span>→</span></button>
+                  </div>
+                  <p class="solver-boundary-note"><strong>Important:</strong> this action analyses the current idealised frame and its entered beam line loads. It does not perform reinforced-concrete code design or reinforcement selection.</p>
+                  <div id="analysisError" class="analysis-error" role="alert" hidden></div>
+                  <div id="analysisResults" class="analysis-results" aria-live="polite" hidden>
+                    <div class="results-heading"><div><h3>Calculated frame results</h3><p id="analysisResultMeta">—</p></div><span class="result-validity">Solver response received</span></div>
+                    <div id="analysisSummary" class="analysis-summary-grid"></div>
+                    <div class="results-table-wrap" id="analysisTable"></div>
+                    <p class="result-footnote">Output for this defined linear-elastic frame model only. Review model assumptions, units, stability and results before any engineering use.</p>
+                  </div>
+                </section>
               </div>
-              <div class="model-footnote"><span>i</span><p><strong>Editable demonstration frame.</strong> This model uses idealised joints, fixed bases, assumed elastic concrete properties and entered beam line loads. It does not yet derive slab loads, self-weight, walls, diaphragm action or reinforcement from architectural drawings. Geometry is schematic, not to scale.</p></div>
-            </section>
-
-            <section class="structural-panel" id="loads">
-              <div class="structural-panel-heading"><div><span class="area-number">02</span><div><h2>Loads & combinations</h2><p>Line loads are attached to the actual beam members in the diagram.</p></div></div><span class="area-status status-connected">Model-linked</span></div>
-              <div class="load-case-live">
-                <div class="load-symbol">G</div><div class="load-case-live-copy"><strong>Applied gravity line loads</strong><small>Global −Y · kN/m · edit any beam in the model or list</small></div><span class="live-tag">EDITABLE</span>
+    
+              <div class="structural-right-column">
+                <section class="structural-panel" id="design">
+                  <div class="structural-panel-heading"><div><span class="area-number">04</span><div><h2>Member design</h2><p>Design workflow inspired by integrated building design tools.</p></div></div></div>
+                  <div class="design-module-list">
+                    <div class="design-module"><span class="design-icon">C</span><span><strong>Columns</strong><small>Axial force, moments, slenderness</small></span><span class="module-chevron">›</span></div>
+                    <div class="design-module"><span class="design-icon">B</span><span><strong>Beams</strong><small>Flexure, shear, serviceability</small></span><span class="module-chevron">›</span></div>
+                    <div class="design-module"><span class="design-icon">S</span><span><strong>Slabs</strong><small>Thickness, reinforcement, deflection</small></span><span class="module-chevron">›</span></div>
+                    <div class="design-module"><span class="design-icon">F</span><span><strong>Foundations</strong><small>Bearing, bending, punching shear</small></span><span class="module-chevron">›</span></div>
+                  </div>
+                  <div class="code-selection"><span>Design code</span><strong>Choose per project <span>⌄</span></strong><small>Examples: Eurocode 2, BS 8110, applicable national annex.</small></div>
+                  <div class="engine-note"><span>i</span><span>Code selection and design checks are display concepts. No member capacities are being calculated.</span></div>
+                </section>
+    
+                <section class="structural-panel" id="detailing">
+                  <div class="structural-panel-heading"><div><span class="area-number">05</span><div><h2>Reinforcement & detailing</h2><p>Connect the structural model to production drawings.</p></div></div><span class="area-status status-preview">Planned</span></div>
+                  <div class="detail-feature"><span class="detail-feature-icon">⌁</span><div><strong>Rebar detailing</strong><p>Longitudinal bars, links/stirrups, cover rules, bar marks and bending schedules.</p></div></div>
+                  <div class="detail-feature"><span class="detail-feature-icon">⌗</span><div><strong>Drawing generation</strong><p>Beam, column, slab and foundation detail sheets linked to the model.</p></div></div>
+                  <a class="button button-secondary full-button" href="cad.html">Open CAD drafting <span>↗</span></a>
+                </section>
+    
+                <section class="structural-panel" id="quantities">
+                  <div class="structural-panel-heading"><div><span class="area-number">06</span><div><h2>Quantities & BOQ</h2><p>Planned model-linked take-off.</p></div></div><span class="area-status status-preview">Planned</span></div>
+                  <div class="quantity-preview"><div><span>Concrete</span><strong>— <small>m³</small></strong><i>Awaiting model</i></div><div><span>Reinforcement</span><strong>— <small>kg</small></strong><i>Awaiting design</i></div><div><span>Formwork</span><strong>— <small>m²</small></strong><i>Awaiting model</i></div></div>
+                  <p class="quantity-footnote">Quantities are intentionally blank until they can be calculated from a real model.</p>
+                </section>
+    
+                <section class="structural-panel future-panel" id="budgeting">
+                  <div class="future-panel-heading"><span class="future-icon">₦</span><div><h2>Budgeting & planning</h2><p>Materials, rates, cost options and construction sequence linked to quantities.</p></div></div>
+                  <div class="future-chips"><span>Material pricing</span><span>Cost comparison</span><span>Work sequence</span></div>
+                  <div id="planning"></div>
+                </section>
               </div>
-              <div class="beam-load-list" id="beamLoadList" aria-label="Beam gravity line loads"></div>
-              <div class="combination-live-row"><div><strong>G_SERVICE</strong><small>Current demonstration combination</small></div><span class="combination-pill service">1.0 × G</span></div>
-              <p class="load-code-note">This is an explicit test load, not a code-prescribed load combination. No load factors are inferred automatically. Add dead, imposed, wind and other applicable cases as separate verified inputs in later development.</p>
-            </section>
-
-            <section class="structural-panel" id="analysis">
-              <div class="structural-panel-heading"><div><span class="area-number">03</span><div><h2>Analysis & model checks</h2><p>Run the current editable frame model through the structural analysis API.</p></div></div><span class="area-status status-preview" id="engineBadge">Checking engine</span></div>
-              <div class="analysis-live-card">
-                <div class="analysis-live-icon">∿</div>
-                <div class="analysis-live-copy">
-                  <strong>Run analysis on this frame</strong>
-                  <p>Caddr sends the active frame geometry, section properties and beam line loads to PyNiteFEA, then displays its calculated reactions, internal forces and deflections.</p>
-                  <div id="solverConnection" class="solver-connection pending"><i></i><span id="solverConnectionText">Checking analysis service…</span></div>
-                </div>
-                <button class="button button-primary" type="button" id="runDemoAnalysis" disabled>Run Analysis <span>→</span></button>
-              </div>
-              <p class="solver-boundary-note"><strong>Important:</strong> this action analyses the current idealised frame and its entered beam line loads. It does not perform reinforced-concrete code design or reinforcement selection.</p>
-              <div id="analysisError" class="analysis-error" role="alert" hidden></div>
-              <div id="analysisResults" class="analysis-results" aria-live="polite" hidden>
-                <div class="results-heading"><div><h3>Calculated frame results</h3><p id="analysisResultMeta">—</p></div><span class="result-validity">Solver response received</span></div>
-                <div id="analysisSummary" class="analysis-summary-grid"></div>
-                <div class="results-table-wrap" id="analysisTable"></div>
-                <p class="result-footnote">Output for this defined linear-elastic frame model only. Review model assumptions, units, stability and results before any engineering use.</p>
-              </div>
-            </section>
-          </div>
-
-          <div class="structural-right-column">
-            <section class="structural-panel" id="design">
-              <div class="structural-panel-heading"><div><span class="area-number">04</span><div><h2>Member design</h2><p>Design workflow inspired by integrated building design tools.</p></div></div></div>
-              <div class="design-module-list">
-                <div class="design-module"><span class="design-icon">C</span><span><strong>Columns</strong><small>Axial force, moments, slenderness</small></span><span class="module-chevron">›</span></div>
-                <div class="design-module"><span class="design-icon">B</span><span><strong>Beams</strong><small>Flexure, shear, serviceability</small></span><span class="module-chevron">›</span></div>
-                <div class="design-module"><span class="design-icon">S</span><span><strong>Slabs</strong><small>Thickness, reinforcement, deflection</small></span><span class="module-chevron">›</span></div>
-                <div class="design-module"><span class="design-icon">F</span><span><strong>Foundations</strong><small>Bearing, bending, punching shear</small></span><span class="module-chevron">›</span></div>
-              </div>
-              <div class="code-selection"><span>Design code</span><strong>Choose per project <span>⌄</span></strong><small>Examples: Eurocode 2, BS 8110, applicable national annex.</small></div>
-              <div class="engine-note"><span>i</span><span>Code selection and design checks are display concepts. No member capacities are being calculated.</span></div>
-            </section>
-
-            <section class="structural-panel" id="detailing">
-              <div class="structural-panel-heading"><div><span class="area-number">05</span><div><h2>Reinforcement & detailing</h2><p>Connect the structural model to production drawings.</p></div></div><span class="area-status status-preview">Planned</span></div>
-              <div class="detail-feature"><span class="detail-feature-icon">⌁</span><div><strong>Rebar detailing</strong><p>Longitudinal bars, links/stirrups, cover rules, bar marks and bending schedules.</p></div></div>
-              <div class="detail-feature"><span class="detail-feature-icon">⌗</span><div><strong>Drawing generation</strong><p>Beam, column, slab and foundation detail sheets linked to the model.</p></div></div>
-              <a class="button button-secondary full-button" href="cad.html">Open CAD drafting <span>↗</span></a>
-            </section>
-
-            <section class="structural-panel" id="quantities">
-              <div class="structural-panel-heading"><div><span class="area-number">06</span><div><h2>Quantities & BOQ</h2><p>Planned model-linked take-off.</p></div></div><span class="area-status status-preview">Planned</span></div>
-              <div class="quantity-preview"><div><span>Concrete</span><strong>— <small>m³</small></strong><i>Awaiting model</i></div><div><span>Reinforcement</span><strong>— <small>kg</small></strong><i>Awaiting design</i></div><div><span>Formwork</span><strong>— <small>m²</small></strong><i>Awaiting model</i></div></div>
-              <p class="quantity-footnote">Quantities are intentionally blank until they can be calculated from a real model.</p>
-            </section>
-
-            <section class="structural-panel future-panel" id="budgeting">
-              <div class="future-panel-heading"><span class="future-icon">₦</span><div><h2>Budgeting & planning</h2><p>Materials, rates, cost options and construction sequence linked to quantities.</p></div></div>
-              <div class="future-chips"><span>Material pricing</span><span>Cost comparison</span><span>Work sequence</span></div>
-              <div id="planning"></div>
-            </section>
-          </div>
-        </div>
-        <section class="disclaimer-panel" id="limitations"><span class="disclaimer-icon">!</span><div><strong>Important prototype boundary</strong><p>This page is a workflow and UX preview, not engineering software that can certify a structure. It does not solve a structural model, select reinforcement, check a design code or produce validated quantities. Those parts must be connected to tested calculations and reviewed by a qualified engineer before real project use.</p></div></section>
-        <footer class="page-footer"><span>Caddr · Engineering work, connected.</span><a href="index.html">Back to overview ↑</a></footer>
-      </div>
-    </main>
+            </div>
   </div>
+
   <dialog class="modal settings-modal" id="settingsDialog"><form method="dialog"><div class="modal-head"><div><span class="panel-kicker">PROJECT SETUP</span><h2>Project settings</h2><p>Change the frame height. The model will rebuild and previous analysis results will be cleared.</p></div><button type="button" class="modal-close" id="closeSettings" aria-label="Close">×</button></div><label class="form-label" for="structureType">Structural system</label><select id="structureType" class="form-input"><option selected>Reinforced concrete frame (current prototype)</option></select><label class="form-label" for="storeyCount">Model levels including the base</label><select id="storeyCount" class="form-input"><option value="2">2 levels · Ground + 1 upper</option><option value="3" selected>3 levels · Ground + 2 upper</option><option value="4">4 levels · Ground + 3 upper</option><option value="5">5 levels · Ground + 4 upper</option></select><div class="modal-actions"><button type="button" id="cancelSettings" class="button button-secondary">Cancel</button><button type="submit" id="saveSettings" class="button button-primary">Apply model settings</button></div></form></dialog>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
