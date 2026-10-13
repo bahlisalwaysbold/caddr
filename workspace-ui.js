@@ -48,6 +48,7 @@
   let suppressClick = false;
   let fallbackFullscreen = false;
   let history = [];
+  let lastObservedMemberId = "";
   let groupOpen = { storeys: true, beams: true, columns: true, structure: true, drawings: true };
 
   try {
@@ -143,6 +144,12 @@
 
   function syncContext() {
     const ctx = projectContext();
+    if (ctx.member.id && lastObservedMemberId && ctx.member.id !== lastObservedMemberId) {
+      const level = ctx.member.title.match(/level\\s+(\\d+)/i);
+      if (level) activeStorey = "Level " + level[1] + " · +" + (Number(level[1]) * 3.3).toFixed(1) + " m";
+      else if (/foundation/i.test(ctx.member.title)) activeStorey = "Foundation / Ground";
+    }
+    if (ctx.member.id) lastObservedMemberId = ctx.member.id;
     $("#workspaceContextLabel").textContent = ctx.selected + "  ·  " + ctx.count;
     $("#conversationContext").textContent = "Residential Block A  ·  " + (ctx.storey === "Full frame" ? ctx.levelInfo : ctx.storey) + (ctx.member.id ? "  ·  " + ctx.member.title : "");
     $$(".explorer-row[data-member-id]").forEach(row => {
@@ -509,8 +516,12 @@
 
     if (/\b(run|start|perform|calculate)\b.*\banalysis\b|\banalysis now\b/.test(lower)) {
       setTab("analysis");
+      if ($("#runDemoAnalysis").disabled) {
+        addMessage("assistant", "The analysis service is currently unavailable, so I could not start a calculation. Check the solver connection in the Analysis tab and try again when it reports Connected.");
+        return;
+      }
       $("#runDemoAnalysis").click();
-      addMessage("assistant", "I started the existing frame analysis for the current model revision. Check the Analysis tab for the solver response and results.");
+      addMessage("assistant", "I requested analysis for the current frame revision. Check the Analysis tab for the solver response and results.");
       return;
     }
     if (/\b(moment|bending)\b/.test(lower) && /\b(show|view|diagram|plot|display)\b/.test(lower)) {
@@ -539,6 +550,17 @@
     }
     if (mentionOnly.status === "not-found") {
       addMessage("assistant", "I couldn't find " + mentionOnly.label + " in this demonstration frame. The Explorer lists the currently modelled beams and columns.");
+      return;
+    }
+    if (mentionOnly.status === "selected" && /\b(what|which|describe|properties|dimensions|size|width|depth)\b/.test(lower)) {
+      const member = currentMember();
+      const area = ($("#sectionArea")?.textContent || "not available").trim();
+      const inertia = ($("#sectionInertia")?.textContent || "not available").trim();
+      addMessage("assistant", member.title + " (" + member.id + "): width " + member.width + " mm, depth " + member.depth + " mm" + (member.kind === "beam" ? ", entered downward line load " + member.load + " kN/m" : "") + ". Rectangular section area: " + area + "; displayed inertia: " + inertia + ". These are geometry properties, not a design-code capacity check.");
+      return;
+    }
+    if (mentionOnly.status === "selected" && /\b(select|focus|inspect|open|show)\b/.test(lower)) {
+      addMessage("assistant", "Selected " + currentMember().title + " in the model. Its properties and current project context are now shown in the workspace.");
       return;
     }
     if (/\b(beams?|columns?|members?|storeys?|levels?)\b/.test(lower) && /\b(how many|count|number|summari[sz]e|overview|model size|model summary)\b/.test(lower) || /\b(summari[sz]e the current model|model summary|model overview)\b/.test(lower)) {
