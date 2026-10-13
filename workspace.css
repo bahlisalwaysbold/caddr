@@ -132,10 +132,10 @@ body:has(#engineeringWorkspace) .structural-content > .page-footer { display:non
 #engineeringWorkspace .proposal-summary { margin-top:6px; color:#34597f; font-size:10px; font-weight:800; line-height:1.55; }
 #engineeringWorkspace .proposal-help { margin-top:6px; color:#8194ad; font-size:8px; line-height:1.6; }
 #engineeringWorkspace .proposal-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
-#engineeringWorkspace .explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(258px,292px); }
-#engineeringWorkspace .explorer-collapsed #projectExplorer,
-#engineeringWorkspace .conversation-collapsed #projectConversation { display:none; }
-#engineeringWorkspace .conversation-collapsed .workspace-layout { grid-template-columns:minmax(190px,218px) minmax(0,1fr); }
+#engineeringWorkspace.explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(258px,292px); }
+#engineeringWorkspace.explorer-collapsed #projectExplorer,
+#engineeringWorkspace.conversation-collapsed #projectConversation { display:none; }
+#engineeringWorkspace.conversation-collapsed .workspace-layout { grid-template-columns:minmax(190px,218px) minmax(0,1fr); }
 #engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr); }
 #engineeringWorkspace .workspace-conversation #conversationMessages { overflow-wrap:anywhere; }
 #engineeringWorkspace :fullscreen { border-radius:0; }
@@ -168,8 +168,8 @@ body:has(#engineeringWorkspace) .structural-content > .page-footer { display:non
   #engineeringWorkspace .workspace-brand { min-width:145px; }
   #engineeringWorkspace .workspace-tab { padding-left:8px; padding-right:8px; }
   #engineeringWorkspace .workspace-layout { grid-template-columns:minmax(175px,195px) minmax(0,1fr) minmax(238px,260px); }
-  #engineeringWorkspace .explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(238px,260px); }
-  #engineeringWorkspace .conversation-collapsed .workspace-layout { grid-template-columns:minmax(175px,195px) minmax(0,1fr); }
+  #engineeringWorkspace.explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(238px,260px); }
+  #engineeringWorkspace.conversation-collapsed .workspace-layout { grid-template-columns:minmax(175px,195px) minmax(0,1fr); }
   #engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr); }
   #engineeringWorkspace #workspacePanelModel .interactive-model-layout { grid-template-columns:minmax(0,1fr) 205px; }
 }
@@ -179,8 +179,8 @@ body:has(#engineeringWorkspace) .structural-content > .page-footer { display:non
   #engineeringWorkspace .workspace-tabs { order:3; flex:1 1 100%; }
   #engineeringWorkspace .workspace-actions { flex:0 1 auto; }
   #engineeringWorkspace .workspace-layout { grid-template-columns:minmax(155px,180px) minmax(0,1fr) minmax(220px,235px); }
-  #engineeringWorkspace .explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(220px,235px); }
-  #engineeringWorkspace .conversation-collapsed .workspace-layout { grid-template-columns:minmax(155px,180px) minmax(0,1fr); }
+  #engineeringWorkspace.explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(220px,235px); }
+  #engineeringWorkspace.conversation-collapsed .workspace-layout { grid-template-columns:minmax(155px,180px) minmax(0,1fr); }
   #engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr); }
   #engineeringWorkspace #workspacePanelModel .interactive-model-layout { grid-template-columns:minmax(0,1fr); }
   #engineeringWorkspace #workspacePanelModel .member-inspector { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px 12px; }
@@ -205,8 +205,8 @@ body:has(#engineeringWorkspace) .structural-content > .page-footer { display:non
   #engineeringWorkspace .workspace-conversation { border-left:0; border-top:1px solid var(--ws-line); min-height:250px; max-height:330px; }
   #engineeringWorkspace .workspace-center { min-height:420px; overflow:visible; }
   #engineeringWorkspace .workspace-panels { overflow:visible; }
-  #engineeringWorkspace .explorer-collapsed .workspace-layout,
-  #engineeringWorkspace .conversation-collapsed .workspace-layout,
+  #engineeringWorkspace.explorer-collapsed .workspace-layout,
+  #engineeringWorkspace.conversation-collapsed .workspace-layout,
   #engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr); }
   #engineeringWorkspace #workspacePanelModel .interactive-model-layout { grid-template-columns:minmax(0,1fr); }
   #engineeringWorkspace #workspacePanelModel .member-inspector { display:flex; }
