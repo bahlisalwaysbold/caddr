@@ -1,0 +1,220 @@
+/* Caddr structural workspace: panel-first layout around the existing model UI */
+html:has(#engineeringWorkspace), body:has(#engineeringWorkspace) { height:100%; overflow:hidden; }
+body:has(#engineeringWorkspace) { margin:0; background:#edf2f8; }
+body:has(#engineeringWorkspace) .app-shell { min-height:0; height:100vh; overflow:hidden; }
+body:has(#engineeringWorkspace) .app-shell > .sidebar { display:none !important; }
+body:has(#engineeringWorkspace) .main-area { width:100%; min-width:0; height:100vh; min-height:0; overflow:hidden; }
+body:has(#engineeringWorkspace) .topbar { display:none !important; }
+body:has(#engineeringWorkspace) .page-content.structural-content { width:100%; max-width:none; height:100vh; min-height:0; margin:0; padding:0; overflow:hidden; }
+body:has(#engineeringWorkspace) .structural-breadcrumb-row,
+body:has(#engineeringWorkspace) .structural-summary-grid,
+body:has(#engineeringWorkspace) .structural-main-grid,
+body:has(#engineeringWorkspace) .structural-content > .disclaimer-panel,
+body:has(#engineeringWorkspace) .structural-content > .page-footer { display:none !important; }
+
+#engineeringWorkspace.engineering-workspace-shell {
+  display:flex; flex-direction:column; width:100%; height:100vh; min-height:0;
+  overflow:hidden; background:#f1f4f8; color:#233851; border:0; border-radius:0;
+  --ws-line:#dce4ee; --ws-muted:#788aa1; --ws-ink:#243a56; --ws-blue:#3478df;
+}
+#engineeringWorkspace *, #engineeringWorkspace *::before, #engineeringWorkspace *::after { box-sizing:border-box; }
+#engineeringWorkspace button, #engineeringWorkspace input, #engineeringWorkspace textarea { font:inherit; }
+#engineeringWorkspace button { cursor:pointer; }
+#engineeringWorkspace button:focus-visible,
+#engineeringWorkspace a:focus-visible,
+#engineeringWorkspace input:focus-visible,
+#engineeringWorkspace textarea:focus-visible { outline:2px solid #82aff5; outline-offset:2px; }
+#engineeringWorkspace .workspace-toolbar {
+  flex:0 0 auto; min-height:58px; display:flex; align-items:center; gap:14px;
+  padding:8px 13px; background:#fff; border-bottom:1px solid var(--ws-line);
+}
+#engineeringWorkspace .workspace-brand { display:flex; align-items:center; gap:9px; min-width:180px; flex:1 1 190px; }
+#engineeringWorkspace .workspace-brand-mark { display:grid; place-items:center; width:30px; height:30px; border-radius:8px; background:#2f75df; color:#fff; font-size:18px; font-weight:850; }
+#engineeringWorkspace .workspace-brand-copy { min-width:0; display:flex; flex-direction:column; gap:1px; }
+#engineeringWorkspace .workspace-brand-copy strong { font-size:14px; color:#1c3555; letter-spacing:-.45px; }
+#engineeringWorkspace .workspace-brand-copy small { color:#8695a9; font-size:8px; letter-spacing:.75px; font-weight:750; white-space:nowrap; }
+#engineeringWorkspace .workspace-tabs { display:flex; align-items:center; gap:3px; flex:0 1 auto; min-width:0; overflow-x:auto; scrollbar-width:thin; }
+#engineeringWorkspace .workspace-tab { position:relative; flex:0 0 auto; border:1px solid transparent; background:transparent; color:#71829a; padding:9px 12px; border-radius:6px; font-size:10px; font-weight:750; white-space:nowrap; }
+#engineeringWorkspace .workspace-tab:hover { background:#f4f7fb; color:#34577d; }
+#engineeringWorkspace .workspace-tab.active { background:#edf4ff; border-color:#dbe9ff; color:#286ac3; }
+#engineeringWorkspace .workspace-actions { display:flex; align-items:center; justify-content:flex-end; gap:5px; flex:0 1 auto; }
+#engineeringWorkspace .ws-control { border:1px solid #dfe6ef; background:#fff; color:#536981; min-height:31px; padding:6px 8px; border-radius:6px; font-size:9px; font-weight:700; white-space:nowrap; }
+#engineeringWorkspace .ws-control:hover { background:#f5f8fc; color:#2d5f9f; border-color:#cad9ed; }
+#engineeringWorkspace .ws-control.primary { background:#3077e5; color:white; border-color:#3077e5; }
+#engineeringWorkspace .workspace-layout { display:grid; grid-template-columns:minmax(190px,218px) minmax(0,1fr) minmax(258px,292px); flex:1 1 auto; min-height:0; width:100%; }
+#engineeringWorkspace .workspace-explorer,
+#engineeringWorkspace .workspace-conversation { display:flex; flex-direction:column; min-width:0; min-height:0; overflow:hidden; background:#fff; }
+#engineeringWorkspace .workspace-explorer { border-right:1px solid var(--ws-line); }
+#engineeringWorkspace .workspace-conversation { border-left:1px solid var(--ws-line); }
+#engineeringWorkspace .ws-panel-head { display:flex; align-items:center; justify-content:space-between; gap:7px; min-height:45px; padding:0 11px; border-bottom:1px solid #edf1f6; }
+#engineeringWorkspace .ws-panel-head strong { font-size:9px; letter-spacing:.75px; color:#526981; }
+#engineeringWorkspace .ws-panel-head button { border:0; background:transparent; color:#8595a9; border-radius:4px; font-size:17px; padding:4px 7px; }
+#engineeringWorkspace .ws-panel-head button:hover { background:#eef4fc; color:#2f6ebe; }
+#engineeringWorkspace .explorer-search { width:calc(100% - 20px); margin:10px 10px 7px; padding:8px 9px; border:1px solid #e1e8f1; background:#f9fbfe; border-radius:6px; color:#304965; font-size:10px; }
+#engineeringWorkspace .explorer-tree { flex:1 1 auto; min-height:0; overflow:auto; padding:2px 8px 14px; scrollbar-width:thin; }
+#engineeringWorkspace .explorer-project-root { display:flex; align-items:center; gap:8px; padding:10px 6px 12px; margin-bottom:5px; border-bottom:1px solid #edf1f6; }
+#engineeringWorkspace .explorer-project-icon { display:grid; place-items:center; width:28px; height:28px; flex:0 0 28px; border-radius:7px; color:#326dbd; background:#ebf3ff; font-size:14px; }
+#engineeringWorkspace .explorer-project-copy { display:flex; flex-direction:column; gap:3px; min-width:0; flex:1; }
+#engineeringWorkspace .explorer-project-copy strong { color:#344c69; font-size:10px; font-weight:800; overflow-wrap:anywhere; }
+#engineeringWorkspace .explorer-project-copy small { color:#8b9aae; font-size:8px; }
+#engineeringWorkspace .explorer-root-dot { color:#51a57f; font-size:8px; }
+#engineeringWorkspace .explorer-group { margin:2px 0; }
+#engineeringWorkspace .explorer-group > summary { list-style:none; display:flex; align-items:center; gap:6px; padding:8px 5px; cursor:pointer; border-radius:5px; color:#687f99; font-size:9px; user-select:none; }
+#engineeringWorkspace .explorer-group > summary::-webkit-details-marker { display:none; }
+#engineeringWorkspace .explorer-group > summary:hover { background:#f5f8fc; }
+#engineeringWorkspace .tree-caret { width:10px; flex:0 0 10px; color:#8096b1; font-size:10px; }
+#engineeringWorkspace .tree-group-title { font-weight:800; flex:1; }
+#engineeringWorkspace .tree-count { padding:2px 5px; background:#f0f4f9; border-radius:4px; color:#8395aa; font-size:8px; font-variant-numeric:tabular-nums; }
+#engineeringWorkspace .explorer-row { width:100%; display:flex; align-items:center; gap:7px; border:1px solid transparent; padding:7px 6px 7px 17px; border-radius:5px; text-align:left; background:transparent; color:#6b7f98; font-size:9px; min-width:0; }
+#engineeringWorkspace .explorer-row:hover:not(:disabled) { background:#f4f8fe; color:#315f9d; }
+#engineeringWorkspace .explorer-row.selected { background:#eaf3ff; border-color:#d8e8ff; color:#235ca7; }
+#engineeringWorkspace .tree-icon { width:14px; flex:0 0 14px; text-align:center; font-size:11px; color:#6e91bd; }
+#engineeringWorkspace .tree-row-label { flex:1; min-width:0; overflow-wrap:anywhere; line-height:1.35; }
+#engineeringWorkspace .planned-row { color:#a1adbc; cursor:not-allowed; }
+#engineeringWorkspace .planned-row .tree-icon { color:#b3bdca; }
+#engineeringWorkspace .explorer-foot { flex:0 0 auto; background:#f9fbfe; padding:10px 12px; color:#91a0b2; border-top:1px solid #edf1f6; font-size:8px; line-height:1.5; }
+#engineeringWorkspace .workspace-center { display:flex; flex-direction:column; min-height:0; min-width:0; overflow:hidden; background:#edf2f8; }
+#engineeringWorkspace .workspace-subtoolbar { flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 11px; min-height:40px; background:#f8fafd; border-bottom:1px solid #dfe6ef; }
+#engineeringWorkspace .workspace-context-label { min-width:0; color:#73859d; font-size:9px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#engineeringWorkspace .workspace-context-label strong { color:#405a78; }
+#engineeringWorkspace .workspace-view-label { color:#3e5e83; font-size:8px; font-weight:850; letter-spacing:.8px; }
+#engineeringWorkspace .workspace-viewport-tools { display:flex; gap:4px; align-items:center; }
+#engineeringWorkspace .workspace-viewport-tools button { width:27px; height:26px; padding:0; border:1px solid #dce5f0; background:#fff; border-radius:5px; color:#627b98; font-size:12px; }
+#engineeringWorkspace .workspace-viewport-tools button:hover { color:#2d6cc2; background:#edf4ff; }
+#engineeringWorkspace .workspace-panels { flex:1 1 auto; min-height:0; overflow:auto; padding:10px; scrollbar-width:thin; }
+#engineeringWorkspace .workspace-panel { width:100%; min-width:0; }
+#engineeringWorkspace .workspace-panel[hidden] { display:none !important; }
+#engineeringWorkspace .workspace-panel > .structural-panel { width:100%; max-width:none; margin:0 0 10px; padding:15px; border:1px solid #dfe7f0; border-radius:9px; background:#fff; box-shadow:0 1px 2px #203b5a05; }
+#engineeringWorkspace #workspacePanelModel { padding:0; }
+#engineeringWorkspace #workspacePanelModel > #model { margin:0; padding:14px; }
+#engineeringWorkspace #workspacePanelModel .structural-panel-heading { margin-bottom:12px; }
+#engineeringWorkspace #workspacePanelModel .interactive-model-layout { grid-template-columns:minmax(0,1fr) 218px; gap:10px; }
+#engineeringWorkspace #workspacePanelModel .model-toolbar { margin-bottom:10px; }
+#engineeringWorkspace #workspacePanelModel .member-inspector { padding:11px; }
+#engineeringWorkspace #workspacePanelModel .inspector-fields { gap:8px; }
+#engineeringWorkspace #structuralDiagram { display:block; width:100%; height:clamp(340px, calc(100vh - 330px), 650px); min-height:340px; max-height:none; touch-action:pan-y; cursor:crosshair; }
+#engineeringWorkspace #structuralDiagram.is-panning { cursor:grabbing; }
+#engineeringWorkspace .workspace-panel .analysis-live-card { flex-wrap:wrap; }
+#engineeringWorkspace .workspace-panel .analysis-live-copy { min-width:180px; }
+#engineeringWorkspace .workspace-panel .analysis-live-card > .button { flex-shrink:0; }
+#engineeringWorkspace .workspace-panel .analysis-summary-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+#engineeringWorkspace #workspaceDesignGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; align-items:start; }
+#engineeringWorkspace #workspaceDesignGrid > .structural-panel { margin:0; padding:14px; min-width:0; }
+#engineeringWorkspace #workspaceDesignGrid > #design { grid-column:1 / -1; }
+#engineeringWorkspace #workspacePanelDrawings > #detailing { max-width:none; }
+#engineeringWorkspace .drawing-handoff-card { padding:15px; border:1px solid #dfe7f0; border-radius:9px; background:#fff; margin-bottom:10px; }
+#engineeringWorkspace .drawing-handoff-card h2 { font-size:13px; color:#314c6c; }
+#engineeringWorkspace .drawing-handoff-card p { margin-top:6px; font-size:9px; line-height:1.7; color:#8394a9; max-width:640px; }
+#engineeringWorkspace .drawing-handoff-actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:13px; }
+#engineeringWorkspace .workspace-statusline { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:25px; padding:4px 12px; border-top:1px solid #dbe4ee; background:#fff; color:#8493a7; font-size:8px; }
+#engineeringWorkspace .workspace-statusline strong { color:#5a708b; font-weight:750; }
+#engineeringWorkspace .workspace-conversation .conversation-context { padding:9px 11px; background:#f7faff; border-bottom:1px solid #e7edf5; color:#7187a2; font-size:8px; line-height:1.55; }
+#engineeringWorkspace .conversation-messages { flex:1 1 auto; min-height:100px; overflow:auto; padding:12px 10px 8px; display:flex; flex-direction:column; gap:11px; scrollbar-width:thin; }
+#engineeringWorkspace .conversation-message { max-width:100%; padding:9px 10px; border:1px solid #e6ecf4; border-radius:8px; background:#fff; }
+#engineeringWorkspace .conversation-message.from-user { margin-left:12px; background:#edf4ff; border-color:#dae8fc; }
+#engineeringWorkspace .message-head { margin-bottom:5px; color:#6481a2; font-size:8px; font-weight:850; letter-spacing:.3px; }
+#engineeringWorkspace .from-user .message-head { color:#3269b2; }
+#engineeringWorkspace .message-body { color:#566d87; font-size:9px; line-height:1.7; white-space:pre-wrap; overflow-wrap:anywhere; }
+#engineeringWorkspace .conversation-suggestions { display:flex; gap:5px; flex-wrap:wrap; padding:8px 10px; border-top:1px solid #edf1f6; }
+#engineeringWorkspace .conversation-suggestion { border:1px solid #e0e8f2; border-radius:14px; padding:6px 8px; background:#fff; color:#6d829b; font-size:8px; }
+#engineeringWorkspace .conversation-suggestion:hover { background:#eef5ff; color:#2d69ba; border-color:#cfe0f9; }
+#engineeringWorkspace .conversation-form { padding:9px 10px; border-top:1px solid #e8eef5; background:#fff; }
+#engineeringWorkspace .conversation-input-wrap { border:1px solid #dce5ef; border-radius:8px; padding:7px; background:#fcfdff; }
+#engineeringWorkspace .conversation-input { width:100%; display:block; min-height:62px; max-height:130px; resize:vertical; border:0; padding:2px; background:transparent; color:#344d6b; font-size:10px; line-height:1.55; outline:none !important; }
+#engineeringWorkspace .conversation-input::placeholder { color:#9caabd; }
+#engineeringWorkspace .conversation-form-bottom { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:6px; color:#97a4b4; font-size:8px; }
+#engineeringWorkspace .conversation-send { border:1px solid #2f76df; background:#3278e3; color:#fff; padding:7px 11px; border-radius:6px; font-weight:750; font-size:9px; }
+#engineeringWorkspace .conversation-send:hover { background:#2667c8; }
+#engineeringWorkspace .conversation-cancel { border:1px solid #dfe6ef; background:#fff; color:#7588a0; padding:7px 11px; border-radius:6px; font-weight:700; font-size:9px; }
+#engineeringWorkspace .conversation-footer { padding:7px 11px 9px; color:#9aa7b7; font-size:8px; line-height:1.5; border-top:1px solid #f0f3f7; background:#fbfcfe; }
+#engineeringWorkspace .proposal-card { margin-top:9px; padding:10px; border:1px solid #bdd4f4; border-radius:8px; background:#f4f8ff; }
+#engineeringWorkspace .proposal-kicker { color:#3e75b9; font-size:8px; font-weight:850; letter-spacing:.6px; }
+#engineeringWorkspace .proposal-summary { margin-top:6px; color:#34597f; font-size:10px; font-weight:800; line-height:1.55; }
+#engineeringWorkspace .proposal-help { margin-top:6px; color:#8194ad; font-size:8px; line-height:1.6; }
+#engineeringWorkspace .proposal-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+#engineeringWorkspace .explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(258px,292px); }
+#engineeringWorkspace .explorer-collapsed #projectExplorer,
+#engineeringWorkspace .conversation-collapsed #projectConversation { display:none; }
+#engineeringWorkspace .conversation-collapsed .workspace-layout { grid-template-columns:minmax(190px,218px) minmax(0,1fr); }
+#engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr); }
+#engineeringWorkspace .workspace-conversation #conversationMessages { overflow-wrap:anywhere; }
+#engineeringWorkspace :fullscreen { border-radius:0; }
+#engineeringWorkspace:fullscreen { width:100vw; height:100vh; max-width:none; min-height:0; background:#edf2f8; }
+#engineeringWorkspace:fullscreen .workspace-layout { grid-template-columns:minmax(0,1fr); }
+#engineeringWorkspace:fullscreen #projectExplorer,
+#engineeringWorkspace:fullscreen #projectConversation,
+#engineeringWorkspace:fullscreen .workspace-brand-copy small,
+#engineeringWorkspace:fullscreen .workspace-statusline { display:none !important; }
+#engineeringWorkspace:fullscreen .workspace-toolbar { min-height:48px; padding:5px 10px; }
+#engineeringWorkspace:fullscreen .workspace-brand { min-width:95px; flex:0 0 auto; }
+#engineeringWorkspace:fullscreen .workspace-panels { padding:7px; }
+#engineeringWorkspace:fullscreen #workspacePanelModel > #model { padding:8px; }
+#engineeringWorkspace:fullscreen #workspacePanelModel .interactive-model-layout { grid-template-columns:minmax(0,1fr) 220px; }
+#engineeringWorkspace:fullscreen #structuralDiagram { height:calc(100vh - 230px); min-height:300px; }
+#engineeringWorkspace .workspace-fullscreen-fallback { position:fixed; inset:0; z-index:999999; width:100vw; height:100vh; max-width:none; border-radius:0; }
+#engineeringWorkspace.workspace-fullscreen-fallback .workspace-layout { grid-template-columns:minmax(0,1fr); }
+#engineeringWorkspace.workspace-fullscreen-fallback #projectExplorer,
+#engineeringWorkspace.workspace-fullscreen-fallback #projectConversation,
+#engineeringWorkspace.workspace-fullscreen-fallback .workspace-brand-copy small,
+#engineeringWorkspace.workspace-fullscreen-fallback .workspace-statusline { display:none !important; }
+#engineeringWorkspace.workspace-fullscreen-fallback .workspace-toolbar { min-height:48px; padding:5px 10px; }
+#engineeringWorkspace.workspace-fullscreen-fallback #structuralDiagram { height:calc(100vh - 230px); min-height:300px; }
+#engineeringWorkspace.workspace-fullscreen-fallback .workspace-panels { padding:7px; }
+#engineeringWorkspace .workspace-fullscreen-fallback { position:fixed; }
+#engineeringWorkspace:fullscreen .workspace-viewport-tools,
+#engineeringWorkspace.workspace-fullscreen-fallback .workspace-viewport-tools { display:flex; }
+@media (max-width:1280px) {
+  #engineeringWorkspace .workspace-toolbar { gap:8px; padding-left:9px; padding-right:9px; }
+  #engineeringWorkspace .workspace-brand { min-width:145px; }
+  #engineeringWorkspace .workspace-tab { padding-left:8px; padding-right:8px; }
+  #engineeringWorkspace .workspace-layout { grid-template-columns:minmax(175px,195px) minmax(0,1fr) minmax(238px,260px); }
+  #engineeringWorkspace .explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(238px,260px); }
+  #engineeringWorkspace .conversation-collapsed .workspace-layout { grid-template-columns:minmax(175px,195px) minmax(0,1fr); }
+  #engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr); }
+  #engineeringWorkspace #workspacePanelModel .interactive-model-layout { grid-template-columns:minmax(0,1fr) 205px; }
+}
+@media (max-width:1000px) {
+  #engineeringWorkspace .workspace-toolbar { flex-wrap:wrap; min-height:0; }
+  #engineeringWorkspace .workspace-brand { flex:1 1 150px; }
+  #engineeringWorkspace .workspace-tabs { order:3; flex:1 1 100%; }
+  #engineeringWorkspace .workspace-actions { flex:0 1 auto; }
+  #engineeringWorkspace .workspace-layout { grid-template-columns:minmax(155px,180px) minmax(0,1fr) minmax(220px,235px); }
+  #engineeringWorkspace .explorer-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr) minmax(220px,235px); }
+  #engineeringWorkspace .conversation-collapsed .workspace-layout { grid-template-columns:minmax(155px,180px) minmax(0,1fr); }
+  #engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr); }
+  #engineeringWorkspace #workspacePanelModel .interactive-model-layout { grid-template-columns:minmax(0,1fr); }
+  #engineeringWorkspace #workspacePanelModel .member-inspector { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px 12px; }
+  #engineeringWorkspace #workspacePanelModel .inspector-top,
+  #engineeringWorkspace #workspacePanelModel .member-inspector h3,
+  #engineeringWorkspace #workspacePanelModel .inspector-member-id,
+  #engineeringWorkspace #workspacePanelModel .inspector-fields,
+  #engineeringWorkspace #workspacePanelModel .section-property-preview,
+  #engineeringWorkspace #workspacePanelModel .inspector-result-preview,
+  #engineeringWorkspace #workspacePanelModel .inspector-actions,
+  #engineeringWorkspace #workspacePanelModel .inspector-help { grid-column:1/-1; }
+  #engineeringWorkspace #structuralDiagram { height:clamp(320px, calc(100vh - 360px), 520px); }
+}
+@media (max-width:760px) {
+  #engineeringWorkspace .workspace-toolbar { align-items:center; gap:6px; padding:7px; }
+  #engineeringWorkspace .workspace-brand { min-width:105px; flex:1 1 auto; }
+  #engineeringWorkspace .workspace-brand-copy small { display:none; }
+  #engineeringWorkspace .workspace-actions { gap:3px; flex-wrap:wrap; }
+  #engineeringWorkspace .ws-control { padding:6px; font-size:8px; }
+  #engineeringWorkspace .workspace-layout { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(90px,auto) minmax(360px,1fr) minmax(110px,auto); overflow:auto; }
+  #engineeringWorkspace .workspace-explorer { border-right:0; border-bottom:1px solid var(--ws-line); max-height:175px; }
+  #engineeringWorkspace .workspace-conversation { border-left:0; border-top:1px solid var(--ws-line); min-height:250px; max-height:330px; }
+  #engineeringWorkspace .workspace-center { min-height:420px; overflow:visible; }
+  #engineeringWorkspace .workspace-panels { overflow:visible; }
+  #engineeringWorkspace .explorer-collapsed .workspace-layout,
+  #engineeringWorkspace .conversation-collapsed .workspace-layout,
+  #engineeringWorkspace.explorer-collapsed.conversation-collapsed .workspace-layout { grid-template-columns:minmax(0,1fr); }
+  #engineeringWorkspace #workspacePanelModel .interactive-model-layout { grid-template-columns:minmax(0,1fr); }
+  #engineeringWorkspace #workspacePanelModel .member-inspector { display:flex; }
+  #engineeringWorkspace #structuralDiagram { height:clamp(300px, 58vh, 500px); min-height:300px; }
+  #engineeringWorkspace #workspaceDesignGrid { grid-template-columns:minmax(0,1fr); }
+  #engineeringWorkspace #workspaceDesignGrid > #design { grid-column:auto; }
+  #engineeringWorkspace .workspace-statusline { flex-wrap:wrap; }
+}
+@media (prefers-reduced-motion:reduce) {
+  #engineeringWorkspace *, #engineeringWorkspace *::before, #engineeringWorkspace *::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+}
