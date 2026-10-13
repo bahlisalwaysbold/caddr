@@ -7,7 +7,9 @@
   <title>Caddr — Structural Workspace</title>
   <link rel="stylesheet" href="dashboard.css" />
   <link rel="stylesheet" href="structural.css" />
+  <link rel="stylesheet" href="workspace.css" />
   <script src="structural.js" defer></script>
+  <script src="workspace-ui.js" defer></script>
 </head>
 <body>
   <div class="app-shell">
@@ -42,6 +44,89 @@
           <article class="summary-card"><span class="summary-label">STOREYS</span><strong>3 <small>levels</small></strong><small>Ground + 2 upper floors</small><span class="summary-card-icon">▤</span></article>
           <article class="summary-card"><span class="summary-label">DESIGN WORKFLOW</span><strong>Early setup</strong><small>Model definition preview</small><span class="summary-card-icon">◇</span></article>
           <article class="summary-card summary-card-muted" id="solverSummaryCard"><span class="summary-label">SOLVER STATUS</span><strong id="solverStatusText">Checking…</strong><small id="solverStatusDetail">Checking the analysis service</small><span class="summary-card-icon">∿</span></article>
+        </section>
+
+        <section class="engineering-workspace-shell" id="engineeringWorkspace" aria-label="Caddr structural engineering workspace">
+          <header class="workspace-toolbar">
+            <div class="workspace-brand">
+              <a class="workspace-brand-mark" href="index.html" aria-label="Back to Caddr projects">C</a>
+              <div class="workspace-brand-copy"><strong>Residential Block A</strong><small>STRUCTURAL WORKSPACE · SAMPLE PROJECT</small></div>
+            </div>
+            <nav class="workspace-tabs" role="tablist" aria-label="Engineering workspace views">
+              <button class="workspace-tab active" type="button" role="tab" id="workspaceTabModel" data-workspace-tab="model" aria-controls="workspacePanelModel" aria-selected="true">Model</button>
+              <button class="workspace-tab" type="button" role="tab" id="workspaceTabLoads" data-workspace-tab="loads" aria-controls="workspacePanelLoads" aria-selected="false" tabindex="-1">Loads</button>
+              <button class="workspace-tab" type="button" role="tab" id="workspaceTabAnalysis" data-workspace-tab="analysis" aria-controls="workspacePanelAnalysis" aria-selected="false" tabindex="-1">Analysis</button>
+              <button class="workspace-tab" type="button" role="tab" id="workspaceTabDesign" data-workspace-tab="design" aria-controls="workspacePanelDesign" aria-selected="false" tabindex="-1">Design</button>
+              <button class="workspace-tab" type="button" role="tab" id="workspaceTabDrawings" data-workspace-tab="drawings" aria-controls="workspacePanelDrawings" aria-selected="false" tabindex="-1">Drawings</button>
+            </nav>
+            <div class="workspace-actions">
+              <button class="ws-control" id="toggleExplorer" type="button" aria-pressed="true" aria-expanded="true" title="Hide Project Explorer">◂ Explorer</button>
+              <button class="ws-control" id="toggleConversation" type="button" aria-pressed="true" aria-expanded="true" title="Hide Project conversation">Conversation ▸</button>
+              <a class="ws-control" id="openCADWorkspace" href="cad.html" title="Open the existing CAD drafting workspace">⌗ CAD</a>
+              <button class="ws-control primary" id="toggleWorkspaceFullscreen" type="button" aria-pressed="false" title="Expand the model workspace to full screen">⛶ Full screen</button>
+            </div>
+          </header>
+
+          <div class="workspace-layout">
+            <aside class="workspace-explorer" id="projectExplorer" aria-label="Project Explorer">
+              <div class="ws-panel-head"><strong>PROJECT EXPLORER</strong><button id="explorerCollapse" type="button" aria-label="Collapse Project Explorer" title="Collapse Project Explorer">‹</button></div>
+              <input class="explorer-search" id="explorerSearch" type="search" placeholder="Search model elements" aria-label="Search project elements" />
+              <div class="explorer-tree" id="explorerTree" role="tree" aria-label="Project elements"><p style="padding:8px;color:#8494a8;font-size:10px">Loading project elements…</p></div>
+              <div class="explorer-foot">Select a member to inspect it in the model. Slabs and foundations are planned categories until they are added to this model.</div>
+            </aside>
+
+            <main class="workspace-center" id="workspaceCenter">
+              <div class="workspace-subtoolbar" id="workspaceSubtoolbar">
+                <div style="min-width:0;display:flex;align-items:center;gap:10px">
+                  <span class="workspace-view-label" id="workspaceViewLabel">MODEL</span>
+                  <span class="workspace-context-label" id="workspaceContextLabel">Residential Block A · editable frame</span>
+                </div>
+                <div class="workspace-viewport-tools" aria-label="Model camera controls">
+                  <button id="workspaceZoomOut" type="button" aria-label="Zoom out" title="Zoom out">−</button>
+                  <button id="workspaceZoomIn" type="button" aria-label="Zoom in" title="Zoom in">＋</button>
+                  <button id="workspaceFitModel" type="button" aria-label="Fit model to view" title="Fit model to view">⌗</button>
+                </div>
+              </div>
+              <div class="workspace-panels" id="workspacePanels">
+                <section class="workspace-panel is-active" id="workspacePanelModel" data-workspace-panel="model" role="tabpanel" aria-labelledby="workspaceTabModel"></section>
+                <section class="workspace-panel" id="workspacePanelLoads" data-workspace-panel="loads" role="tabpanel" aria-labelledby="workspaceTabLoads" hidden></section>
+                <section class="workspace-panel" id="workspacePanelAnalysis" data-workspace-panel="analysis" role="tabpanel" aria-labelledby="workspaceTabAnalysis" hidden></section>
+                <section class="workspace-panel" id="workspacePanelDesign" data-workspace-panel="design" role="tabpanel" aria-labelledby="workspaceTabDesign" hidden>
+                  <div class="workspace-design-grid" id="workspaceDesignGrid"></div>
+                </section>
+                <section class="workspace-panel" id="workspacePanelDrawings" data-workspace-panel="drawings" role="tabpanel" aria-labelledby="workspaceTabDrawings" hidden>
+                  <section class="drawing-handoff-card">
+                    <div class="kicker">DRAWING WORKSPACE</div>
+                    <h2>Move between the structural model and CAD drafting</h2>
+                    <p>The CAD editor remains a separate working environment with its existing drawing, selection, layers, command history and DXF import/export tools. Automatically generating drawings from this structural frame is not connected yet.</p>
+                    <div class="drawing-handoff-actions"><a class="button button-primary" href="cad.html">Open CAD drafting <span>↗</span></a><a class="button button-secondary" href="index.html#files">Project files <span>↗</span></a></div>
+                  </section>
+                </section>
+              </div>
+            </main>
+
+            <aside class="workspace-conversation" id="projectConversation" aria-label="Project conversation">
+              <div class="ws-panel-head"><strong>PROJECT CONVERSATION</strong><button id="conversationCollapse" type="button" aria-label="Collapse Project conversation" title="Collapse Project conversation">›</button></div>
+              <div class="conversation-context" id="conversationContext">Residential Block A · Current frame</div>
+              <div class="conversation-messages" id="conversationMessages" aria-live="polite" aria-relevant="additions"></div>
+              <div class="conversation-suggestions" aria-label="Suggested project questions">
+                <button class="conversation-suggestion" type="button" data-prompt="Summarise the current model">Model summary</button>
+                <button class="conversation-suggestion" type="button" data-prompt="What is the selected member?">Selected member</button>
+                <button class="conversation-suggestion" type="button" data-prompt="Show bending moment diagram">Bending moments</button>
+              </div>
+              <form class="conversation-form" id="conversationForm">
+                <div class="conversation-input-wrap"><textarea class="conversation-input" id="conversationInput" rows="3" maxlength="1600" placeholder="Ask about this project or propose a member change…" aria-label="Message the project conversation"></textarea>
+                  <div class="conversation-form-bottom"><span>Enter to send · Shift+Enter for a new line</span><button class="conversation-send" type="submit">Send ↑</button></div>
+                </div>
+              </form>
+              <div class="conversation-footer">Supported changes are proposed for review. Nothing is applied until you approve it.</div>
+            </aside>
+          </div>
+
+          <footer class="workspace-statusline">
+            <span id="workspaceStatusMessage"><strong>Ready</strong> · Editable demonstration frame</span>
+            <span>Wheel to zoom · Middle mouse or Space + drag to pan · <strong>Ctrl+Shift+F</strong> full screen · <strong>Esc</strong> to exit</span>
+          </footer>
         </section>
 
         <div class="structural-main-grid">
