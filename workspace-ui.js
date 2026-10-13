@@ -436,7 +436,8 @@
       const labelMatch = item.label.toUpperCase().includes(kind.toUpperCase() + " " + label) || item.id.toUpperCase().includes(label);
       if (!labelMatch) return false;
       if (level === null) return true;
-      return item.label.toLowerCase().includes("level " + level) || item.id.toLowerCase().includes("_l" + level) || item.id.toLowerCase().endsWith("_l" + (level + 1));
+      if (kind === "column" && level === 0) return item.label.toLowerCase().includes("foundation");
+      return item.label.toLowerCase().includes("level " + level);
     });
     if (matches.length === 1) {
       matches[0].target.click();
@@ -540,7 +541,7 @@
       addMessage("assistant", "I couldn't find " + mentionOnly.label + " in this demonstration frame. The Explorer lists the currently modelled beams and columns.");
       return;
     }
-    if (/\b(beams?|columns?|members?|storeys?|levels?)\b/.test(lower) && /\b(how many|count|number|summari[sz]e|overview|model size|model summary)\b/.test(lower)) {
+    if (/\b(beams?|columns?|members?|storeys?|levels?)\b/.test(lower) && /\b(how many|count|number|summari[sz]e|overview|model size|model summary)\b/.test(lower) || /\b(summari[sz]e the current model|model summary|model overview)\b/.test(lower)) {
       const items = liveTargets();
       const nBeam = items.filter(item => item.kind === "beam").length;
       const nCol = items.filter(item => item.kind === "column").length;
@@ -673,17 +674,7 @@
       addMessage("assistant", "The browser could not enter native full-screen mode. Use the workspace full-screen button again to try the supported full-window fallback.");
     });
     $("#saveSettings").addEventListener("click", () => window.setTimeout(renderExplorer, 0));
-    $("#workspaceFitModel").addEventListener("click", fitCamera);
-    $("#workspaceZoomIn").addEventListener("click", () => {
-      if (!svg) return;
-      const r = svg.getBoundingClientRect();
-      zoomCamera(0.82, r.left + r.width / 2, r.top + r.height / 2);
-    });
-    $("#workspaceZoomOut").addEventListener("click", () => {
-      if (!svg) return;
-      const r = svg.getBoundingClientRect();
-      zoomCamera(1.22, r.left + r.width / 2, r.top + r.height / 2);
-    });
+
   }
 
   function syncExplorerSelection() {
@@ -692,6 +683,25 @@
 
   bindWorkspaceControls();
   bindModelNavigation();
+  $("#explorerSearch").addEventListener("input", event => {
+    const query = event.target.value.trim().toLowerCase();
+    $(".explorer-row", $("#explorerTree")).forEach(row => {
+      row.hidden = Boolean(query) && !row.textContent.toLowerCase().includes(query);
+    });
+    $(".explorer-group", $("#explorerTree")).forEach(group => {
+      const matchingRows = $(".explorer-row", group).filter(row => !row.hidden).length;
+      group.hidden = Boolean(query) && matchingRows === 0;
+      if (query && matchingRows) group.open = true;
+      else if (!query) {
+        const summaryText = $(".tree-group-title", group)?.textContent || "";
+        const key = summaryText.toLowerCase().includes("storey") ? "storeys" :
+          summaryText.toLowerCase() === "beams" ? "beams" :
+          summaryText.toLowerCase() === "columns" ? "columns" :
+          summaryText.toLowerCase().includes("structural") ? "structure" : "drawings";
+        group.open = Boolean(groupOpen[key]);
+      }
+    });
+  });
   setupConversation();
   renderExplorer();
   setTab(activeTab, false);
