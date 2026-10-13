@@ -444,8 +444,10 @@
     const jointCount = Object.keys(nodeCoordinates()).length;
     $("#modelCountLabel").textContent = members.length + " members · " + jointCount + " joints";
     $("#modelLevelSummary").textContent = "Ground + " + (LEVELS.length - 1) + " upper levels";
-    $(".summary-card:nth-child(2) > strong").innerHTML = LEVELS.length + ' <small>levels</small>';
-    $(".summary-card:nth-child(2) > small").textContent = "Ground + " + (LEVELS.length - 1) + " upper levels";
+    const legacyLevelValue = $(".summary-card:nth-child(2) > strong");
+    const legacyLevelDescription = $(".summary-card:nth-child(2) > small");
+    if (legacyLevelValue) legacyLevelValue.innerHTML = LEVELS.length + ' <small>levels</small>';
+    if (legacyLevelDescription) legacyLevelDescription.textContent = "Ground + " + (LEVELS.length - 1) + " upper levels";
   }
 
   function selectMember(id) {
@@ -591,13 +593,21 @@
   }
 
   function setEngineState(state, message) {
-    $("#solverStatusText").textContent = state === "ready" ? "Connected" : state === "failed" ? "Unavailable" : "Checking…";
-    $("#solverStatusDetail").textContent = state === "ready" ? "PyNiteFEA API responding" : state === "failed" ? "Check the deployment and API logs" : "Checking the analysis service";
-    $("#solverConnection").className = "solver-connection " + state;
-    $("#solverConnectionText").textContent = message;
-    $("#engineBadge").textContent = state === "ready" ? "Engine connected" : state === "failed" ? "Engine unavailable" : "Checking engine";
-    $("#engineBadge").className = "area-status " + (state === "ready" ? "status-connected" : state === "failed" ? "status-disconnected" : "status-preview");
-    $("#solverSummaryCard").classList.toggle("summary-card-muted", state !== "ready");
+    const legacyStatus = $("#solverStatusText");
+    const legacyDetail = $("#solverStatusDetail");
+    const legacyCard = $("#solverSummaryCard");
+    if (legacyStatus) legacyStatus.textContent = state === "ready" ? "Connected" : state === "failed" ? "Unavailable" : "Checking…";
+    if (legacyDetail) legacyDetail.textContent = state === "ready" ? "PyNiteFEA API responding" : state === "failed" ? "Check the deployment and API logs" : "Checking the analysis service";
+    const connection = $("#solverConnection");
+    const connectionText = $("#solverConnectionText");
+    const engineBadge = $("#engineBadge");
+    if (connection) connection.className = "solver-connection " + state;
+    if (connectionText) connectionText.textContent = message;
+    if (engineBadge) {
+      engineBadge.textContent = state === "ready" ? "Engine connected" : state === "failed" ? "Engine unavailable" : "Checking engine";
+      engineBadge.className = "area-status " + (state === "ready" ? "status-connected" : state === "failed" ? "status-disconnected" : "status-preview");
+    }
+    if (legacyCard) legacyCard.classList.toggle("summary-card-muted", state !== "ready");
     engineReady = state === "ready";
     runButton.disabled = !engineReady;
   }
@@ -611,7 +621,8 @@
         throw new Error(data.error || "The analysis engine did not report ready.");
       }
       setEngineState("ready", data.engine + " " + data.version + " is responding.");
-      $("#statusButton").title = "Analysis engine: " + data.engine + " " + data.version;
+      const statusButton = $("#statusButton");
+      if (statusButton) statusButton.title = "Analysis engine: " + data.engine + " " + data.version;
     } catch (error) {
       setEngineState("failed", "Could not reach the analysis API.");
       errorBox.textContent = "Solver health check failed: " + error.message + " Refresh the preview and check the Vercel deployment if this persists.";
@@ -757,9 +768,9 @@
   }
 
   function bindProjectSettings() {
-    $("#workspaceSwitch").addEventListener("click", () => showToast("Workspace switching will be added with account and cloud support."));
-    $("#profileMore").addEventListener("click", () => showToast("Profile settings are not connected in this prototype."));
-    $("#statusButton").addEventListener("click", () => showToast("The current solver runs a linear-elastic frame analysis. Reinforced-concrete code design and reinforcement detailing are not connected."));
+    $("#workspaceSwitch")?.addEventListener("click", () => showToast("Workspace switching will be added with account and cloud support."));
+    $("#profileMore")?.addEventListener("click", () => showToast("Profile settings are not connected in this prototype."));
+    $("#statusButton")?.addEventListener("click", () => showToast("The current solver runs a linear-elastic frame analysis. Reinforced-concrete code design and reinforcement detailing are not connected."));
     const settingsDialog = $("#settingsDialog");
     $("#modelSettingsButton").addEventListener("click", () => {
       if (typeof settingsDialog.showModal === "function") settingsDialog.showModal();

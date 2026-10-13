@@ -1,20 +1,13 @@
-/* Caddr structural workspace: panel-first layout around the existing model UI */
-html:has(#engineeringWorkspace), body:has(#engineeringWorkspace) { height:100%; overflow:hidden; }
-body:has(#engineeringWorkspace) { margin:0; background:#edf2f8; }
-body:has(#engineeringWorkspace) .app-shell { min-height:0; height:100vh; overflow:hidden; }
-body:has(#engineeringWorkspace) .app-shell > .sidebar { display:none !important; }
-body:has(#engineeringWorkspace) .main-area { width:100%; min-width:0; height:100vh; min-height:0; overflow:hidden; }
-body:has(#engineeringWorkspace) .topbar { display:none !important; }
-body:has(#engineeringWorkspace) .page-content.structural-content { width:100%; max-width:none; height:100vh; min-height:0; margin:0; padding:0; overflow:hidden; }
-body:has(#engineeringWorkspace) .structural-breadcrumb-row,
-body:has(#engineeringWorkspace) .structural-summary-grid,
-body:has(#engineeringWorkspace) .structural-main-grid,
-body:has(#engineeringWorkspace) .structural-content > .disclaimer-panel,
-body:has(#engineeringWorkspace) .structural-content > .page-footer { display:none !important; }
+/* Caddr structural workspace: the live engineering shell owns the page viewport. */
+html:has(#engineeringWorkspace), body:has(#engineeringWorkspace) {
+  width:100%; height:100%; min-height:0; margin:0; padding:0; overflow:hidden;
+}
+body:has(#engineeringWorkspace) { display:block !important; background:#edf2f8; }
+.workspace-source-staging[hidden] { display:none !important; }
 
 #engineeringWorkspace.engineering-workspace-shell {
-  display:flex; flex-direction:column; width:100%; height:100vh; min-height:0;
-  overflow:hidden; background:#f1f4f8; color:#233851; border:0; border-radius:0;
+  position:relative; display:flex; flex-direction:column; width:100vw; height:100vh; height:100dvh; min-height:0;
+  overflow:hidden; background:#f1f4f8; color:#233851; border:0; border-radius:0; flex-shrink:0;
   --ws-line:#dce4ee; --ws-muted:#788aa1; --ws-ink:#243a56; --ws-blue:#3478df;
 }
 #engineeringWorkspace *, #engineeringWorkspace *::before, #engineeringWorkspace *::after { box-sizing:border-box; }
