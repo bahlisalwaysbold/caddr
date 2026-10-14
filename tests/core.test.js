@@ -199,3 +199,10 @@ test('unsupported-only DXF explains why import cannot proceed', () => {
   const dxf = dxfWithHeaderUnits(4, [['0','INSERT','8','S-COLUMNS','2','COLUMN_BLOCK','10','0','20','0']]);
   assert.throws(() => Core.parseDxf(dxf), /No supported DXF entities found.*INSERT \(1\)/);
 });
+
+test('DXF unit code mapping can preserve source units during export', () => {
+  assert.equal(Core.dxfUnitCode('mm'), 4);
+  assert.equal(Core.dxfUnitCode('feet'), 2);
+  assert.equal(Core.dxfUnitCode('Gm'), 17);
+  assert.equal(Core.dxfUnitCode('not-a-unit'), null);
+});
