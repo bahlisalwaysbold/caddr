@@ -377,7 +377,38 @@
   document.getElementById('gridToggle').addEventListener('click',()=>{state.grid=!state.grid;render()});
   document.getElementById('fitView').addEventListener('click',fitView);
   document.getElementById('addLayer').addEventListener('click',()=>{const n=window.prompt('New layer name:','Layer '+(state.layers.length+1));if(!n)return;if(state.layers.some(l=>l.name===n)){setStatus('Layer already exists.');return}history.transact('CREATE LAYER',()=>{state.layers.push({id:`layer-${Date.now()}`,name:n,visible:true,locked:false,color:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0')});state.activeLayer=n});render();log(`Layer created: ${n}`)});
-  fileInput.addEventListener('change',async()=>{const f=fileInput.files?.[0];if(!f)return;try{const raw=await f.text();let doc,view=null,description='';if(f.name.toLowerCase().endsWith('.dxf')||raw.trimStart().startsWith('0\nSECTION\n2\nHEADER')){const imported=Core.parseDxf(raw);doc={units:imported.units,layers:imported.layers,activeLayer:imported.activeLayer,entities:imported.entities,nextId:imported.nextId,constraints:[],parameters:[]};description=' (DXF import)';}else{const data=JSON.parse(raw),migrated=Core.normalizeDocument(data);doc=migrated.document;view=migrated.view;description=data.version?'':' (legacy format migrated)';}Object.assign(state,{units:doc.units||'mm',layers:doc.layers,activeLayer:doc.activeLayer,entities:doc.entities,nextId:doc.nextId,constraints:doc.constraints||[],parameters:doc.parameters||[],grid:view?.grid??true,snap:view?.snap??true,ortho:view?.ortho??false,polar:view?.polar??false,tracking:view?.tracking??false,dynamicInput:view?.dynamicInput??true,gridSize:view?.gridSize||50,majorGrid:view?.majorGrid||250,viewport:view?.viewport||{x:0,y:0,scale:1},selection:[],interaction:null});history.clear();render();fitView();setStatus('Drawing opened.');log(`Opened ${f.name}${description}`)}catch(e){alert(`Could not open that drawing: ${e.message}`)}finally{fileInput.value='';}});
+  fileInput.addEventListener('change',async()=>{const f=fileInput.files?.[0];if(!f)return;try{
+    const raw=await f.text();let doc,view=null,description='',importWarnings=[];
+    const isDxf=f.name.toLowerCase().endsWith('.dxf')||raw.trimStart().startsWith('0\nSECTION\n2\nHEADER');
+    if(isDxf){
+      const imported=Core.parseDxf(raw);
+      let importedUnits=imported.units;
+      if(!importedUnits){
+        const reason=imported.unitStatus==='unitless'?'This DXF explicitly declares no units.':imported.unitStatus==='unsupported'?'This DXF uses an unrecognised INSUNITS code ('+imported.unitCode+').':imported.unitStatus==='invalid'?'This DXF has an invalid $INSUNITS value.':'This DXF does not declare drawing units.';
+        const answer=window.prompt(reason+' Enter the source drawing units (for example mm, cm, m, in, or ft). Coordinates will not be rescaled; this records the units to interpret them. Cancel to abort import.','mm');
+        if(answer===null){setStatus('DXF import cancelled because units were not confirmed.');return;}
+        importedUnits=Core.normalizeDrawingUnit(answer);
+        if(!importedUnits)throw new Error('"'+answer+'" is not a recognised drawing unit. Use a supported unit such as mm, cm, m, in, ft, yd, or km. No drawing changes were made.');
+        importWarnings.push('Units manually assigned: '+importedUnits+'.');
+      }else{
+        importWarnings.push('Units read from $INSUNITS: '+importedUnits+'.');
+      }
+      if(imported.unsupportedCount>0){
+        const summary=Object.entries(imported.unsupportedEntityTypes).map(([type,count])=>type+' ×'+count).join(', ');
+        importWarnings.push('Skipped '+imported.unsupportedCount+' unsupported DXF entity record(s): '+summary+'. Their geometry was not imported.');
+      }
+      doc={units:importedUnits,layers:imported.layers,activeLayer:imported.activeLayer,entities:imported.entities,nextId:imported.nextId,constraints:[],parameters:[]};
+      description=' (DXF import)';
+    }else{
+      const data=JSON.parse(raw),migrated=Core.normalizeDocument(data);
+      doc=migrated.document;view=migrated.view;description=data.version?'':' (legacy format migrated)';
+    }
+    Object.assign(state,{units:doc.units||'mm',layers:doc.layers,activeLayer:doc.activeLayer,entities:doc.entities,nextId:doc.nextId,constraints:doc.constraints||[],parameters:doc.parameters||[],grid:view?.grid??true,snap:view?.snap??true,ortho:view?.ortho??false,polar:view?.polar??false,tracking:view?.tracking??false,dynamicInput:view?.dynamicInput??true,gridSize:view?.gridSize||50,majorGrid:view?.majorGrid||250,viewport:view?.viewport||{x:0,y:0,scale:1},selection:[],interaction:null});
+    history.clear();render();fitView();
+    setStatus(importWarnings.length?'Drawing opened. '+importWarnings.length+' DXF pre-flight note(s); see command log.':'Drawing opened.');
+    importWarnings.forEach(message=>log('DXF PRE-FLIGHT: '+message));
+    log('Opened '+f.name+description);
+  }catch(e){alert('Could not open that drawing: '+e.message)}finally{fileInput.value='';}});
   function newDrawing(){if(!confirm('Start a new drawing? Unsaved work will be lost.'))return;state.entities=[];state.constraints=[];state.parameters=[];state.selection=[];state.nextId=1;state.viewport={x:0,y:0,scale:1};history.clear();render();setStatus('New drawing.');log('NEW drawing')}
   function saveBahl(){download('bahl-drawing.bahl',JSON.stringify(Core.serializeDocument(state),null,2),'application/json');log('SAVED .BAHL drawing')}
   function download(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
