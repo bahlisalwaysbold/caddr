@@ -8,10 +8,10 @@ Reviewed entities in the first slice:
 - Closed four-corner rectangular polylines and native editor rectangles.
 - Rectangular outlines formed by four connected line entities.
 - Circular outlines.
-- Column-like layer names, nearby column marks/section annotations, and crossings represented by explicitly named structural grid/axis lines.
+- Column-like layer names, nearby column marks/section annotations, explicitly named structural grid/axis lines, and line alignment through the candidate centre on recognisable structural-member layers.
 - Source geometry references and dimensions in the current document's units.
 
-A rectangle or circle alone is not sufficient evidence to classify it as a column. Compact shapes without column-layer, column-annotation or structural-grid evidence are excluded and counted for test feedback. Candidates with atypical dimensions or other ambiguity remain reviewable and carry warnings.
+A rectangle or circle alone is not sufficient evidence to classify it as a column. Compact shapes without column-layer, column-annotation, structural-grid, or recognisable structural-member-alignment evidence are excluded and counted for test feedback. Candidates with atypical dimensions or other ambiguity remain reviewable and carry warnings. Displayed confidence is a heuristic evidence score, not a calibrated probability or a safety rating.
 
 ## DXF limitations
 
