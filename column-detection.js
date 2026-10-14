@@ -192,7 +192,7 @@
     return Math.hypot(dx, dy);
   }
 
-  function hasGridIntersection(shape, lines, tolerance) {
+  function gridIntersectionEntityIds(shape, lines, tolerance) {
     const maxDimension = Math.max(shape.width, shape.depth);
     const horizontal = [], vertical = [];
     for (const line of lines) {
@@ -205,7 +205,8 @@
           Math.max(line.a.y, line.b.y) >= shape.centerY + maxDimension * 0.25 &&
           Math.abs((line.a.x + line.b.x) / 2 - shape.centerX) <= maxDimension * 0.12) vertical.push(line);
     }
-    return horizontal.length > 0 && vertical.length > 0;
+    if (!horizontal.length || !vertical.length) return [];
+    return [...new Set([...horizontal, ...vertical].map(line => line.id))].sort();
   }
 
   function inTypicalColumnRange(shape, units) {
@@ -250,7 +251,7 @@
         b: { x: Number(entity.b.x), y: Number(entity.b.y) }
       }));
     const columnAnnotations = sourceEntities.filter(entity => entity.type === "text" && COLUMN_TEXT.test(String(entity.text || "")) &&
-      finite(entity.x) && finite(entity.y)).map(entity => ({ text: String(entity.text), x: Number(entity.x), y: Number(entity.y) }));
+      finite(entity.x) && finite(entity.y)).map(entity => ({ id: String(entity.id || ""), text: String(entity.text), x: Number(entity.x), y: Number(entity.y) }));
 
     let unclassifiedPlausibleShapes = 0, duplicatesMerged = 0, ambiguousCandidates = 0;
     const merged = new Map();
@@ -261,7 +262,9 @@
         Math.max(shape.width, shape.depth) * 1.5,
         Math.hypot(shape.width, shape.depth) * 0.75
       ));
-      const gridEvidence = hasGridIntersection(shape, lineRecords, tolerance);
+      const gridSourceIds = gridIntersectionEntityIds(shape, lineRecords, tolerance);
+      const gridEvidence = gridSourceIds.length > 0;
+      const evidenceEntityIds = [...new Set([...(annotation ? [annotation.id] : []), ...gridSourceIds])].filter(Boolean).sort();
       const hasContext = layerEvidence || Boolean(annotation) || gridEvidence;
 
       if (!hasContext) {
@@ -273,6 +276,7 @@
       if (merged.has(key)) {
         const existing = merged.get(key);
         existing.sourceEntityIds = [...new Set([...existing.sourceEntityIds, ...shape.sourceEntityIds])].sort();
+        existing.evidenceEntityIds = [...new Set([...existing.evidenceEntityIds, ...evidenceEntityIds])].sort();
         existing.sourceLayers = [...new Set([...existing.sourceLayers, ...shape.layers])].sort();
         existing.associatedLayer = existing.sourceLayers.length === 1 ? existing.sourceLayers[0] : null;
         existing.sourceGroupCount += 1;
@@ -303,6 +307,7 @@
         type: "column",
         classification: "column",
         sourceEntityIds: [...new Set(shape.sourceEntityIds)].sort(),
+        evidenceEntityIds,
         geometry: {
           shape: shape.shape,
           centerX: round(shape.centerX),
