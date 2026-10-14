@@ -129,3 +129,80 @@ test('object snaps include ellipse quadrants and closed polygon edges', () => {
   const polygon = { type: 'polygon', points: [{ x: 0, y: 0 }, { x: 20, y: 0 }, { x: 10, y: 20 }] };
   assert.equal(Core.snapPoint({ x: 5, y: 10 }, [polygon], { threshold: 2 }).kind, 'MIDPOINT');
 });
+function dxfWithHeaderUnits(unitCode, entityRecords = [
+  ['0','LINE','8','S-CONC','10','0','20','0','11','100','21','0']
+]) {
+  const header = ['0','SECTION','2','HEADER'];
+  if (unitCode !== 'missing') header.push('9','$INSUNITS','70', String(unitCode));
+  header.push('0','ENDSEC');
+  return [...header, '0','SECTION','2','ENTITIES', ...entityRecords.flat(), '0','ENDSEC','0','EOF'].join(String.fromCharCode(10));
+}
+
+test('DXF INSUNITS code maps to explicit drawing units without scaling geometry', () => {
+  for (const [code, expectedUnit] of [[1,'in'],[2,'ft'],[4,'mm'],[5,'cm'],[6,'m'],[21,'us-ft'],[24,'us-mi']]) {
+    const parsed = Core.parseDxf(dxfWithHeaderUnits(code));
+    assert.equal(parsed.units, expectedUnit, `INSUNITS ${code}`);
+    assert.equal(parsed.unitCode, code);
+    assert.equal(parsed.unitStatus, 'known');
+    assert.equal(parsed.unitSource, '$INSUNITS');
+    assert.equal(parsed.entities[0].b.x, 100, 'raw coordinates are preserved');
+  }
+});
+
+test('DXF with missing INSUNITS is marked missing rather than silently assumed millimetres', () => {
+  const parsed = Core.parseDxf(dxfWithHeaderUnits('missing'));
+  assert.equal(parsed.units, null);
+  assert.equal(parsed.unitCode, null);
+  assert.equal(parsed.unitStatus, 'missing');
+});
+
+test('DXF with unitless or unsupported INSUNITS is explicit and does not assume a unit', () => {
+  const unitless = Core.parseDxf(dxfWithHeaderUnits(0));
+  assert.equal(unitless.units, null);
+  assert.equal(unitless.unitStatus, 'unitless');
+  const unknown = Core.parseDxf(dxfWithHeaderUnits(99));
+  assert.equal(unknown.units, null);
+  assert.equal(unknown.unitCode, 99);
+  assert.equal(unknown.unitStatus, 'unsupported');
+});
+
+test('drawing-unit normalizer accepts common unit names and rejects ambiguous input', () => {
+  assert.equal(Core.normalizeDrawingUnit('millimetres'), 'mm');
+  assert.equal(Core.normalizeDrawingUnit('feet'), 'ft');
+  assert.equal(Core.normalizeDrawingUnit('us survey feet'), 'us-ft');
+  assert.equal(Core.normalizeDrawingUnit('bananas'), null);
+});
+
+test('DXF parser reports skipped unsupported entity types and counts', () => {
+  const records = [
+    ['0','LINE','8','S-CONC','10','0','20','0','11','100','21','0'],
+    ['0','INSERT','8','S-COLUMNS','2','COLUMN_300','10','10','20','20'],
+    ['0','HATCH','8','S-HATCH'],
+    ['0','HATCH','8','S-HATCH'],
+    ['0','POLYLINE','8','S-COLUMNS'],
+    ['0','VERTEX','10','0','20','0'],
+    ['0','SEQEND']
+  ];
+  const parsed = Core.parseDxf(dxfWithHeaderUnits(4, records));
+  assert.equal(parsed.unsupportedCount, 4);
+  assert.deepEqual(parsed.unsupportedEntityTypes, { INSERT: 1, HATCH: 2, POLYLINE: 1 });
+});
+
+
+test('DXF with malformed INSUNITS value is marked invalid', () => {
+  const parsed = Core.parseDxf(dxfWithHeaderUnits('not-a-number'));
+  assert.equal(parsed.units, null);
+  assert.equal(parsed.unitStatus, 'invalid');
+});
+
+test('unsupported-only DXF explains why import cannot proceed', () => {
+  const dxf = dxfWithHeaderUnits(4, [['0','INSERT','8','S-COLUMNS','2','COLUMN_BLOCK','10','0','20','0']]);
+  assert.throws(() => Core.parseDxf(dxf), /No supported DXF entities found.*INSERT \(1\)/);
+});
+
+test('DXF unit code mapping can preserve source units during export', () => {
+  assert.equal(Core.dxfUnitCode('mm'), 4);
+  assert.equal(Core.dxfUnitCode('feet'), 2);
+  assert.equal(Core.dxfUnitCode('Gm'), 17);
+  assert.equal(Core.dxfUnitCode('not-a-unit'), null);
+});
