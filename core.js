@@ -38,8 +38,17 @@
       'astronomical unit': 'au', 'astronomical units': 'au',
       'light year': 'ly', 'light years': 'ly', 'parsec': 'pc', 'parsecs': 'pc'
     };
-    const canonical = aliases[input] || input;
+    const canonical = aliases[input] || [...DXF_UNIT_VALUES].find(unit => unit.toLowerCase() === input) || input;
     return DXF_UNIT_VALUES.has(canonical) ? canonical : null;
+  }
+
+  function dxfUnitCode(value) {
+    const unit = normalizeDrawingUnit(value);
+    if (!unit) return null;
+    for (const [code, candidate] of Object.entries(DXF_UNITS_BY_CODE)) {
+      if (candidate === unit) return Number(code);
+    }
+    return null;
   }
 
   function dxfUnitInfo(variablePresent, rawCode) {
@@ -430,7 +439,7 @@
     };
   }
 
-  const api = { FORMAT, VERSION, normalizeDocument, serializeDocument, CommandRegistry, HistoryManager, parseCoordinate, parseDxf, normalizeDrawingUnit, snapPoint, zoomViewportAt, MIN_VIEW_SCALE, MAX_VIEW_SCALE };
+  const api = { FORMAT, VERSION, normalizeDocument, serializeDocument, CommandRegistry, HistoryManager, parseCoordinate, parseDxf, normalizeDrawingUnit, dxfUnitCode, snapPoint, zoomViewportAt, MIN_VIEW_SCALE, MAX_VIEW_SCALE };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BahlCore = api;
 })(globalThis);
