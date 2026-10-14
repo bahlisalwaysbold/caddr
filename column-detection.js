@@ -3,6 +3,7 @@
 
   const COLUMN_LAYER = /(?:^|[^a-z])(?:col(?:umn)?s?|pillars?)(?:$|[^a-z])/i;
   const GRID_LAYER = /(?:^|[^a-z])(?:grid|axis|axes|centreline|centerline)(?:$|[^a-z])/i;
+  const STRUCTURAL_MEMBER_LAYER = /(?:^|[^a-z])(?:s[-_ ]?(?:conc|concrete|struct|beam|col(?:umn)?s?)|structural|columns?|beams?|framing)(?:$|[^a-z])/i;
   const COLUMN_TEXT = /\b(?:col(?:umn)?\s*[-_:]?\s*[a-z]?\d+[a-z]?|c\s*[-_:]?\s*\d{1,3}[a-z]?)\b/i;
   const MM_PER_UNIT = Object.freeze({
     mm: 1, cm: 10, m: 1000, in: 25.4, ft: 304.8, yd: 914.4,
@@ -209,6 +210,22 @@
     return [...new Set([...horizontal, ...vertical].map(line => line.id))].sort();
   }
 
+  function structuralMemberLineIds(shape, lines, tolerance) {
+    const region = Math.max(Math.min(shape.width, shape.depth) * 0.12, tolerance * 4);
+    const matches = [];
+    for (const line of lines) {
+      if (!STRUCTURAL_MEMBER_LAYER.test(line.layer)) continue;
+      const dx = line.b.x - line.a.x, dy = line.b.y - line.a.y;
+      const lengthSquared = dx * dx + dy * dy;
+      if (lengthSquared <= tolerance * tolerance) continue;
+      const rawT = ((shape.centerX - line.a.x) * dx + (shape.centerY - line.a.y) * dy) / lengthSquared;
+      const t = Math.max(0, Math.min(1, rawT));
+      const closest = { x: line.a.x + t * dx, y: line.a.y + t * dy };
+      if (pointDistance(closest, { x: shape.centerX, y: shape.centerY }) <= region) matches.push(line.id);
+    }
+    return [...new Set(matches)].sort();
+  }
+
   function inTypicalColumnRange(shape, units) {
     const factor = MM_PER_UNIT[String(units || "").toLowerCase()];
     if (!factor) return { known: false, plausible: false, widthMm: null, depthMm: null };
@@ -264,8 +281,10 @@
       ));
       const gridSourceIds = gridIntersectionEntityIds(shape, lineRecords, tolerance);
       const gridEvidence = gridSourceIds.length > 0;
-      const evidenceEntityIds = [...new Set([...(annotation ? [annotation.id] : []), ...gridSourceIds])].filter(Boolean).sort();
-      const hasContext = layerEvidence || Boolean(annotation) || gridEvidence;
+      const memberAlignmentIds = structuralMemberLineIds(shape, lineRecords, tolerance);
+      const memberAlignment = memberAlignmentIds.length > 0;
+      const evidenceEntityIds = [...new Set([...(annotation ? [annotation.id] : []), ...gridSourceIds, ...memberAlignmentIds])].filter(Boolean).sort();
+      const hasContext = layerEvidence || Boolean(annotation) || gridEvidence || memberAlignment;
 
       if (!hasContext) {
         if (unitScreen.plausible) unclassifiedPlausibleShapes += 1;
@@ -292,6 +311,7 @@
       if (layerEvidence) evidence.push("structural_layer_match");
       if (annotation) evidence.push("column_annotation");
       if (gridEvidence) evidence.push("structural_grid_intersection");
+      if (memberAlignment) evidence.push("structural_member_alignment");
       if (unitScreen.plausible) evidence.push("typical_column_proportions");
 
       const warnings = [];
@@ -300,7 +320,7 @@
       if (shape.layers.length > 1) warnings.push("source_geometry_spans_multiple_layers");
       const confidence = Math.min(0.97, Math.round((
         0.35 + (layerEvidence ? 0.3 : 0) + (annotation ? 0.2 : 0) +
-        (gridEvidence ? 0.15 : 0) + (unitScreen.plausible ? 0.1 : 0)
+        (gridEvidence ? 0.15 : 0) + (memberAlignment ? 0.1 : 0) + (unitScreen.plausible ? 0.1 : 0)
       ) * 100) / 100);
       const candidate = {
         id: "",
@@ -353,7 +373,8 @@
       },
       notes: [
         "Recognition is deterministic geometry interpretation, not a structural safety assessment.",
-        "Shapes without column-layer, column-annotation or structural-grid evidence are not classified as columns.",
+        "Confidence is a heuristic evidence score, not a calibrated probability or a safety rating.",
+        "Shapes without column-layer, column-annotation, structural-grid, or structural-member-alignment evidence are not classified as columns.",
         "BLOCK/INSERT symbols are not recognised by the current DXF importer."
       ],
       source: options.source || "current-drawing"
