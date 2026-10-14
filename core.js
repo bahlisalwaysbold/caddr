@@ -3,6 +3,63 @@
   const VERSION = 1;
   const clone = value => JSON.parse(JSON.stringify(value));
 
+  // DXF $INSUNITS values from Autodesk's documented header-variable table.
+  // Coordinates remain in source drawing units; this metadata does not rescale geometry.
+  const DXF_UNITS_BY_CODE = Object.freeze({
+    1: 'in', 2: 'ft', 3: 'mi', 4: 'mm', 5: 'cm', 6: 'm', 7: 'km',
+    8: 'microin', 9: 'mil', 10: 'yd', 11: 'angstrom', 12: 'nm',
+    13: 'micron', 14: 'dm', 15: 'dam', 16: 'hm', 17: 'Gm',
+    18: 'au', 19: 'ly', 20: 'pc', 21: 'us-ft', 22: 'us-in',
+    23: 'us-yd', 24: 'us-mi'
+  });
+  const DXF_UNIT_VALUES = new Set(Object.values(DXF_UNITS_BY_CODE));
+
+  function normalizeDrawingUnit(value) {
+    const input = String(value ?? '').trim().toLowerCase().split(' ').filter(Boolean).join(' ');
+    const aliases = {
+      'millimeter': 'mm', 'millimeters': 'mm', 'millimetre': 'mm', 'millimetres': 'mm',
+      'centimeter': 'cm', 'centimeters': 'cm', 'centimetre': 'cm', 'centimetres': 'cm',
+      'meter': 'm', 'meters': 'm', 'metre': 'm', 'metres': 'm',
+      'inch': 'in', 'inches': 'in', 'foot': 'ft', 'feet': 'ft',
+      'mile': 'mi', 'miles': 'mi', 'kilometer': 'km', 'kilometers': 'km',
+      'kilometre': 'km', 'kilometres': 'km', 'yard': 'yd', 'yards': 'yd',
+      'micron': 'micron', 'microns': 'micron',
+      'us survey foot': 'us-ft', 'us survey feet': 'us-ft',
+      'us survey inch': 'us-in', 'us survey inches': 'us-in',
+      'us survey yard': 'us-yd', 'us survey yards': 'us-yd',
+      'us survey mile': 'us-mi', 'us survey miles': 'us-mi',
+      'microinch': 'microin', 'microinches': 'microin',
+      'mil': 'mil', 'mils': 'mil', 'angstroms': 'angstrom',
+      'nanometer': 'nm', 'nanometers': 'nm', 'nanometre': 'nm', 'nanometres': 'nm',
+      'decimeter': 'dm', 'decimeters': 'dm', 'decimetre': 'dm', 'decimetres': 'dm',
+      'dekameter': 'dam', 'dekameters': 'dam', 'dekametre': 'dam', 'dekametres': 'dam',
+      'hectometer': 'hm', 'hectometers': 'hm', 'hectometre': 'hm', 'hectometres': 'hm',
+      'gigameter': 'Gm', 'gigameters': 'Gm', 'gigametre': 'Gm', 'gigametres': 'Gm',
+      'astronomical unit': 'au', 'astronomical units': 'au',
+      'light year': 'ly', 'light years': 'ly', 'parsec': 'pc', 'parsecs': 'pc'
+    };
+    const canonical = aliases[input] || input;
+    return DXF_UNIT_VALUES.has(canonical) ? canonical : null;
+  }
+
+  function dxfUnitInfo(variablePresent, rawCode) {
+    if (!variablePresent) {
+      return { units: null, unitCode: null, unitStatus: 'missing', unitSource: null };
+    }
+    if (!Number.isInteger(rawCode) || rawCode < 0) {
+      return { units: null, unitCode: null, unitStatus: 'invalid', unitSource: '$INSUNITS' };
+    }
+    if (rawCode === 0) {
+      return { units: null, unitCode: 0, unitStatus: 'unitless', unitSource: '$INSUNITS' };
+    }
+    const units = DXF_UNITS_BY_CODE[rawCode];
+    if (!units) {
+      return { units: null, unitCode: rawCode, unitStatus: 'unsupported', unitSource: '$INSUNITS' };
+    }
+    return { units, unitCode: rawCode, unitStatus: 'known', unitSource: '$INSUNITS' };
+  }
+
+
   function normalizeDocument(input = {}) {
     const source = input.document && typeof input.document === 'object' ? input.document : input;
     const sourceLayers = Array.isArray(source.layers) ? source.layers : [];
@@ -280,8 +337,13 @@
     }
     const sections = [];
     let section = '', table = '', expectTableName = false, currentLayer = null, currentEntity = null;
+    let currentHeaderVariable = null, headerInsunitsPresent = false, headerInsunitsCode = null;
     const layerMap = new Map();
     const entities = [];
+    const unsupportedEntityTypes = Object.create(null);
+    const supportedEntityTypes = new Set(['LINE', 'CIRCLE', 'ARC', 'LWPOLYLINE', 'POINT', 'TEXT', 'MTEXT']);
+    // These are structural records/terminators rather than independently drawable entities.
+    const ignoredEntityRecords = new Set(['SEQEND', 'VERTEX', 'ATTRIB', 'ENDSEC', 'EOF', 'SECTION', 'TABLE', 'ENDTAB', 'ENDBLK']);
     const aci = {1:'#ff3333',2:'#ffff33',3:'#33cc66',4:'#33ffff',5:'#3366ff',6:'#ff33ff',7:'#e6e6e6',8:'#999999',9:'#cccccc',10:'#ff6666',11:'#ffaaaa',12:'#bd4b4b',13:'#bd7a7a',14:'#a64b00',15:'#a67a00',16:'#a6a600',17:'#7aa600',18:'#4ba600',19:'#00a64b',20:'#00a67a',21:'#00a6a6',22:'#007aa6',23:'#004ba6',24:'#4b00a6',25:'#7a00a6',26:'#a600a6',27:'#a6007a',28:'#a6004b'};
     const colorFor = value => { const n = Math.abs(Number(value)); return aci[n] || (n === 7 ? '#e6e6e6' : '#59d7af'); };
     const val = (items, code, fallback = 0) => { const p = items.find(item => item.code === code); const n = p ? Number(p.value) : fallback; return Number.isFinite(n) ? n : fallback; };
@@ -290,7 +352,13 @@
     const layerName = items => str(items, 8, '0') || '0';
     const flushEntity = () => {
       if (!currentEntity) return;
-      const type = currentEntity.type, p = currentEntity.items, layer = layerName(p);
+      const type = currentEntity.type, p = currentEntity.items;
+      if (!supportedEntityTypes.has(type)) {
+        if (!ignoredEntityRecords.has(type)) unsupportedEntityTypes[type] = (unsupportedEntityTypes[type] || 0) + 1;
+        currentEntity = null;
+        return;
+      }
+      const layer = layerName(p);
       if (!layerMap.has(layer)) layerMap.set(layer, { id: 'layer-' + (layerMap.size + 1), name: layer, visible: true, locked: false, color: colorFor(str(p, 62, '7')), linetype: 'CONTINUOUS' });
       const base = { id: 'e' + (entities.length + 1), layer, color: 'BYLAYER' };
       if (type === 'LINE') entities.push({ ...base, type: 'line', a: point(p,10,20), b: point(p,11,21) });
@@ -309,15 +377,25 @@
       else if (type === 'TEXT' || type === 'MTEXT') {
         const raw=p.filter(item=>item.code===1||item.code===3).map(item=>item.value).join('');
         entities.push({...base,type:'text',x:val(p,10),y:val(p,20),size:Math.max(1,Math.abs(val(p,40,20))),text:raw.replace(/\\P/g,' ').replace(/\\\\[A-Za-z][^;]*;/g,'')});
-      } else if (type !== 'SEQEND' && type !== 'VERTEX' && type !== 'ENDSEC' && type !== 'EOF' && type !== 'SECTION' && type !== 'TABLE' && type !== 'ENDTAB') {
-        // Unsupported entity types are skipped deliberately; caller receives the count.
       }
       currentEntity = null;
     };
     for (const pair of pairs) {
       if (pair.code === 0 && pair.value === 'SECTION') { flushEntity(); section=''; table=''; }
       if (section === '' && pair.code === 2) { section=pair.value; continue; }
-      if (section === 'TABLES') {
+      if (section === 'HEADER') {
+        if (pair.code === 9) {
+          currentHeaderVariable = pair.value;
+          if (currentHeaderVariable === '$INSUNITS') {
+            headerInsunitsPresent = true;
+            headerInsunitsCode = null;
+          }
+        } else if (currentHeaderVariable === '$INSUNITS' && pair.code === 70) {
+          const parsedUnitCode = Number(pair.value);
+          headerInsunitsCode = Number.isInteger(parsedUnitCode) ? parsedUnitCode : null;
+          currentHeaderVariable = null;
+        }
+      } else if (section === 'TABLES') {
         if (pair.code===0 && pair.value==='TABLE') { table=''; currentLayer=null; expectTableName=true; continue; }
         if (pair.code===2 && expectTableName) { table=pair.value; expectTableName=false; continue; }
         if (table==='LAYER') {
@@ -333,15 +411,26 @@
       if(pair.code===0 && pair.value==='EOF'){flushEntity();break}
     }
     flushEntity();
-    if (!entities.length) throw new Error('No supported DXF entities found. Supported types: LINE, CIRCLE, ARC, LWPOLYLINE, POINT, TEXT and MTEXT.');
+    const unsupportedCount = Object.values(unsupportedEntityTypes).reduce((total, count) => total + count, 0);
+    if (!entities.length) {
+      const unsupportedSummary = Object.entries(unsupportedEntityTypes).map(([type, count]) => type + ' (' + count + ')').join(', ');
+      const suffix = unsupportedCount ? ' Unsupported entity types encountered: ' + unsupportedSummary + '.' : '';
+      throw new Error('No supported DXF entities found. Supported types: LINE, CIRCLE, ARC, LWPOLYLINE, POINT, TEXT and MTEXT.' + suffix);
+    }
     const usedNames = new Set(entities.map(entity=>entity.layer));
     const layers = [...layerMap.values()].filter(layer=>usedNames.has(layer.name));
     for(const name of usedNames) if(!layers.some(layer=>layer.name===name)) layers.push({id:'layer-'+(layers.length+1),name,visible:true,locked:false,color:'#59d7af',linetype:'CONTINUOUS'});
     const normalizedEntities=entities.map(entity=>({...entity,layerId:layers.find(layer=>layer.name===entity.layer)?.id||layers[0].id}));
-    return { units: 'mm', layers, activeLayer: layers[0]?.name || '0', entities: normalizedEntities, nextId: normalizedEntities.length+1, unsupportedCount: 0 };
+    return {
+      ...dxfUnitInfo(headerInsunitsPresent, headerInsunitsCode),
+      layers, activeLayer: layers[0]?.name || '0', entities: normalizedEntities,
+      nextId: normalizedEntities.length+1,
+      unsupportedCount,
+      unsupportedEntityTypes: { ...unsupportedEntityTypes }
+    };
   }
 
-  const api = { FORMAT, VERSION, normalizeDocument, serializeDocument, CommandRegistry, HistoryManager, parseCoordinate, parseDxf, snapPoint, zoomViewportAt, MIN_VIEW_SCALE, MAX_VIEW_SCALE };
+  const api = { FORMAT, VERSION, normalizeDocument, serializeDocument, CommandRegistry, HistoryManager, parseCoordinate, parseDxf, normalizeDrawingUnit, snapPoint, zoomViewportAt, MIN_VIEW_SCALE, MAX_VIEW_SCALE };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BahlCore = api;
 })(globalThis);
