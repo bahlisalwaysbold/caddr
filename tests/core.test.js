@@ -206,3 +206,26 @@ test('DXF unit code mapping can preserve source units during export', () => {
   assert.equal(Core.dxfUnitCode('Gm'), 17);
   assert.equal(Core.dxfUnitCode('not-a-unit'), null);
 });
+
+
+test('column-recognition review data survives project save and reopen', () => {
+  const review = [{
+    id: 'candidate-column-stable',
+    type: 'column',
+    classification: 'column',
+    sourceEntityIds: ['e1', 'e2', 'e3', 'e4'],
+    evidenceEntityIds: ['e5'],
+    geometry: { shape: 'rectangle', width: 300, depth: 450, unit: 'mm', centerX: 10, centerY: 20 },
+    evidence: ['closed_rectangular_boundary', 'structural_layer_match'],
+    confidence: 0.75,
+    reviewStatus: 'confirmed',
+    warnings: []
+  }];
+  const saved = Core.serializeDocument({
+    units: 'mm', layers: [{ id: 'layer-1', name: 'S-COLUMNS' }], activeLayer: 'S-COLUMNS',
+    entities: [], nextId: 1, structuralDetections: review,
+    viewport: { x: 0, y: 0, scale: 1 }
+  });
+  const reopened = Core.normalizeDocument(saved);
+  assert.deepEqual(reopened.document.structuralDetections, review);
+});
