@@ -132,10 +132,10 @@ test('object snaps include ellipse quadrants and closed polygon edges', () => {
 function dxfWithHeaderUnits(unitCode, entityRecords = [
   ['0','LINE','8','S-CONC','10','0','20','0','11','100','21','0']
 ]) {
-  const header = ['0','SECTION','2','HEADER','9','$INSUNITS'];
-  if (unitCode !== 'missing') header.push('70', String(unitCode));
+  const header = ['0','SECTION','2','HEADER'];
+  if (unitCode !== 'missing') header.push('9','$INSUNITS','70', String(unitCode));
   header.push('0','ENDSEC');
-  return [...header, '0','SECTION','2','ENTITIES', ...entityRecords.flat(), '0','ENDSEC','0','EOF'].join('\\n');
+  return [...header, '0','SECTION','2','ENTITIES', ...entityRecords.flat(), '0','ENDSEC','0','EOF'].join(String.fromCharCode(10));
 }
 
 test('DXF INSUNITS code maps to explicit drawing units without scaling geometry', () => {
@@ -186,4 +186,16 @@ test('DXF parser reports skipped unsupported entity types and counts', () => {
   const parsed = Core.parseDxf(dxfWithHeaderUnits(4, records));
   assert.equal(parsed.unsupportedCount, 4);
   assert.deepEqual(parsed.unsupportedEntityTypes, { INSERT: 1, HATCH: 2, POLYLINE: 1 });
+});
+
+
+test('DXF with malformed INSUNITS value is marked invalid', () => {
+  const parsed = Core.parseDxf(dxfWithHeaderUnits('not-a-number'));
+  assert.equal(parsed.units, null);
+  assert.equal(parsed.unitStatus, 'invalid');
+});
+
+test('unsupported-only DXF explains why import cannot proceed', () => {
+  const dxf = dxfWithHeaderUnits(4, [['0','INSERT','8','S-COLUMNS','2','COLUMN_BLOCK','10','0','20','0']]);
+  assert.throws(() => Core.parseDxf(dxf), /No supported DXF entities found.*INSERT \(1\)/);
 });
