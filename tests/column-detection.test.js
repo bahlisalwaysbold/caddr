@@ -44,6 +44,8 @@ test('recognises represented columns from a mixed DXF and retains source entity 
   const gridded = detection.candidates.find(candidate => candidate.evidence.includes('structural_grid_intersection'));
   assert.ok(gridded);
   assert.equal(gridded.sourceEntityIds.length, 1, 'outline source geometry stays distinct from grid references');
+  assert.equal(gridded.evidenceEntityIds.length, 2, 'the two structural grid entities are retained as supporting evidence');
+  assert.ok(labelled.evidenceEntityIds.length >= 1, 'the nearby column annotation is retained as supporting evidence');
 });
 
 test('recognises a closed rectangle drawn as four connected lines', () => {
