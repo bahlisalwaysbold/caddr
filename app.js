@@ -1,5 +1,6 @@
 (() => {
   const Core = window.BahlCore;
+  const ColumnDetection = window.BahlColumnDetection;
   const svg = document.getElementById('cadCanvas');
   const root = document.getElementById('drawingRoot');
   const grid = document.getElementById('grid');
@@ -29,9 +30,11 @@
     units:'mm', grid:true, snap:true, ortho:false, polar:false, tracking:false, dynamicInput:true, gridSize:50, majorGrid:250,
     layers:[{id:'layer-1',name:'S-CONC',visible:true,locked:false,color:'#59d7af'},{id:'layer-2',name:'S-DIMS',visible:true,locked:false,color:'#cbd5e1'},{id:'layer-3',name:'S-TEXT',visible:true,locked:false,color:'#a9cbff'}],
     activeLayer:'S-CONC', entities:[], selection:[], tool:'select',
-    constraints:[], parameters:[],
+    constraints:[], parameters:[], structuralDetections:[],
     viewport:{x:0,y:0,scale:1}, interaction:null, panKeyDown:false, previousSelection:[], nextId:1
   };
+  let activeColumnCandidateId = null;
+  let lastColumnDetectionStats = null;
 
   const clone = o => JSON.parse(JSON.stringify(o));
   const uid=()=>`e${state.nextId++}`;
@@ -56,8 +59,8 @@
     else if(ref&&state.polar){const dx=resolved.p.x-ref.x,dy=resolved.p.y-ref.y,r=Math.hypot(dx,dy),step=Math.PI/12,a=Math.round(Math.atan2(dy,dx)/step)*step;resolved.p={x:ref.x+Math.cos(a)*r,y:ref.y+Math.sin(a)*r};resolved.kind='POLAR'}
     return resolved;
   }
-  function captureDocument(){return clone({units:state.units,layers:state.layers,activeLayer:state.activeLayer,entities:state.entities,nextId:state.nextId,constraints:state.constraints,parameters:state.parameters,grid:state.grid,snap:state.snap,ortho:state.ortho,polar:state.polar,tracking:state.tracking,dynamicInput:state.dynamicInput,gridSize:state.gridSize,majorGrid:state.majorGrid,viewport:state.viewport})}
-  function restoreDocument(snapshot){Object.assign(state,clone(snapshot));state.selection=[];state.interaction=null;render()}
+  function captureDocument(){return clone({units:state.units,layers:state.layers,activeLayer:state.activeLayer,entities:state.entities,nextId:state.nextId,constraints:state.constraints,parameters:state.parameters,structuralDetections:state.structuralDetections||[],grid:state.grid,snap:state.snap,ortho:state.ortho,polar:state.polar,tracking:state.tracking,dynamicInput:state.dynamicInput,gridSize:state.gridSize,majorGrid:state.majorGrid,viewport:state.viewport})}
+  function restoreDocument(snapshot){Object.assign(state,clone(snapshot));state.structuralDetections=Array.isArray(state.structuralDetections)?state.structuralDetections:[];state.selection=[];state.interaction=null;render()}
   function worldBounds(e){
     if(e.type==='line'||e.type==='dimension') return {x1:Math.min(e.a.x,e.b.x),y1:Math.min(e.a.y,e.b.y),x2:Math.max(e.a.x,e.b.x),y2:Math.max(e.a.y,e.b.y)};
     if(e.type==='arc'){const pts=arcSamples(e),xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);return{x1:Math.min(...xs),y1:Math.min(...ys),x2:Math.max(...xs),y2:Math.max(...ys)}}
@@ -97,9 +100,187 @@
       else if(e.type==='text'){createEl('text',{x:e.x,y:e.y,'font-size':e.size||20,fill:l.color,'font-family':'Arial, sans-serif',...common}).textContent=e.text||'TEXT'}
       else if(e.type==='dimension') renderDimension(e,l.color,selected);
     }
+    renderColumnOverlays();
     renderGrips();
-    updateProperties();updateLayers();renderConstraintManager();updatePrecisionModes();applyViewport();
+    updateProperties();updateLayers();renderConstraintManager();updatePrecisionModes();renderColumnDetectionPanel();applyViewport();
   }
+
+  function columnCandidateById(id){return (state.structuralDetections||[]).find(candidate=>candidate.id===id)||null}
+  function selectColumnCandidate(id){
+    const candidate=columnCandidateById(id);if(!candidate)return;
+    activeColumnCandidateId=id;
+    const existingIds=new Set(state.entities.map(entity=>entity.id));
+    state.selection=(candidate.sourceEntityIds||[]).filter(sourceId=>existingIds.has(sourceId));
+    render();
+    setStatus('Selected column candidate. Source entities are highlighted where available.');
+  }
+  function renderColumnOverlays(){
+    for(const candidate of (state.structuralDetections||[])){
+      if(candidate.reviewStatus==='rejected')continue;
+      const g=candidate.geometry||{},bounds=g.bounds||{minX:g.centerX-(g.width||0)/2,minY:g.centerY-(g.depth||0)/2,maxX:g.centerX+(g.width||0)/2,maxY:g.centerY+(g.depth||0)/2};
+      const classes=['column-candidate-outline'];
+      if(candidate.reviewStatus==='confirmed')classes.push('is-confirmed');
+      if(candidate.id===activeColumnCandidateId)classes.push('is-selected');
+      const common={class:classes.join(' '),'data-column-candidate':candidate.id,'vector-effect':'non-scaling-stroke'};
+      let shape=null;
+      if(g.shape==='circle')shape=createEl('circle',{cx:g.centerX,cy:g.centerY,r:Math.max(0,(bounds.maxX-bounds.minX)/2),...common});
+      else if(Array.isArray(g.points)&&g.points.length>=3)shape=createEl('polygon',{points:g.points.map(point=>point.x+','+point.y).join(' '),...common});
+      else shape=createEl('rect',{x:bounds.minX,y:bounds.minY,width:bounds.maxX-bounds.minX,height:bounds.maxY-bounds.minY,...common});
+      shape.setAttribute('tabindex','0');shape.setAttribute('role','button');shape.setAttribute('aria-label','Select column candidate');
+      const choose=event=>{event.stopPropagation();selectColumnCandidate(candidate.id)};
+      // Keep the candidate overlay out of the CAD canvas' pointer-drag selection lifecycle.
+      shape.addEventListener('pointerdown',event=>event.stopPropagation());
+      shape.addEventListener('pointerup',event=>event.stopPropagation());
+      shape.addEventListener('click',choose);
+      shape.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();choose(event)}});
+    }
+  }
+  function renderColumnDetectionPanel(){
+    const results=document.getElementById('columnDetectionResults');
+    const summary=document.getElementById('columnDetectionSummary');
+    const count=document.getElementById('columnDetectionCount');
+    if(!results||!summary||!count)return;
+    const candidates=state.structuralDetections||[];
+    const pending=candidates.filter(candidate=>candidate.reviewStatus==='needs_review').length;
+    const confirmed=candidates.filter(candidate=>candidate.reviewStatus==='confirmed').length;
+    const rejected=candidates.filter(candidate=>candidate.reviewStatus==='rejected').length;
+    count.textContent=String(candidates.length);
+    if(!candidates.length&&!lastColumnDetectionStats){
+      summary.textContent='Run detection on the current drawing. Only explicit column evidence is used; this does not design or approve members.';
+    }else{
+      const skipped=lastColumnDetectionStats?lastColumnDetectionStats.unclassifiedPlausibleShapes:0;
+      summary.textContent=candidates.length+' candidate(s) · '+pending+' need review · '+confirmed+' confirmed · '+rejected+' rejected'+(lastColumnDetectionStats?' · '+skipped+' shape-only object(s) not classified':'')+'.';
+    }
+    if(!candidates.length){
+      results.innerHTML='<p class="column-detection-empty">No candidates yet. Import a vector drawing or run detection on the current drawing.</p>';
+      return;
+    }
+    results.innerHTML=candidates.map((candidate,index)=>{
+      const g=candidate.geometry||{},status=String(candidate.reviewStatus||'needs_review').replaceAll('_',' ');
+      const boundaryIds=(candidate.sourceEntityIds||[]).join(', ');
+      const evidenceIds=(candidate.evidenceEntityIds||[]).join(', ');
+      const evidence=(candidate.evidence||[]).join(', ').replaceAll('_',' ');
+      const warnings=(candidate.warnings||[]).join(', ').replaceAll('_',' ');
+      const classification=candidate.classification==='not_column'||candidate.reviewStatus==='rejected'?'not_column':'column';
+      const selected=candidate.id===activeColumnCandidateId?'true':'false';
+      const circle=g.shape==='circle';
+      const dimensions='<div class="column-candidate-fields">'+
+        '<label>Classification<select data-column-field="classification"><option value="column" '+(classification==='column'?'selected':'')+'>Column</option><option value="not_column" '+(classification==='not_column'?'selected':'')+'>Not a column</option></select></label>'+
+        '<label>Width / diameter ('+escapeHtml(g.unit||state.units)+')<input type="number" min="0.001" step="any" data-column-field="width" value="'+escapeHtml(g.width??'')+'" /></label>'+
+        '<label>Depth ('+escapeHtml(g.unit||state.units)+')<input type="number" min="0.001" step="any" data-column-field="depth" value="'+escapeHtml(g.depth??'')+'" '+(circle?'disabled':'')+' /></label></div>';
+      let actions='';
+      if(candidate.reviewStatus==='rejected')actions='<button type="button" data-column-action="review">Return to review</button>';
+      else if(candidate.reviewStatus==='confirmed')actions='<button type="button" data-column-action="review">Return to review</button><button type="button" data-column-action="reject">Reject</button>';
+      else actions='<button type="button" class="primary" data-column-action="confirm">Confirm column</button><button type="button" data-column-action="reject">Reject</button>';
+      return '<article class="column-candidate-card '+escapeHtml(candidate.reviewStatus||'needs_review')+'" data-column-candidate-card="'+escapeHtml(candidate.id)+'">'+
+        '<button class="column-candidate-select" type="button" data-column-action="select" aria-pressed="'+selected+'"><strong>Candidate '+(index+1)+'</strong><span>'+escapeHtml(status)+'</span></button>'+
+        '<p class="column-candidate-meta">'+escapeHtml(g.shape||'shape')+' · confidence '+(Number.isFinite(candidate.confidence)?Math.round(candidate.confidence*100)+'%':'—')+' · '+escapeHtml(g.unit||state.units)+'</p>'+
+        '<p><b>Boundary entities:</b> '+escapeHtml(boundaryIds||'None — manually added')+'</p>'+
+        (evidenceIds?'<p><b>Evidence entities:</b> '+escapeHtml(evidenceIds)+'</p>':'')+
+        '<p><b>Evidence:</b> '+escapeHtml(evidence||'manual engineer input')+'</p>'+
+        dimensions+
+        (warnings?'<p class="column-candidate-warning"><b>Review note:</b> '+escapeHtml(warnings)+'</p>':'')+
+        '<div class="column-candidate-actions">'+actions+'</div></article>';
+    }).join('');
+  }
+  function runColumnDetection(){
+    if(!ColumnDetection||typeof ColumnDetection.detectColumns!=='function'){setStatus('Column detection module did not load.');return}
+    const result=ColumnDetection.detectColumns(state.entities,state.layers,state.units,{source:'current-drawing'});
+    const previous=new Map((state.structuralDetections||[]).filter(candidate=>candidate.source!=='manual').map(candidate=>[candidate.id,candidate]));
+    const manual=(state.structuralDetections||[]).filter(candidate=>candidate.source==='manual');
+    const detected=result.candidates.map(candidate=>{
+      const old=previous.get(candidate.id);if(!old)return candidate;
+      const merged={...candidate,reviewStatus:old.reviewStatus||candidate.reviewStatus,classification:old.classification||candidate.classification};
+      if(old.dimensionSource==='engineer_override'&&old.geometry){
+        merged.geometry={...candidate.geometry,width:old.geometry.width,depth:old.geometry.depth};
+        merged.dimensionSource='engineer_override';
+        merged.warnings=[...new Set([...(candidate.warnings||[]),'manual_dimension_override'])];
+      }
+      return merged;
+    });
+    state.structuralDetections=[...detected,...manual];
+    lastColumnDetectionStats=result.stats;
+    activeColumnCandidateId=state.structuralDetections.find(candidate=>candidate.reviewStatus==='needs_review')?.id||state.structuralDetections[0]?.id||null;
+    render();
+    setStatus(result.candidates.length+' column candidate(s) found. Review every candidate; no structural design was generated.');
+    log('COLUMN DETECTION: '+result.candidates.length+' candidate(s), '+result.stats.unclassifiedPlausibleShapes+' plausible shape-only object(s) excluded, '+result.stats.duplicatesMerged+' duplicate outline(s) merged.');
+  }
+  function addManualColumnCandidate(){
+    const xText=window.prompt('Column centre X ('+state.units+')','0');if(xText===null)return;
+    const yText=window.prompt('Column centre Y ('+state.units+')','0');if(yText===null)return;
+    const widthText=window.prompt('Column width ('+state.units+')','300');if(widthText===null)return;
+    const depthText=window.prompt('Column depth ('+state.units+')','300');if(depthText===null)return;
+    const x=Number(xText),y=Number(yText),width=Number(widthText),depth=Number(depthText);
+    if(![x,y,width,depth].every(Number.isFinite)||width<=0||depth<=0){setStatus('Manual candidate needs finite coordinates and positive dimensions.');return}
+    const candidate={
+      id:'manual-column-'+Date.now().toString(36),type:'column',classification:'column',
+      sourceEntityIds:[],evidenceEntityIds:[],associatedLayer:state.activeLayer,sourceLayers:[state.activeLayer],
+      geometry:{shape:'rectangle',centerX:x,centerY:y,width,depth,unit:state.units,
+        bounds:{minX:x-width/2,minY:y-depth/2,maxX:x+width/2,maxY:y+depth/2},
+        points:[{x:x-width/2,y:y-depth/2},{x:x+width/2,y:y-depth/2},{x:x+width/2,y:y+depth/2},{x:x-width/2,y:y+depth/2}]},
+      evidence:['engineer_manual_input'],confidence:null,reviewStatus:'needs_review',
+      warnings:['manual_candidate_without_source_geometry'],dimensionSource:'engineer_input',source:'manual'
+    };
+    history.transact('ADD MANUAL COLUMN CANDIDATE',()=>state.structuralDetections.push(candidate));
+    activeColumnCandidateId=candidate.id;render();
+    setStatus('Manual column candidate added for review. It has not been inserted into the analysis model.');
+    log('Added a manual column candidate at '+x+', '+y+' ('+width+' × '+depth+' '+state.units+').');
+  }
+  function handleColumnDetectionClick(event){
+    const button=event.target.closest('[data-column-action]');if(!button)return;
+    const card=button.closest('[data-column-candidate-card]');
+    const candidate=card?columnCandidateById(card.dataset.columnCandidateCard):null;
+    const action=button.dataset.columnAction;
+    if(action==='select'){if(candidate)selectColumnCandidate(candidate.id);return}
+    if(!candidate)return;
+    history.transact('UPDATE COLUMN REVIEW',()=>{
+      if(action==='confirm'){
+        if(candidate.classification==='not_column'){candidate.reviewStatus='rejected';return}
+        candidate.classification='column';candidate.reviewStatus='confirmed';
+      }else if(action==='reject'){
+        candidate.classification='not_column';candidate.reviewStatus='rejected';
+      }else if(action==='review'){
+        candidate.classification='column';candidate.reviewStatus='needs_review';
+      }
+    });
+    activeColumnCandidateId=candidate.id;render();
+    if(action==='confirm')setStatus('Recognition confirmed by the engineer. This candidate is not yet connected, analysed or designed.');
+    else if(action==='reject')setStatus('Candidate rejected. Its source drawing geometry remains unchanged.');
+    else setStatus('Candidate returned to review.');
+    log('COLUMN REVIEW: '+candidate.id+' → '+candidate.reviewStatus);
+  }
+  function handleColumnDetectionChange(event){
+    const field=event.target.closest('[data-column-field]');if(!field)return;
+    const card=field.closest('[data-column-candidate-card]');
+    const candidate=card?columnCandidateById(card.dataset.columnCandidateCard):null;if(!candidate)return;
+    const value=field.value;
+    if(field.dataset.columnField==='classification'&&value!=='column'&&value!=='not_column')return;
+    if((field.dataset.columnField==='width'||field.dataset.columnField==='depth')&&(!Number.isFinite(Number(value))||Number(value)<=0)){
+      setStatus('Corrected dimensions must be positive numbers.');renderColumnDetectionPanel();return;
+    }
+    history.transact('EDIT COLUMN CANDIDATE',()=>{
+      if(field.dataset.columnField==='classification'){
+        candidate.classification=value;
+        if(value==='not_column')candidate.reviewStatus='rejected';
+        else if(candidate.reviewStatus==='rejected')candidate.reviewStatus='needs_review';
+      }else{
+        const number=Number(value);
+        candidate.geometry[field.dataset.columnField]=number;
+        if(candidate.geometry.shape==='circle')candidate.geometry.width=candidate.geometry.depth=number;
+        candidate.dimensionSource='engineer_override';
+        candidate.warnings=[...new Set([...(candidate.warnings||[]),'manual_dimension_override'])];
+      }
+    });
+    activeColumnCandidateId=candidate.id;render();
+    log('Corrected column candidate '+candidate.id+' ('+field.dataset.columnField+').');
+  }
+  function setupColumnDetectionUI(){
+    document.getElementById('runColumnDetection')?.addEventListener('click',runColumnDetection);
+    document.getElementById('addManualColumnCandidate')?.addEventListener('click',addManualColumnCandidate);
+    document.getElementById('columnDetectionResults')?.addEventListener('click',handleColumnDetectionClick);
+    document.getElementById('columnDetectionResults')?.addEventListener('change',handleColumnDetectionChange);
+  }
+
   function updatePrecisionModes(){
     for(const [id,enabled] of [['snapToggle',state.snap],['orthoToggle',state.ortho],['polarToggle',state.polar],['trackingToggle',state.tracking],['dynamicToggle',state.dynamicInput],['gridToggle',state.grid]]){
       const button=document.getElementById(id);button.classList.toggle('active',enabled);button.setAttribute('aria-pressed',String(enabled));
@@ -366,7 +547,7 @@
   });
   window.addEventListener('keyup',ev=>{if(ev.code==='Space'){state.panKeyDown=false;wrap.classList.remove('pan-ready')}});
   document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
-  document.querySelectorAll('[data-command]').forEach(b=>b.addEventListener('click',()=>{const c=b.dataset.command;if(c==='new')newDrawing();else if(c==='open'||c==='importdxf')fileInput.click();else if(c==='save')saveBahl();else if(c==='svg')exportSvg();else if(c==='dxf')exportDxf();else command(c)}));
+  document.querySelectorAll('[data-command]').forEach(b=>b.addEventListener('click',()=>{const c=b.dataset.command;if(c==='new')newDrawing();else if(c==='open'||c==='importdxf')fileInput.click();else if(c==='save')saveBahl();else if(c==='svg')exportSvg();else if(c==='dxf')exportDxf();else if(c==='detectcolumns')runColumnDetection();else command(c)}));
   document.getElementById('snapToggle').addEventListener('click',()=>{state.snap=!state.snap;document.getElementById('snapState').textContent=state.snap?'SNAP ON':'SNAP OFF';document.getElementById('snapToggle').classList.toggle('active',state.snap)});
   document.getElementById('orthoToggle').addEventListener('click',()=>{state.ortho=!state.ortho;document.getElementById('orthoToggle').classList.toggle('active',state.ortho);setStatus(`Ortho ${state.ortho?'on':'off'}.`)});
   document.getElementById('polarToggle').addEventListener('click',()=>{state.polar=!state.polar;document.getElementById('polarToggle').classList.toggle('active',state.polar);setStatus(`Polar tracking ${state.polar?'on':'off'} (15° increments).`)});
@@ -397,19 +578,20 @@
         const summary=Object.entries(imported.unsupportedEntityTypes).map(([type,count])=>type+' ×'+count).join(', ');
         importWarnings.push('Skipped '+imported.unsupportedCount+' unsupported DXF entity record(s): '+summary+'. Their geometry was not imported.');
       }
-      doc={units:importedUnits,layers:imported.layers,activeLayer:imported.activeLayer,entities:imported.entities,nextId:imported.nextId,constraints:[],parameters:[]};
+      doc={units:importedUnits,layers:imported.layers,activeLayer:imported.activeLayer,entities:imported.entities,nextId:imported.nextId,constraints:[],parameters:[],structuralDetections:[]};
       description=' (DXF import)';
     }else{
       const data=JSON.parse(raw),migrated=Core.normalizeDocument(data);
       doc=migrated.document;view=migrated.view;description=data.version?'':' (legacy format migrated)';
     }
-    Object.assign(state,{units:doc.units||'mm',layers:doc.layers,activeLayer:doc.activeLayer,entities:doc.entities,nextId:doc.nextId,constraints:doc.constraints||[],parameters:doc.parameters||[],grid:view?.grid??true,snap:view?.snap??true,ortho:view?.ortho??false,polar:view?.polar??false,tracking:view?.tracking??false,dynamicInput:view?.dynamicInput??true,gridSize:view?.gridSize||50,majorGrid:view?.majorGrid||250,viewport:view?.viewport||{x:0,y:0,scale:1},selection:[],interaction:null});
+    Object.assign(state,{units:doc.units||'mm',layers:doc.layers,activeLayer:doc.activeLayer,entities:doc.entities,nextId:doc.nextId,constraints:doc.constraints||[],parameters:doc.parameters||[],structuralDetections:doc.structuralDetections||[],grid:view?.grid??true,snap:view?.snap??true,ortho:view?.ortho??false,polar:view?.polar??false,tracking:view?.tracking??false,dynamicInput:view?.dynamicInput??true,gridSize:view?.gridSize||50,majorGrid:view?.majorGrid||250,viewport:view?.viewport||{x:0,y:0,scale:1},selection:[],interaction:null});
+    activeColumnCandidateId=null;lastColumnDetectionStats=null;
     history.clear();render();fitView();
     setStatus(importWarnings.length?'Drawing opened. '+importWarnings.length+' DXF pre-flight note(s); see command log.':'Drawing opened.');
     importWarnings.forEach(message=>log('DXF PRE-FLIGHT: '+message));
     log('Opened '+f.name+description);
   }catch(e){alert('Could not open that drawing: '+e.message)}finally{fileInput.value='';}});
-  function newDrawing(){if(!confirm('Start a new drawing? Unsaved work will be lost.'))return;state.entities=[];state.constraints=[];state.parameters=[];state.selection=[];state.nextId=1;state.viewport={x:0,y:0,scale:1};history.clear();render();setStatus('New drawing.');log('NEW drawing')}
+  function newDrawing(){if(!confirm('Start a new drawing? Unsaved work will be lost.'))return;state.entities=[];state.constraints=[];state.parameters=[];state.structuralDetections=[];activeColumnCandidateId=null;lastColumnDetectionStats=null;state.selection=[];state.nextId=1;state.viewport={x:0,y:0,scale:1};history.clear();render();setStatus('New drawing.');log('NEW drawing')}
   function saveBahl(){download('bahl-drawing.bahl',JSON.stringify(Core.serializeDocument(state),null,2),'application/json');log('SAVED .BAHL drawing')}
   function download(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
   function exportSvg(){const copy=svg.cloneNode(true);copy.querySelector('#cursorOverlay')?.remove();copy.querySelector('#grid')?.remove();copy.setAttribute('xmlns',NS);copy.setAttribute('viewBox',`0 0 ${wrap.clientWidth} ${wrap.clientHeight}`);copy.querySelector('#drawingRoot')?.setAttribute('transform',`translate(${state.viewport.x} ${state.viewport.y}) scale(${state.viewport.scale})`);download('bahl-drawing.svg',new XMLSerializer().serializeToString(copy),'image/svg+xml');log('EXPORTED SVG')}
@@ -429,5 +611,6 @@
     state.entities.push({id:uid(),type:'dimension',layer:D,a:{x:250,y:250},b:{x:250,y:500},offset:-80});
     state.entities.push({id:uid(),type:'text',layer:'S-TEXT',x:380,y:380,text:'STRUCTURAL PLAN — MVP',size:24});
   }
-  seedExample();const initial=Core.normalizeDocument(captureDocument()).document;Object.assign(state,{layers:initial.layers,activeLayer:initial.activeLayer,entities:initial.entities,nextId:initial.nextId});registerCommands();setTool('select');render();fitView();setStatus('Bahl CAD MVP ready.');log('READY — structural drafting core loaded');
+  setupColumnDetectionUI();
+  seedExample();const initial=Core.normalizeDocument(captureDocument()).document;Object.assign(state,{layers:initial.layers,activeLayer:initial.activeLayer,entities:initial.entities,nextId:initial.nextId,structuralDetections:initial.structuralDetections||[]});registerCommands();setTool('select');render();fitView();setStatus('Bahl CAD MVP ready.');log('READY — structural drafting core loaded');
 })();

@@ -127,7 +127,8 @@
         layouts: source.layouts || [],
         references: source.references || [],
         constraints: Array.isArray(source.constraints) ? source.constraints : [],
-        parameters: Array.isArray(source.parameters) ? source.parameters : []
+        parameters: Array.isArray(source.parameters) ? source.parameters : [],
+        structuralDetections: Array.isArray(source.structuralDetections) ? source.structuralDetections : []
       },
       view: {
         grid: input.view?.grid ?? input.grid !== false,
