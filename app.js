@@ -123,7 +123,7 @@
       if(candidate.id===activeColumnCandidateId)classes.push('is-selected');
       const common={class:classes.join(' '),'data-column-candidate':candidate.id,'vector-effect':'non-scaling-stroke'};
       let shape=null;
-      if(g.shape==='circle')shape=createEl('circle',{cx:g.centerX,cy:g.centerY,r:Math.max(Number(g.width)||0,Number(g.depth)||0)/2,...common});
+      if(g.shape==='circle')shape=createEl('circle',{cx:g.centerX,cy:g.centerY,r:Math.max(0,(bounds.maxX-bounds.minX)/2),...common});
       else if(Array.isArray(g.points)&&g.points.length>=3)shape=createEl('polygon',{points:g.points.map(point=>point.x+','+point.y).join(' '),...common});
       else shape=createEl('rect',{x:bounds.minX,y:bounds.minY,width:bounds.maxX-bounds.minX,height:bounds.maxY-bounds.minY,...common});
       shape.setAttribute('tabindex','0');shape.setAttribute('role','button');shape.setAttribute('aria-label','Select column candidate');
