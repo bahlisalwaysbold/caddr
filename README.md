@@ -75,3 +75,16 @@ python -m http.server 5173
 The static HTML frontend can run with the simple HTTP server, but the `/api` endpoints are Vercel serverless functions and are **not** provided by `python -m http.server`. For a local end-to-end test, run a compatible Vercel development environment or create a small local API adapter.
 
 The Structural Workspace now creates an editable idealised two-bay, two-storey frame model from the same member data used by the diagram and member inspector. Section widths/depths and explicit gravity line loads can be edited before analysis. After solving, the API returns 17 sampled result points per member for moment/shear/deflection diagram overlays. These results are for the submitted linear-elastic frame only: there is no automatic slab-load distribution, self-weight take-off, diaphragm action, reinforced-concrete code design, reinforcement selection or code-compliance certification. A regression test checks a known simply supported beam and verifies that the editable portal frame reactions balance the specified applied line loads.
+
+
+## Structural column recognition (initial)
+
+The CAD workspace can run a deterministic column-candidate pass on supported vector drawing geometry. It recognises four-corner closed rectangular outlines, rectangles represented by four connected lines, and circles when supported by column-layer names, nearby column marks, or explicitly named grid/axis lines. Candidate geometry and the evidence entity IDs are shown for engineer review; confirm/reject decisions and corrected dimensions are stored in the canonical project document.
+
+This is a recognition aid, not a structural-design feature. Generic rectangles/circles without supporting context are not called columns. The current DXF importer does not expand INSERT/block references, preserve native DXF handles, or read raster/scanned drawings. Confirmed candidates are not automatically connected to the current sample frame or sent to analysis/design. Regression fixtures and limitations are described in docs/column-detection-and-desktop-plan.md.
+
+Run the current deterministic recognition tests with:
+
+```bash
+node --test tests/column-detection.test.js
+```
