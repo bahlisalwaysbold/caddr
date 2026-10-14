@@ -172,3 +172,79 @@ Initial capabilities can be ordinary deterministic application functions; a lang
 - FreeCAD scope and underlying technology: https://github.com/FreeCAD/FreeCAD
 
 **Bottom line:** the easiest credible route is not to adopt an entire open-source CAD package. Keep the working 2D editor, add a separate and versioned structural project model, use a lightweight browser 3D viewer for the first viewport, and benchmark a solver only once the model data is well-defined.
+
+
+## 10. New capability brief: structural member detection
+
+The separate “CADDR — Structural Member Detection & Recognition” brief is aligned with Caddr's purpose and should become the first engineering-specific vertical slice. It describes a traceable workflow from source drawing, through proposed member detections and engineer review, to a confirmed structural model.
+
+### Recommended revised first vertical slice
+
+1. Import a supported DXF drawing.
+2. Run a **column-only** deterministic detector on a declared supported entity subset.
+3. Display candidate columns over the original drawing, with evidence and source entity references.
+4. Allow confirm, reject, reclassify, edit dimensions/position, and add a missing column.
+5. Save candidate/review state separately from original drawing geometry.
+6. Convert confirmed members to typed structural-model entities with stable IDs and explicit units.
+7. Use the confirmed model later as the input for the 3D project viewport and, after validation, structural analysis.
+
+The in-project workspace shell and navigation can be built around this workflow, but the first end-to-end proof should establish that Caddr can interpret a supported real drawing and keep an engineer in control. Avoid spending the first milestone on a polished viewport that has no real model behind it.
+
+### A critical DXF preflight finding
+
+Source inspection of `core.js` confirms the current DXF parser recognises LINE, CIRCLE, ARC, LWPOLYLINE, POINT, TEXT and MTEXT. It extracts layer names and some layer metadata, but skips unsupported entity types, does not currently process INSERT/block contents, and returns `units: 'mm'` without deriving drawing units from the DXF header. The parser also returns `unsupportedCount: 0`, so callers cannot presently rely on that field to warn users about skipped entity types.
+
+These are material limitations for structural recognition:
+- Do not trust reported dimensions until units have been recovered or explicitly confirmed by the engineer.
+- Do not claim block-based column detection until INSERT and block definitions are implemented or the drawing is processed by a suitable library.
+- Do not silently imply that an incomplete parse represents the whole drawing. Improve unsupported-entity reporting, and show warnings for unsupported content.
+- Keep original entity geometry immutable during detection and corrections.
+
+### Do we immediately add Python, ezdxf and FastAPI?
+
+**Not automatically.** The recognition brief lists Python + ezdxf and FastAPI as candidate components, not an instruction to replace the current architecture. The current app is a dependency-free browser JavaScript application with an existing parser. Adding a Python service introduces runtime packaging, deployment, process/API boundaries, error handling, and desktop-distribution work.
+
+Choose the smallest path based on a representative fixture corpus:
+- First test real DXF examples and label known column locations, dimensions, layers, entities, and units.
+- If the required columns are faithfully represented by the current supported entities, implement a deterministic in-browser detector behind a small module interface.
+- If important drawings depend on blocks, unsupported entities or better DXF-header interpretation, benchmark ezdxf against the current parser and adopt it only if it closes a demonstrated gap. The service boundary can be decided afterward; a local library or packaged local service may be preferable to a remote API for a downloadable/offline desktop product.
+- DWG, PDFs, raster recognition and IFC remain separate later pipelines. Do not describe them as supported because DXF is supported.
+
+### Initial detection contract
+
+Each proposed member should contain, at minimum:
+- Stable candidate ID and type.
+- Source entity IDs where available.
+- Candidate geometry/coordinates and explicit units.
+- Dimensions only when recoverable and clearly qualified.
+- Storey/level only when present or confirmed.
+- Evidence/rules that produced the candidate.
+- An uncertainty indicator (not a structural safety score).
+- Review status such as `needs_review`, `confirmed`, or `rejected`.
+- Warnings for unsupported geometry, unit uncertainty, duplicate candidates, or unresolved relationships.
+
+Keep proposals distinct from confirmed structural members. Engineer corrections must persist and must not overwrite the source drawing. Do not auto-approve a detection merely because its rule score or confidence is high.
+
+### Column-detector acceptance gate
+
+Before expanding to beams, slabs, walls or a general automatic model:
+- Establish a labelled set of representative DXF drawings reviewed by a qualified practitioner.
+- Include rectangular closed polylines, circles, structural layers, mixed layer conventions, unit variations, duplicate geometry, unsupported entities, and (if present in actual source plans) block-inserted columns.
+- Measure precision, recall, dimension/location error and duplicate rate separately; do not invent accuracy claims.
+- Test entity traceability, unit handling, confirmation/rejection, edit persistence, source-drawing preservation, and regression of existing import/export and undo/redo.
+- Report every unsupported case clearly.
+
+Targets should be set after the first representative dataset has been inspected. A detection output is a proposal, not a structural safety finding.
+
+### Updated implementation order
+
+1. Preserve and regression-test current 2D CAD workflows.
+2. Add/repair DXF preflight: unit handling/confirmation, unsupported-entity reporting, and fixtures for the current parser's actual supported subset.
+3. Build deterministic column detection for that subset, with evidence and source references.
+4. Add the review/correction UI in the project workspace and persist the decisions.
+5. Convert confirmed columns into a versioned structural-model schema.
+6. Generate the initial 3D model viewport from that schema and keep it separate from model data.
+7. Add beam detection and connectivity after column detection has demonstrated measured performance.
+8. Benchmark a structural solver against an independently checked frame only after the model schema, units and boundary conditions are sufficiently defined.
+
+This sequence is the quickest meaningful demonstration of Caddr's distinctive value: **it reads a supported drawing, explains what it thinks the structural elements are, lets the engineer correct that understanding, and carries the confirmed information forward into a usable model.**
