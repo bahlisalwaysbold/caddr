@@ -31,7 +31,7 @@
       <div class="document-title"><span>Caddr</span><span class="document-divider">·</span><strong>Structural-Detail.bahl</strong><span class="unsaved-dot" title="Local working drawing"></span></div>
       <div class="quickbar-right">
         <label class="command-search"><span class="search-glyph">⌕</span><input id="commandSearch" type="search" autocomplete="off" placeholder="Search commands" aria-label="Search or run a command" /></label>
-        <button class="export-button" data-command="importdxf">Import DXF</button><button class="export-button primary" data-command="dxf">Export DXF</button>
+        <button class="export-button" data-command="importdxf">Import DXF</button><button class="export-button" data-command="detectcolumns">Detect columns</button><button class="export-button primary" data-command="dxf">Export DXF</button>
         <button class="export-button" data-command="svg">Export SVG</button>
       </div>
     </header>
@@ -235,6 +235,14 @@
           <div class="panel-head"><h3>Properties</h3><span id="selectionCount">0 selected</span></div>
           <div id="properties" class="properties-empty">Select an object to inspect its geometry.</div>
         </section>
+        <details class="panel panel-details column-detection-panel" id="columnDetectionPanel" open>
+          <summary><span>Column recognition</span><span class="column-detection-count" id="columnDetectionCount">0</span></summary>
+          <div class="panel-content">
+            <p id="columnDetectionSummary" class="column-detection-summary">Run detection on the current drawing. Candidate results require engineering review.</p>
+            <div class="column-detection-toolbar"><button type="button" id="runColumnDetection" class="primary">Run detection</button><button type="button" id="addManualColumnCandidate">＋ Add candidate</button></div>
+            <div id="columnDetectionResults" class="column-detection-results" aria-live="polite" aria-relevant="additions"></div>
+          </div>
+        </details>
         <details class="panel panel-details">
           <summary><span>Constraints</span><button id="addConstraint" class="icon-button" type="button" title="Add a constraint to the selected line">＋</button></summary>
           <div class="panel-content"><div id="constraints"></div></div>
@@ -276,6 +284,7 @@
 
   <input type="file" id="fileInput" accept=".dxf,application/dxf,text/plain,application/json,.bahl,.json" hidden />
   <script src="core.js"></script>
+  <script src="column-detection.js"></script>
   <script src="app.js"></script>
   <script>
     (() => {
