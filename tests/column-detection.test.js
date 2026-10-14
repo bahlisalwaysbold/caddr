@@ -108,3 +108,17 @@ test('empty or unrelated drawings return an empty detection result instead of gu
   assert.deepEqual(result.candidates, []);
   assert.equal(result.stats.columnsDetected, 0);
 });
+
+
+test('uses structural-member alignment as evidence for rectangles in a structural drawing', () => {
+  const result = ColumnDetection.detectColumns([
+    { id: 'col-a', type: 'rect', layer: 'S-CONC', x: 225, y: 225, w: 50, h: 50 },
+    { id: 'col-b', type: 'rect', layer: 'S-CONC', x: 725, y: 225, w: 50, h: 50 },
+    { id: 'beam-a-b', type: 'line', layer: 'S-CONC', a: {x:250,y:250}, b: {x:750,y:250} }
+  ], [], 'mm');
+  assert.equal(result.candidates.length, 2);
+  assert.ok(result.candidates.every(candidate => candidate.evidence.includes('structural_member_alignment')));
+  assert.ok(result.candidates.every(candidate => candidate.evidenceEntityIds.includes('beam-a-b')));
+  assert.ok(result.candidates.every(candidate => candidate.reviewStatus === 'needs_review'));
+  assert.ok(result.candidates.every(candidate => candidate.warnings.includes('dimensions_outside_initial_column_screen')));
+});
