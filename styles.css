@@ -223,3 +223,40 @@ button.window-icon{cursor:pointer}
 .text-editor-actions button:hover{filter:brightness(1.12)}
 .text-editor-actions button.primary{background:#078fc8;border-color:#14a7e6;color:#fff;font-weight:600}
 .text-editor-panel p{margin:10px 0 0;color:#8998aa;font-size:9px}
+
+
+/* Structural column recognition is a review overlay, not drawing geometry or a solver result. */
+.column-candidate-outline{fill:rgba(245,184,11,.12);stroke:#f5b80b;stroke-width:2.5;stroke-dasharray:6 3;cursor:pointer;pointer-events:all}
+.column-candidate-outline.is-confirmed{fill:rgba(52,211,153,.12);stroke:#34d399;stroke-dasharray:3 2}
+.column-candidate-outline.is-selected{fill:rgba(59,130,246,.2);stroke:#60a5fa;stroke-width:3;stroke-dasharray:none}
+.column-candidate-outline:focus{outline:none;stroke:#fff;stroke-width:3}
+.column-detection-panel{padding-bottom:12px}
+.column-detection-panel summary{gap:6px}
+.column-detection-count{min-width:20px;padding:2px 5px;border-radius:9px;background:#303b48;color:#dbeafe;text-align:center;font-size:9px}
+.column-detection-summary{margin:0 0 8px;color:#aebaca;font-size:10px;line-height:1.5}
+.column-detection-toolbar{display:flex;gap:5px;margin:0 0 9px}
+.column-detection-toolbar button,.column-candidate-actions button{min-height:25px;padding:4px 7px;border:1px solid #455364;border-radius:3px;background:#293341;color:#e4ecf5;font-size:9px;cursor:pointer}
+.column-detection-toolbar button.primary,.column-candidate-actions button.primary{border-color:#187ec0;background:#087eb8;color:#fff;font-weight:600}
+.column-detection-toolbar button:hover,.column-candidate-actions button:hover{border-color:#58a6e7}
+.column-detection-results{display:flex;flex-direction:column;gap:8px}
+.column-detection-empty{margin:0;padding:8px 6px;border:1px dashed #435061;border-radius:4px;color:#9ba9ba;font-size:10px;line-height:1.5}
+.column-candidate-card{padding:8px;border:1px solid #414d5c;border-radius:4px;background:#202833;min-width:0}
+.column-candidate-card.confirmed{border-left:3px solid #34d399}
+.column-candidate-card.rejected{opacity:.76;border-left:3px solid #8b96a5}
+.column-candidate-select{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;padding:0 0 6px;border:0;border-bottom:1px solid #374353;background:transparent;color:#edf4fb;text-align:left;cursor:pointer;font-size:10px}
+.column-candidate-select span{color:#d8b65d;font-size:9px;text-transform:capitalize}
+.column-candidate-card.confirmed .column-candidate-select span{color:#65dcb0}
+.column-candidate-meta{margin:6px 0;color:#a9b7c8;font-size:9px}
+.column-candidate-card p{margin:5px 0;color:#c5d0dd;font-size:9px;line-height:1.4;overflow-wrap:anywhere}
+.column-candidate-card p b{color:#e1e8f1;font-weight:600}
+.column-candidate-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.column-candidate-fields label{display:flex;flex-direction:column;gap:3px;color:#9dabbc;font-size:9px}
+.column-candidate-fields label:first-child{grid-column:1/-1}
+.column-candidate-fields input,.column-candidate-fields select{width:100%;min-width:0;height:25px;padding:3px 5px;border:1px solid #435162;border-radius:3px;background:#19212b;color:#eaf1f8;font-size:10px}
+.column-candidate-fields input:disabled{opacity:.55}
+.column-candidate-warning{padding:5px 6px;border-left:2px solid #d6aa42;background:rgba(214,170,66,.08);color:#efcf80!important}
+.column-candidate-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+@media (max-width: 760px){
+  .work-area{grid-template-columns:minmax(0,1fr) 210px}
+  .column-detection-toolbar{flex-wrap:wrap}
+}
